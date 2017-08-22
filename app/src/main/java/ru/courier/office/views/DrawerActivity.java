@@ -21,8 +21,8 @@ import ru.courier.office.R;
 import ru.courier.office.core.Member;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        SurveyFragment.OnFragmentInteractionListener, ProductFragment.OnFragmentInteractionListener,
-        CameraFragment.OnFragmentInteractionListener {
+        HomeFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
+        QrcodeFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,16 +122,15 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         Fragment fragment = null;
 
-        if (id == R.id.nav_camera) {
-
-            fragment = new SurveyFragment();
+        if (id == R.id.nav_home) {
+            fragment = new HomeFragment();
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-            fragment = new ProductFragment();
-        } else if (id == R.id.nav_slideshow) {
-            fragment = new CameraFragment();
+        } else if (id == R.id.nav_scan) {
+            fragment = new QrcodeFragment();
+        } else if (id == R.id.nav_applications) {
+            fragment = new AppListFragment();
         } else if (id == R.id.nav_manage) {
-            fragment = new SurveyFragment();
+            fragment = new HomeFragment();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
