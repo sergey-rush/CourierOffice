@@ -1,4 +1,4 @@
-package com.clientoffice.core;
+package ru.courier.office.core;
 
 /* Application mode. Depends on used urls groups*/
 public enum AppMode {

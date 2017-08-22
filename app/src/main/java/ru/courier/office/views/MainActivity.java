@@ -1,7 +1,8 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -17,7 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clientoffice.R;
+import ru.courier.office.R;
+import ru.courier.office.data.LoginManager;
+import ru.courier.office.data.UserManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -37,20 +41,16 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         dotsLayout = (LinearLayout) findViewById(R.id.layoutDots);
-        //btnSkip = (Button) findViewById(R.id.btn_skip);
-        //btnNext = (Button) findViewById(R.id.btn_next);
 
-        layouts = new int[]{
-                R.layout.slide1,
-                R.layout.slide2,
-                R.layout.slide3};
-
-        // adding bottom dots
+        layouts = new int[]{R.layout.slide1, R.layout.slide2, R.layout.slide3};
         addBottomDots(0);
 
         viewPagerAdapter = new ViewPagerAdapter();
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
+
+        //UserManager userManager = new UserManager(this);
+        //final AsyncTask<Void, Void, Void> execute = userManager.execute();
     }
 
     @Override

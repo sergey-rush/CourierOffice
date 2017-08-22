@@ -1,11 +1,14 @@
-package com.clientoffice.data;
+package ru.courier.office.data;
 
 import android.text.TextUtils;
 
-import com.clientoffice.core.AppMode;
-import com.clientoffice.core.Member;
-import com.clientoffice.core.Product;
-import com.clientoffice.core.UrlType;
+import ru.courier.office.core.AppMode;
+import ru.courier.office.core.HttpMethod;
+import ru.courier.office.core.Member;
+import ru.courier.office.core.UrlObject;
+import ru.courier.office.core.User;
+import ru.courier.office.core.Product;
+import ru.courier.office.core.UrlType;
 
 import java.net.CookieManager;
 import java.net.HttpCookie;
@@ -23,12 +26,14 @@ public class DataContext {
     }
 
     public AppMode Mode = AppMode.Develop;
+    public User User = new User();
     public Member Member = new Member();
     public List<Product> Products = new ArrayList<>();
     private CookieManager CookieManager = new CookieManager();
+
     private DataContext(){
 
-        InitUrls();
+        initUrls();
     }
 
     /*
@@ -45,35 +50,24 @@ public class DataContext {
         }
     }
 
-    public void getCookie(HttpURLConnection connection)
+    public void attachCookieTo(HttpURLConnection connection)
     {
         if (CookieManager.getCookieStore().getCookies().size() > 0) {
             connection.setRequestProperty("Cookie", TextUtils.join(";",  CookieManager.getCookieStore().getCookies()));
         }
     }
 
-    Map<AppMode, Map<UrlType, String>> urlMap = new HashMap<AppMode, Map<UrlType, String>>();
+    Map<AppMode, Map<UrlType, UrlObject>> urlMap = new HashMap<AppMode, Map<UrlType, UrlObject>>();
 
-    private void InitUrls()
+    private void initUrls()
     {
-        Map<UrlType, String> productMap = new HashMap<UrlType, String>();
-        productMap.put(UrlType.Sign, "http://7seconds.ru/widget/api/mobile/Sign");
-        urlMap.put(AppMode.Product, productMap);
-
-        Map<UrlType, String> testMap = new HashMap<UrlType, String>();
-        testMap.put(UrlType.Sign, "http://52.233.157.183:1000/widget/api/mobile/Sign");
-        urlMap.put(AppMode.Test, testMap);
-
-        Map<UrlType, String> developMap = new HashMap<UrlType, String>();
-        developMap.put(UrlType.Sign, "http://192.168.100.100/widget/api/mobile/Sign");
-        developMap.put(UrlType.Member, "http://192.168.100.100/widget/api/mobile/GetPersonData?personId");
-        developMap.put(UrlType.Products, "http://192.168.100.100/widget/api/mobile/GetApplications?personId");
-        developMap.put(UrlType.Product, "http://192.168.100.100/widget/api/mobile/GetApplication?applicationId");
-
+        Map<UrlType, UrlObject> developMap = new HashMap<UrlType, UrlObject>();
+        developMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/account/sign"));
+        developMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/account"));
         urlMap.put(AppMode.Develop, developMap);
     }
 
-    public String getUrl(UrlType urlType) {
+    public UrlObject getUrl(UrlType urlType) {
         return urlMap.get(Mode).get(urlType);
     }
 }

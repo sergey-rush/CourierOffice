@@ -1,7 +1,8 @@
-package com.clientoffice.core;
+package ru.courier.office.core;
 
 public class Member {
     public String Id;
+
     public String FirstName;
     public String MiddleName;
     public String LastName;

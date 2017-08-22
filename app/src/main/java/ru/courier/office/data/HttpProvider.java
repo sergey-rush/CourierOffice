@@ -1,16 +1,20 @@
 package ru.courier.office.data;
 
-import ru.courier.office.core.UrlObject;
-import ru.courier.office.core.UrlType;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class LoginProvider extends BaseProvider {
+import ru.courier.office.core.UrlObject;
+import ru.courier.office.core.UrlType;
 
-    public int doSign(String postData) {
+/**
+ * Created by rash on 21.08.2017.
+ */
+
+public class HttpProvider extends BaseProvider {
+
+    public int doSign(UrlType urlType, String postData) {
 
         URL url;
         try {

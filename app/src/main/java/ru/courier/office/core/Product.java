@@ -1,4 +1,4 @@
-package com.clientoffice.core;
+package ru.courier.office.core;
 
 public class Product {
     public String Id;

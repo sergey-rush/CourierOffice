@@ -1,5 +1,7 @@
-package com.clientoffice.core;
+package ru.courier.office.core;
 
 public enum UrlType {
-    Sign, Member, Product, Products, Document
+    Sign, User, Member, Product, Products, Document
 }
+
+

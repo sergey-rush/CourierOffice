@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,8 +15,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.clientoffice.R;
-import com.clientoffice.core.CustomDialog;
+import ru.courier.office.R;
+import ru.courier.office.core.CustomDialog;
 import com.pinlock.IndicatorDots;
 import com.pinlock.PinLockListener;
 import com.pinlock.PinLockView;

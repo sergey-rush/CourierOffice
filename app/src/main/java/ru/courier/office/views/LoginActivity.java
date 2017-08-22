@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -13,8 +13,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clientoffice.R;
-import com.clientoffice.data.LoginManager;
+import ru.courier.office.R;
+import ru.courier.office.data.LoginManager;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -66,29 +66,12 @@ public class LoginActivity extends AppCompatActivity implements PhoneFragment.On
         EditText etLogin = (EditText) findViewById(R.id.etLogin);
         EditText etPassword = (EditText) findViewById(R.id.etPassword);
 
-//        HashMap<String, String> postDataParams = new HashMap<>();
-//        postDataParams.put("username", editTextPhone.getText().toString());
-//        postDataParams.put("password", editTextPassword.getText().toString());
-
-        String postData = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", "username", "password");
-
-        //tvMessage = (TextView) findViewById(R.id.tvMessage);
+        String postData = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", etLogin.getText(), etPassword.getText());
 
         LoginManager loginManager = new LoginManager(this, postData);
         final AsyncTask<Void, Void, Void> execute = loginManager.execute();
-
-
-        //LoginProvider loginProvider = new LoginProvider();
-        //loginProvider.validateMember(requestURL, postDataParams);
-
-        //Toast.makeText(this, "Сервис вызван!", Toast.LENGTH_SHORT).show();
-
-//        Intent intent = new Intent(this, DrawerActivity.class);
-//        startActivity(intent);
-
-        //startActivity(new Intent(view.getContext(), DrawerActivity.class));
-        //finish();
     }
+
     public void btnPinlockClick(View v)
     {
         //Toast.makeText(this, "btnRegisterClick", Toast.LENGTH_LONG).show();

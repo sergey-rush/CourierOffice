@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:padding="@dimen/form_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.clientoffice.views.DrawerActivity"
+    tools:context="ru.courier.office.views.DrawerActivity"
     tools:showIn="@layout/drawer_bar">
 
     <FrameLayout

@@ -1,7 +1,7 @@
-package com.clientoffice.data;
+package ru.courier.office.data;
 
-import com.clientoffice.core.Member;
-import com.clientoffice.core.UrlType;
+import ru.courier.office.core.Member;
+import ru.courier.office.core.UrlType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ public class MemberProvider extends BaseProvider {
 
             URL url = new URL(String.format("%s=%s", dataContext.getUrl(UrlType.Member), memberId));
             connection = (HttpURLConnection) url.openConnection();
-            dataContext.getCookie(connection);
+            dataContext.attachCookieTo(connection);
             connection.connect();
             responseCode = connection.getResponseCode();
 

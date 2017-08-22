@@ -1,6 +1,7 @@
-package com.clientoffice.data;
+package ru.courier.office.data;
 
-import com.clientoffice.core.Member;
+import ru.courier.office.core.Member;
+import ru.courier.office.core.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +42,19 @@ public class BaseProvider {
 
         String output = buffer.toString();
         return output;
+    }
+
+    protected User parseToUser(String input) throws JSONException {
+
+        User member = new User();
+        JSONObject resultData = new JSONObject(input);
+        //JSONObject resultData = jsonObj.getJSONObject("ResultData");
+        member.Id = resultData.getInt("Id");
+        member.Name = resultData.getString("Name");
+        member.Phone = resultData.getString("Phone");
+        member.Email = resultData.getString("Email");
+        member.IsValid = resultData.getBoolean("IsValid");
+        return member;
     }
     
     protected Member parseToMember(String input) throws JSONException {

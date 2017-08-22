@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -12,8 +12,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clientoffice.R;
-import com.clientoffice.data.LoginManager;
+import ru.courier.office.R;
+import ru.courier.office.data.LoginManager;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;

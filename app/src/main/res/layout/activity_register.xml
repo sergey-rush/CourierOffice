@@ -5,7 +5,7 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:background="@color/appBackground"
-    tools:context="com.clientoffice.views.RegisterActivity">
+    tools:context="ru.courier.office.views.RegisterActivity">
 
     <ImageView
         android:id="@+id/imageViewLogo"

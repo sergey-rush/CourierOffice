@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,12 +15,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clientoffice.R;
-import com.clientoffice.core.Product;
-import com.clientoffice.core.ProductAdapter;
-import com.clientoffice.data.DataContext;
-import com.clientoffice.data.MemberManager;
-import com.clientoffice.data.ProductManager;
+import ru.courier.office.R;
+import ru.courier.office.core.Product;
+import ru.courier.office.core.ProductAdapter;
+import ru.courier.office.data.DataContext;
+import ru.courier.office.data.MemberManager;
+import ru.courier.office.data.ProductManager;
 
 import java.util.List;
 

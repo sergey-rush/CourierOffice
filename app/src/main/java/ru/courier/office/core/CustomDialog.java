@@ -1,4 +1,4 @@
-package com.clientoffice.core;
+package ru.courier.office.core;
 
 import android.content.Context;
 import android.content.DialogInterface;

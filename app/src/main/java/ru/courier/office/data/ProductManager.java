@@ -1,4 +1,4 @@
-package com.clientoffice.data;
+package ru.courier.office.data;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,8 +13,8 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.clientoffice.core.Member;
-import com.clientoffice.views.DrawerActivity;
+import ru.courier.office.core.Member;
+import ru.courier.office.views.DrawerActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;

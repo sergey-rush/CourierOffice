@@ -10,7 +10,7 @@
     <string name="prompt_phone">Телефон</string>
     <string name="prompt_code">СМС код</string>
     <string name="prompt_password">Пароль</string>
-    <string name="sign">Далее</string>
+    <string name="sign_button">Войти</string>
     <string name="next">Далее</string>
     <string name="confirm">Подтвердить</string>
     <string name="pinLost"><u>Я забыл пин-код</u></string>

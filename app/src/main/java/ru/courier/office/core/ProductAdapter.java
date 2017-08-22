@@ -1,4 +1,4 @@
-package com.clientoffice.core;
+package ru.courier.office.core;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.clientoffice.R;
+import ru.courier.office.R;
 
 import java.util.List;
 

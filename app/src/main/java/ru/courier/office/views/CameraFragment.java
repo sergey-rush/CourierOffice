@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.clientoffice.R;
+import ru.courier.office.R;
 
 import java.io.File;
 import java.io.IOException;

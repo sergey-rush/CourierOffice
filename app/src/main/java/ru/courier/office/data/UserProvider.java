@@ -1,12 +1,6 @@
 package ru.courier.office.data;
 
-import ru.courier.office.core.Member;
-import ru.courier.office.core.Product;
-import ru.courier.office.core.UrlType;
-
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -15,15 +9,21 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ProductProvider extends BaseProvider {
+import ru.courier.office.core.HttpMethod;
+import ru.courier.office.core.UrlObject;
+import ru.courier.office.core.UrlType;
 
-    public int getProducts(String memberId) {
+/**
+ * Created by rash on 21.08.2017.
+ */
+public class UserProvider extends BaseProvider {
 
+    public int getUser() {
         HttpURLConnection connection = null;
-
+        URL url;
         try {
-
-            URL url = new URL(String.format("%s=%s", dataContext.getUrl(UrlType.Products), memberId));
+            UrlObject urlObject = dataContext.getUrl(UrlType.User);
+            url = new URL(urlObject.Url);
             connection = (HttpURLConnection) url.openConnection();
             dataContext.attachCookieTo(connection);
             connection.connect();
@@ -31,22 +31,9 @@ public class ProductProvider extends BaseProvider {
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-
-                JSONObject jsonObj = new JSONObject(output);
-                //JSONObject resultData = jsonObj.getJSONObject("ResultData");
-                JSONArray items = jsonObj.getJSONArray("ResultData");
-                for (int i = 0; i < items.length(); i++) {
-                    JSONObject item = items.getJSONObject(i);
-                    Product product = new Product();
-                    product.Id = item.getString("Id");
-                    product.Amount = item.getString("Amount");
-                    product.Created = item.getString("Created");
-                    dataContext.Products.add(product);
-                }
-
+                dataContext.User = parseToUser(output);
             } else {
                 return responseCode;
-
             }
 
         } catch (MalformedURLException mex) {
@@ -59,11 +46,9 @@ public class ProductProvider extends BaseProvider {
             if (connection != null) {
                 connection.disconnect();
             }
-
         }
-
         return responseCode;
-
     }
 }
+
 

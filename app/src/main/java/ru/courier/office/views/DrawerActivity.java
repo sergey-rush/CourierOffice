@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,8 +17,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.clientoffice.R;
-import com.clientoffice.core.Member;
+import ru.courier.office.R;
+import ru.courier.office.core.Member;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         SurveyFragment.OnFragmentInteractionListener, ProductFragment.OnFragmentInteractionListener,

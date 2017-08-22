@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.clientoffice.R;
+import ru.courier.office.R;
 
 /**
  * A simple {@link Fragment} subclass.

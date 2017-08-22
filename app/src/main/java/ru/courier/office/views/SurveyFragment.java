@@ -1,4 +1,4 @@
-package com.clientoffice.views;
+package ru.courier.office.views;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,9 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.clientoffice.R;
-import com.clientoffice.data.LoginManager;
-import com.clientoffice.data.MemberManager;
+import ru.courier.office.R;
+import ru.courier.office.data.LoginManager;
+import ru.courier.office.data.MemberManager;
 
 import java.net.CookieManager;
 import java.util.HashMap;

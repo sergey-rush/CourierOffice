@@ -5,7 +5,7 @@
     android:gravity="center_horizontal"
     android:orientation="vertical"
     android:background="@color/appBackground"
-    tools:context="com.clientoffice.views.LoginActivity">
+    tools:context="ru.courier.office.views.LoginActivity">
 
     <ImageView
         android:id="@+id/imageViewLogo"
@@ -35,7 +35,7 @@
                 android:id="@+id/etLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_phone"
+                android:hint="@string/prompt_phone" android:text="79267026528"
                 android:inputType="number"
                 android:maxLines="1"
                 android:textColor="@color/colorWhite"
@@ -51,7 +51,7 @@
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_password"
+                android:hint="@string/prompt_password" android:text="letmein"
                 android:inputType="textPassword"
                 android:maxLines="1"
                 android:textColor="@color/colorWhite"
@@ -73,7 +73,7 @@
             android:background="@drawable/button_bg"
             android:onClick="onSignClick"
             android:padding="@dimen/button_padding"
-            android:text="@string/sign"
+            android:text="@string/sign_button"
             android:textColor="@android:color/white" />
 
         <Button

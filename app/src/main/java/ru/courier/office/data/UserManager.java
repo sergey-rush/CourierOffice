@@ -5,26 +5,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import ru.courier.office.R;
 import ru.courier.office.views.DrawerActivity;
-import ru.courier.office.views.LoginActivity;
+import ru.courier.office.views.MainActivity;
 
+/**
+ * Created by rash on 21.08.2017.
+ */
 
-public class LoginManager extends AsyncTask<Void, Void, Void> {
+public class UserManager extends AsyncTask<Void, Void, Void> {
 
-    private LoginActivity _view;
-    private String _postData;
+    private MainActivity _view;
     private int responseCode;
 
     private DataContext dataContext = DataContext.getInstance();
 
-    public LoginManager(LoginActivity view, String postData) {
+    public UserManager(MainActivity view) {
         _view = view;
-        _postData = postData;
     }
 
     private ProgressDialog pDialog;
@@ -41,8 +39,8 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... arg0) {
-        LoginProvider loginProvider = new LoginProvider();
-        responseCode = loginProvider.doSign(_postData);
+        UserProvider userProvider = new UserProvider();
+        responseCode = userProvider.getUser();
         return null;
     }
 
@@ -59,14 +57,13 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
         }
 
         if (responseCode == 403) {
-            LoginFailed().show();
-        }
-        else {
+            UserFailed().show();
+        } else {
             ConnectionFailed().show();
         }
     }
 
-    private AlertDialog LoginFailed() {
+    private AlertDialog UserFailed() {
         AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
                 .setTitle("Ошибка входа")
                 .setMessage("Неверный телефон или пароль")
