@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -24,7 +24,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     private String _qrCodeValue;
     private int responseCode;
 
-    private DataContext dataContext = DataContext.getInstance();
+    private WebContext dataContext = WebContext.getInstance();
 
     public ApplicationManager(Context context, QrcodeFragment fragment, String qrCodeValue) {
         _view = context;

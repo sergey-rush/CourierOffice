@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.UrlType;

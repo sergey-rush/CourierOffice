@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import org.json.JSONException;
 

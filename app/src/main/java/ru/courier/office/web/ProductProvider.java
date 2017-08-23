@@ -1,6 +1,6 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 import ru.courier.office.core.Product;
 import ru.courier.office.core.UrlType;
 

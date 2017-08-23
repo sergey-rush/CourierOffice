@@ -36,7 +36,7 @@ import net.sourceforge.zbar.SymbolSet;
 import ru.courier.office.R;
 import ru.courier.office.core.CameraPreview;
 import ru.courier.office.core.LocalSettings;
-import ru.courier.office.data.ApplicationManager;
+import ru.courier.office.web.ApplicationManager;
 
 import java.io.File;
 import java.io.IOException;

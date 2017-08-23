@@ -18,7 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
@@ -72,21 +72,21 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
 
-        Member member = new Member();
+        Person member = new Person();
         member.FirstName = editTextFirstName.getText().toString();
         member.MiddleName = editTextMiddleName.getText().toString();
         member.LastName = editTextLastName.getText().toString();
 
-        member.BirthDate = editTextBirthDate.getText().toString();
-        member.BirthPlace = editTextBirthPlace.getText().toString();
-        member.PasportNum = editTextPasportNum.getText().toString();
-        member.PasportSerial = editTextPasportSerial.getText().toString();
-
-        member.Authority = editTextAuthority.getText().toString();
-        member.Snils = editTextSnils.getText().toString();
-        member.Inn = editTextInn.getText().toString();
-
-        member.Address = editTextAddress.getText().toString();
+        //member.BirthDate = editTextBirthDate.getText().toString();
+//        member.BirthPlace = editTextBirthPlace.getText().toString();
+//        member.PasportNum = editTextPasportNum.getText().toString();
+//        member.PasportSerial = editTextPasportSerial.getText().toString();
+//
+//        member.Authority = editTextAuthority.getText().toString();
+//        member.Snils = editTextSnils.getText().toString();
+//        member.Inn = editTextInn.getText().toString();
+//
+//        member.Address = editTextAddress.getText().toString();
 
         Toast.makeText(this, member.FirstName + " вы опять нажали на кнопку \"Сохранить\"?", Toast.LENGTH_SHORT).show();
     }

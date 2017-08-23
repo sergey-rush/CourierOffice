@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 import ru.courier.office.views.DrawerActivity;
 
 import org.json.JSONArray;

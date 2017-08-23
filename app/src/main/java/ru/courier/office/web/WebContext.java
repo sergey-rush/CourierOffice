@@ -1,11 +1,11 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import android.text.TextUtils;
 
 import ru.courier.office.core.AppMode;
 import ru.courier.office.core.Application;
 import ru.courier.office.core.HttpMethod;
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.User;
 import ru.courier.office.core.Product;
@@ -19,21 +19,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DataContext {
+public class WebContext {
 
-    private static DataContext current = new DataContext();
-    public static DataContext getInstance(){
+    private static WebContext current = new WebContext();
+    public static WebContext getInstance(){
         return current;
     }
 
     public AppMode Mode = AppMode.Develop;
     public User User = new User();
-    public Member Member = new Member();
+    public Person Person = new Person();
     public Application Application = new Application();
     public List<Product> Products = new ArrayList<>();
     private CookieManager CookieManager = new CookieManager();
 
-    private DataContext(){
+    private WebContext(){
 
         initUrls();
     }

@@ -1,7 +1,7 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import ru.courier.office.core.Application;
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 import ru.courier.office.core.Product;
 import ru.courier.office.core.Status;
 import ru.courier.office.core.User;
@@ -26,7 +26,7 @@ import java.util.List;
 
 public class BaseProvider {
 
-    protected DataContext dataContext = DataContext.getInstance();
+    protected WebContext dataContext = WebContext.getInstance();
 
     protected int responseCode = 0;
 
@@ -57,7 +57,6 @@ public class BaseProvider {
 
         Application application = new Application();
         JSONObject resultData = new JSONObject(input);
-        //JSONObject resultData = jsonObj.getJSONObject("ResultData");
         application.Id = resultData.getString("Id");
         application.MerchantId = resultData.getString("MerchantId");
         application.PersonId = resultData.getString("PersonId");
@@ -76,6 +75,9 @@ public class BaseProvider {
             application.StatusList.add(status);
         }
 
+        JSONObject personData = resultData.getJSONObject("Person");
+        application.Person = parseToPerson(personData.toString());
+
         return application;
     }
 
@@ -83,7 +85,6 @@ public class BaseProvider {
 
         User user = new User();
         JSONObject resultData = new JSONObject(input);
-        //JSONObject resultData = jsonObj.getJSONObject("ResultData");
         user.Id = resultData.getInt("Id");
         user.Name = resultData.getString("Name");
         user.Phone = resultData.getString("Phone");
@@ -92,26 +93,18 @@ public class BaseProvider {
         return user;
     }
     
-    protected Member parseToMember(String input) throws JSONException {
+    protected Person parseToPerson(String input) throws JSONException, ParseException {
         
-        Member member = new Member();
+        Person member = new Person();
         JSONObject resultData = new JSONObject(input);
-        //JSONObject resultData = jsonObj.getJSONObject("ResultData");
+
         member.Id = resultData.getString("Id");
         member.FirstName = resultData.getString("FirstName");
         member.MiddleName = resultData.getString("MiddleName");
         member.LastName = resultData.getString("LastName");
         member.Gender = resultData.getString("Gender");
-        member.BirthDate = resultData.getString("BirthDate");
-        member.BirthPlace = resultData.getString("BirthPlace");
-        member.PasportNum = resultData.getString("PasportNum");
-        member.PasportSerial = resultData.getString("PasportSerial");
-        member.Authority = resultData.getString("Authority");
-        member.Snils = resultData.getString("Snils");
-        member.Inn = resultData.getString("Inn");
-        member.Marital = resultData.getString("Marital");
-        member.Children = resultData.getString("Children");
-        member.Address = resultData.getString("Address");
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        member.BirthDate = format.parse(resultData.getString("BirthDate"));
         return member;
     }
 }

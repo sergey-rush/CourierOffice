@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.data.LoginManager;
+import ru.courier.office.web.LoginManager;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;

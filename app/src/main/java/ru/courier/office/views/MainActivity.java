@@ -19,8 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.data.LoginManager;
-import ru.courier.office.data.UserManager;
+import ru.courier.office.web.LoginManager;
+import ru.courier.office.web.UserManager;
 
 public class MainActivity extends AppCompatActivity {
 

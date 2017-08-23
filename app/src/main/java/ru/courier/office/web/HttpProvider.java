@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import java.net.HttpURLConnection;
 import java.net.URL;

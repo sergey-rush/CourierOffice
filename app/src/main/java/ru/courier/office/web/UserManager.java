@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -19,7 +19,7 @@ public class UserManager extends AsyncTask<Void, Void, Void> {
     private MainActivity _view;
     private int responseCode;
 
-    private DataContext dataContext = DataContext.getInstance();
+    private WebContext dataContext = WebContext.getInstance();
 
     public UserManager(MainActivity view) {
         _view = view;

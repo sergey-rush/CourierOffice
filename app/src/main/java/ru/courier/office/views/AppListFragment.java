@@ -18,9 +18,9 @@ import android.widget.Toast;
 import ru.courier.office.R;
 import ru.courier.office.core.Product;
 import ru.courier.office.core.ProductAdapter;
-import ru.courier.office.data.DataContext;
-import ru.courier.office.data.MemberManager;
-import ru.courier.office.data.ProductManager;
+import ru.courier.office.web.WebContext;
+import ru.courier.office.web.MemberManager;
+import ru.courier.office.web.ProductManager;
 
 import java.util.List;
 
@@ -83,7 +83,7 @@ public class AppListFragment extends Fragment {
         ProductManager productManager = new ProductManager(view, "BC2533EF-A298-4BAA-9728-8A8C26DF4A1D");
         productManager.execute();
 
-        List<Product> products = DataContext.getInstance().Products;
+        List<Product> products = WebContext.getInstance().Products;
 
         ProductAdapter adapter = new ProductAdapter(this.getContext(), products);
 

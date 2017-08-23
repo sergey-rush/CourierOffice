@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -12,7 +12,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 import ru.courier.office.views.DrawerActivity;
 
 import org.json.JSONArray;
@@ -61,7 +61,7 @@ public class MemberManager extends AsyncTask<Void, Void, Void> {
         if (pDialog.isShowing())
             pDialog.dismiss();
 
-        Member member = DataContext.getInstance().Member;
+        Person member = WebContext.getInstance().Person;
 
         EditText editTextFirstName = (EditText) _view.findViewById(R.id.editTextFirstName);
         editTextFirstName.setText(member.FirstName);
@@ -73,7 +73,7 @@ public class MemberManager extends AsyncTask<Void, Void, Void> {
         editTextLastName.setText(member.LastName);
 
 
-        Toast.makeText(_view.getContext(), "Member LastName: " + member.LastName, Toast.LENGTH_SHORT).show();
+        Toast.makeText(_view.getContext(), "Person LastName: " + member.LastName, Toast.LENGTH_SHORT).show();
 
         //Intent intent = new Intent(_view.getContext(), DrawerActivity.class);
         //_view.getContext().startActivity(intent);

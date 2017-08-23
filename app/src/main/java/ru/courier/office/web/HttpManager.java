@@ -1,4 +1,4 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
 /**
  * Created by rash on 21.08.2017.

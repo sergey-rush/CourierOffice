@@ -1,6 +1,6 @@
-package ru.courier.office.data;
+package ru.courier.office.web;
 
-import ru.courier.office.core.Member;
+import ru.courier.office.core.Person;
 import ru.courier.office.core.UrlType;
 
 import org.json.JSONException;
@@ -21,7 +21,7 @@ public class MemberProvider extends BaseProvider {
 
         try {
 
-            URL url = new URL(String.format("%s=%s", dataContext.getUrl(UrlType.Member), memberId));
+            URL url = new URL(String.format("%s=%s", dataContext.getUrl(UrlType.Person), memberId));
             connection = (HttpURLConnection) url.openConnection();
             dataContext.attachCookieTo(connection);
             connection.connect();
@@ -29,7 +29,7 @@ public class MemberProvider extends BaseProvider {
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-                dataContext.Member = parseToMember(output);
+                //dataContext.Person = parseToMember(output);
             } else {
                 return responseCode;
             }
@@ -38,8 +38,6 @@ public class MemberProvider extends BaseProvider {
             mex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         } finally {
             if (connection != null) {
                 connection.disconnect();
