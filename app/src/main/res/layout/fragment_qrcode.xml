@@ -2,27 +2,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.courier.office.views.CameraFragment">
+    tools:context="ru.courier.office.views.QrcodeFragment">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Откройте камера"
-        android:id="@+id/textView" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/colorPrimary">
 
-    <Button
-        android:id="@+id/btnCapture"
-        android:onClick="onbtnCaptureClick"
-        android:text="Включить камеру"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/scan_app_qrcode"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
 
-    <ImageView
-        android:id="@+id/imageView"
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/cameraPreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:layout_below="@+id/btnCapture" />
+        android:layout_marginTop="80dp"/>
 
 </FrameLayout>

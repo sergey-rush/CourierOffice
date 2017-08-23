@@ -1,6 +1,10 @@
 <resources>
-    <string name="app_name">7 seconds</string>
+    <string name="app_name">Курьер офис</string>
     <string name="greeting">Введите пин-код</string>
+
+    <!-- Strings related to AlertDialog -->
+    <string name="ok">ОК</string>
+    <string name="error">Ошибка</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -18,6 +22,12 @@
     <!-- Strings related to menu -->
     <string name="nav_home">Главная</string>
     <string name="nav_scan">Сканировать</string>
+
+    <!-- Strings related to hardware -->
+    <string name="camera_not_available">Камера недоступна</string>
+
+    <!-- Strings related to wizard -->
+    <string name="scan_app_qrcode">Отсканируйте QR-код заявки</string>
 
     <!-- titles -->
     <string name="title_activity_main">MainActivity</string>

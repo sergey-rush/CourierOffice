@@ -1,8 +1,12 @@
 package ru.courier.office.data;
 
+import ru.courier.office.core.Application;
 import ru.courier.office.core.Member;
+import ru.courier.office.core.Product;
+import ru.courier.office.core.Status;
 import ru.courier.office.core.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,6 +18,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class BaseProvider {
 
@@ -44,17 +53,43 @@ public class BaseProvider {
         return output;
     }
 
-    protected User parseToUser(String input) throws JSONException {
+    protected Application parseToApplication(String input) throws JSONException, ParseException {
 
-        User member = new User();
+        Application application = new Application();
         JSONObject resultData = new JSONObject(input);
         //JSONObject resultData = jsonObj.getJSONObject("ResultData");
-        member.Id = resultData.getInt("Id");
-        member.Name = resultData.getString("Name");
-        member.Phone = resultData.getString("Phone");
-        member.Email = resultData.getString("Email");
-        member.IsValid = resultData.getBoolean("IsValid");
-        return member;
+        application.Id = resultData.getString("Id");
+        application.MerchantId = resultData.getString("MerchantId");
+        application.PersonId = resultData.getString("PersonId");
+        application.Amount = resultData.getString("Amount");
+        application.DeliveryAddress = resultData.getString("DeliveryAddress");
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        application.Created = format.parse(resultData.getString("Created"));
+        application.StatusList = new ArrayList<Status>();
+
+        JSONArray items = resultData.getJSONArray("StatusList");
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = items.getJSONObject(i);
+            Status status = new Status();
+            status.Title = item.getString("Title");
+            status.Created = format.parse(item.getString("Created"));
+            application.StatusList.add(status);
+        }
+
+        return application;
+    }
+
+    protected User parseToUser(String input) throws JSONException {
+
+        User user = new User();
+        JSONObject resultData = new JSONObject(input);
+        //JSONObject resultData = jsonObj.getJSONObject("ResultData");
+        user.Id = resultData.getInt("Id");
+        user.Name = resultData.getString("Name");
+        user.Phone = resultData.getString("Phone");
+        user.Email = resultData.getString("Email");
+        user.IsValid = resultData.getBoolean("IsValid");
+        return user;
     }
     
     protected Member parseToMember(String input) throws JSONException {

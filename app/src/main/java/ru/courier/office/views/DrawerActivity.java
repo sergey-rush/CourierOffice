@@ -115,16 +115,10 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        //Toast.makeText(this, "Id: " + id, Toast.LENGTH_LONG).show();
-
         Fragment fragment = null;
-
+        int id = item.getItemId();
         if (id == R.id.nav_home) {
             fragment = new HomeFragment();
-            // Handle the camera action
         } else if (id == R.id.nav_scan) {
             fragment = new QrcodeFragment();
         } else if (id == R.id.nav_applications) {

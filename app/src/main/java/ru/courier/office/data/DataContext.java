@@ -3,6 +3,7 @@ package ru.courier.office.data;
 import android.text.TextUtils;
 
 import ru.courier.office.core.AppMode;
+import ru.courier.office.core.Application;
 import ru.courier.office.core.HttpMethod;
 import ru.courier.office.core.Member;
 import ru.courier.office.core.UrlObject;
@@ -28,6 +29,7 @@ public class DataContext {
     public AppMode Mode = AppMode.Develop;
     public User User = new User();
     public Member Member = new Member();
+    public Application Application = new Application();
     public List<Product> Products = new ArrayList<>();
     private CookieManager CookieManager = new CookieManager();
 
@@ -64,6 +66,7 @@ public class DataContext {
         Map<UrlType, UrlObject> developMap = new HashMap<UrlType, UrlObject>();
         developMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/account/sign"));
         developMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/account"));
+        developMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/application"));
         urlMap.put(AppMode.Develop, developMap);
     }
 
