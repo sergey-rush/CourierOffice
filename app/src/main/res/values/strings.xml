@@ -22,6 +22,9 @@
     <!-- Strings related to menu -->
     <string name="nav_home">Главная</string>
     <string name="nav_scan">Сканировать</string>
+    <string name="nav_apps">Заявки</string>
+    <string name="nav_service">Служебные</string>
+    <string name="nav_data">База данных</string>
 
     <!-- Strings related to hardware -->
     <string name="camera_not_available">Камера недоступна</string>

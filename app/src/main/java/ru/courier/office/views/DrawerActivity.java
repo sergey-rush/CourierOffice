@@ -21,7 +21,7 @@ import ru.courier.office.R;
 import ru.courier.office.core.Person;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        HomeFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
+        HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
         QrcodeFragment.OnFragmentInteractionListener {
 
     @Override
@@ -121,12 +121,12 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new HomeFragment();
         } else if (id == R.id.nav_scan) {
             fragment = new QrcodeFragment();
-        } else if (id == R.id.nav_applications) {
+        } else if (id == R.id.nav_apps) {
             fragment = new AppListFragment();
         } else if (id == R.id.nav_manage) {
             fragment = new HomeFragment();
-        } else if (id == R.id.nav_share) {
-
+        } else if (id == R.id.nav_data) {
+            fragment = new DatabaseFragment();
         } else if (id == R.id.nav_send) {
 
         }

@@ -11,21 +11,21 @@
             android:icon="@drawable/ic_qrcode"
             android:title="@string/nav_scan" />
         <item
-            android:id="@+id/nav_applications"
+            android:id="@+id/nav_apps"
             android:icon="@drawable/ic_list"
-            android:title="Заявки" />
+            android:title="@string/nav_apps" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="Профиль" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/nav_service">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Сообщения" />
+                android:id="@+id/nav_data"
+                android:icon="@drawable/ic_info"
+                android:title="@string/nav_data" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"

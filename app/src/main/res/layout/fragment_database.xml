@@ -1,0 +1,76 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" android:background="@color/colorPrimary"
+    tools:context="ru.courier.office.views.DatabaseFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/form_margin"
+        android:paddingRight="@dimen/form_margin"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/tvInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:text="tvDatabaseInfo" />
+
+        <TextView
+            android:id="@+id/tvApps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:text="tvApps" />
+
+        <TextView
+            android:id="@+id/tvPersons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:text="tvPersons" />
+
+        <TextView
+            android:id="@+id/tvStatuses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:text="tvStatuses" />
+
+        <Button
+            android:id="@+id/btnCreateDatabase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg"
+            android:padding="@dimen/button_padding"
+            android:text="Create Database"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnSetupDatabase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg"
+            android:padding="@dimen/button_padding"
+            android:text="Setup Database"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnDropDatabase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_bg"
+            android:padding="@dimen/button_padding"
+            android:text="Drop Database"
+            android:textColor="@android:color/white" />
+
+
+    </LinearLayout>
+</FrameLayout>

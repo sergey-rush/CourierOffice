@@ -12,6 +12,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.UrlType;
+import ru.courier.office.data.DataAccess;
 
 /**
  * Created by rash on 22.08.2017.
@@ -23,7 +24,7 @@ public class ApplicationProvider extends BaseProvider {
         HttpURLConnection connection = null;
 
         try {
-            UrlObject urlObject = dataContext.getUrl(UrlType.Application);
+            UrlObject urlObject = webContext.getUrl(UrlType.Application);
             URL url = new URL(urlObject.Url);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
@@ -32,14 +33,15 @@ public class ApplicationProvider extends BaseProvider {
             connection.setRequestMethod(urlObject.HttpMethod.toString());
             connection.setDoInput(true);
             connection.setDoOutput(true);
-            dataContext.attachCookieTo(connection);
+            webContext.attachCookieTo(connection);
 
             serialisePost(connection, postData);
             responseCode = connection.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-                dataContext.Application = parseToApplication(output);
+                webContext.Application = parseToApplication(output);
+
             } else {
                 return responseCode;
             }

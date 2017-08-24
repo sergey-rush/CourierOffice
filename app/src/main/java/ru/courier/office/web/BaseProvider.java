@@ -2,7 +2,6 @@ package ru.courier.office.web;
 
 import ru.courier.office.core.Application;
 import ru.courier.office.core.Person;
-import ru.courier.office.core.Product;
 import ru.courier.office.core.Status;
 import ru.courier.office.core.User;
 
@@ -21,12 +20,10 @@ import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class BaseProvider {
 
-    protected WebContext dataContext = WebContext.getInstance();
+    protected WebContext webContext = WebContext.getInstance();
 
     protected int responseCode = 0;
 
@@ -70,13 +67,15 @@ public class BaseProvider {
         for (int i = 0; i < items.length(); i++) {
             JSONObject item = items.getJSONObject(i);
             Status status = new Status();
-            status.Title = item.getString("Title");
+            status.ApplicationId = application.Id;
+            status.Info = item.getString("Info");
             status.Created = format.parse(item.getString("Created"));
             application.StatusList.add(status);
         }
 
         JSONObject personData = resultData.getJSONObject("Person");
         application.Person = parseToPerson(personData.toString());
+        application.Person.ApplicationId = application.Id;
 
         return application;
     }

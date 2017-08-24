@@ -23,9 +23,9 @@ public class ProductProvider extends BaseProvider {
 
         try {
 
-            URL url = new URL(String.format("%s=%s", dataContext.getUrl(UrlType.Products), memberId));
+            URL url = new URL(String.format("%s=%s", webContext.getUrl(UrlType.Products), memberId));
             connection = (HttpURLConnection) url.openConnection();
-            dataContext.attachCookieTo(connection);
+            webContext.attachCookieTo(connection);
             connection.connect();
             responseCode = connection.getResponseCode();
 
@@ -41,7 +41,7 @@ public class ProductProvider extends BaseProvider {
                     product.Id = item.getString("Id");
                     product.Amount = item.getString("Amount");
                     product.Created = item.getString("Created");
-                    dataContext.Products.add(product);
+                    webContext.Products.add(product);
                 }
 
             } else {

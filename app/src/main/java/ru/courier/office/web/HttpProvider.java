@@ -18,7 +18,7 @@ public class HttpProvider extends BaseProvider {
 
         URL url;
         try {
-            UrlObject urlObject = dataContext.getUrl(UrlType.Sign);
+            UrlObject urlObject = webContext.getUrl(UrlType.Sign);
             url = new URL(urlObject.Url);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
@@ -32,9 +32,9 @@ public class HttpProvider extends BaseProvider {
             responseCode = connection.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
-                dataContext.setCookie(connection.getHeaderFields());
+                webContext.setCookie(connection.getHeaderFields());
                 String output = deserializeToString(connection);
-                dataContext.User = parseToUser(output);
+                webContext.User = parseToUser(output);
             } else {
                 return responseCode;
             }

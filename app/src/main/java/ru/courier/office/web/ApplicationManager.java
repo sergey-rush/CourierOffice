@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 
 import ru.courier.office.R;
+import ru.courier.office.data.DataAccess;
 import ru.courier.office.views.DrawerActivity;
 import ru.courier.office.views.MainActivity;
 import ru.courier.office.views.QrcodeFragment;
@@ -24,7 +25,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     private String _qrCodeValue;
     private int responseCode;
 
-    private WebContext dataContext = WebContext.getInstance();
+    private WebContext webContext = WebContext.getInstance();
 
     public ApplicationManager(Context context, QrcodeFragment fragment, String qrCodeValue) {
         _view = context;
@@ -50,6 +51,15 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         ApplicationProvider applicationProvider = new ApplicationProvider();
         responseCode = applicationProvider.postApplication(postData);
         _fragment.releaseCamera();
+
+        DataAccess dataAccess = DataAccess.getInstance(_view);
+        WebContext current = WebContext.getInstance();
+        dataAccess.insertApplication(current.Application);
+        for(ru.courier.office.core.Status status:current.Application.StatusList) {
+            dataAccess.insertStatus(status);
+        }
+        dataAccess.insertPerson(current.Application.Person);
+        
         return null;
     }
 

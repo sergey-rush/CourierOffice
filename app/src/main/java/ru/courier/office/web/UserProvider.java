@@ -22,16 +22,16 @@ public class UserProvider extends BaseProvider {
         HttpURLConnection connection = null;
         URL url;
         try {
-            UrlObject urlObject = dataContext.getUrl(UrlType.User);
+            UrlObject urlObject = webContext.getUrl(UrlType.User);
             url = new URL(urlObject.Url);
             connection = (HttpURLConnection) url.openConnection();
-            dataContext.attachCookieTo(connection);
+            webContext.attachCookieTo(connection);
             connection.connect();
             responseCode = connection.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-                dataContext.User = parseToUser(output);
+                webContext.User = parseToUser(output);
             } else {
                 return responseCode;
             }

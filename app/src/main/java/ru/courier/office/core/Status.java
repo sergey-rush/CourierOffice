@@ -7,6 +7,17 @@ import java.util.Date;
  */
 
 public class Status {
-    public String Title;
+    public int Id;
+    public String ApplicationId;
+    public String Info;
     public Date Created;
+
+    public Status() {
+
+    }
+
+    public Status(int id, Date created) {
+        Id = id;
+        Created = created;
+    }
 }

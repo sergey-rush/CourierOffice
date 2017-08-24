@@ -21,15 +21,15 @@ public class MemberProvider extends BaseProvider {
 
         try {
 
-            URL url = new URL(String.format("%s=%s", dataContext.getUrl(UrlType.Person), memberId));
+            URL url = new URL(String.format("%s=%s", webContext.getUrl(UrlType.Person), memberId));
             connection = (HttpURLConnection) url.openConnection();
-            dataContext.attachCookieTo(connection);
+            webContext.attachCookieTo(connection);
             connection.connect();
             responseCode = connection.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-                //dataContext.Person = parseToMember(output);
+                //webContext.Person = parseToMember(output);
             } else {
                 return responseCode;
             }

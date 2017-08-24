@@ -8,6 +8,7 @@ import java.util.Date;
 public class Person {
 
     public String Id;
+    public String ApplicationId;
     public String FirstName;
     public String MiddleName;
     public String LastName;

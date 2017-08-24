@@ -20,7 +20,7 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
     private String _postData;
     private int responseCode;
 
-    private WebContext dataContext = WebContext.getInstance();
+    private WebContext webContext = WebContext.getInstance();
 
     public LoginManager(LoginActivity view, String postData) {
         _view = view;

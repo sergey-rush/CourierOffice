@@ -19,7 +19,7 @@ public class UserManager extends AsyncTask<Void, Void, Void> {
     private MainActivity _view;
     private int responseCode;
 
-    private WebContext dataContext = WebContext.getInstance();
+    private WebContext webContext = WebContext.getInstance();
 
     public UserManager(MainActivity view) {
         _view = view;
