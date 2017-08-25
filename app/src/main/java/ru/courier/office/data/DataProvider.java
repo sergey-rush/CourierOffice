@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import ru.courier.office.core.Application;
+import ru.courier.office.core.Merchant;
 import ru.courier.office.core.Person;
 import ru.courier.office.core.Status;
 
@@ -189,18 +190,84 @@ public class DataProvider extends DataAccess {
         return ret;
     }
 
+    @Override
+    public Merchant getMerchantById(String merchantId) {
+        Merchant merchant = null;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT Id, ApplicationId, FullName, Inn, Email, Site, ManagerName, ManagerPhone FROM Merchants WHERE Id = ?", new String[]{merchantId + ""});
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                merchant = new Merchant();
+                merchant.Id = cursor.getString(cursor.getColumnIndex("Id"));
+                merchant.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
+                merchant.FullName = cursor.getString(cursor.getColumnIndex("FullName"));
+                merchant.Inn = cursor.getString(cursor.getColumnIndex("Inn"));
+                merchant.Email = cursor.getString(cursor.getColumnIndex("Email"));
+                merchant.Site = cursor.getString(cursor.getColumnIndex("Site"));
+                merchant.ManagerName = cursor.getString(cursor.getColumnIndex("ManagerName"));
+                merchant.ManagerPhone = cursor.getString(cursor.getColumnIndex("ManagerPhone"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return merchant;
+    }
+
+    @Override
+    public long countMerchants() {
+        int count = 0;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Merchants", null);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(cursor.getColumnIndex("Total"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public long insertMerchant(Merchant merchant) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("Id", merchant.Id);
+        contentValues.put("ApplicationId", merchant.ApplicationId);
+        contentValues.put("FullName", merchant.FullName);
+        contentValues.put("Inn", merchant.Inn);
+        contentValues.put("Email", merchant.Email);
+        contentValues.put("Site", merchant.Site);
+        contentValues.put("ManagerName", merchant.ManagerName);
+        contentValues.put("ManagerPhone", merchant.ManagerPhone);
+        long ret = db.insert("Merchants", null, contentValues);
+        return ret;
+    }
 
     @Override
     public List<Status> getStatuses(String applicationId) {
         List<Status> statuses = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, Info, Created FROM Statuses ORDER BY Created DESC WHERE ApplicationId = ?", new String[]{applicationId + ""});
+            cursor = db.rawQuery("SELECT Id, ApplicationId, Code, Category, Info, Created FROM Statuses WHERE ApplicationId = ? ORDER BY Created DESC", new String[]{applicationId + ""});
             cursor.moveToFirst();
             statuses = new ArrayList<Status>();
             while (!cursor.isAfterLast()) {
                 Status status = new Status();
-                status.Id = cursor.getInt(cursor.getColumnIndex("ApplicationId"));
+                status.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                status.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
+                status.Code = cursor.getString(cursor.getColumnIndex("Code"));
+                status.Category = cursor.getString(cursor.getColumnIndex("Category"));
                 status.Info = cursor.getString(cursor.getColumnIndex("Info"));
                 String datetime = cursor.getString(cursor.getColumnIndex("Created"));
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -244,7 +311,9 @@ public class DataProvider extends DataAccess {
     public long insertStatus(Status status) {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         ContentValues contentValues = new ContentValues();
-        contentValues.put("Id", status.ApplicationId);
+        contentValues.put("ApplicationId", status.ApplicationId);
+        contentValues.put("Code", status.Code);
+        contentValues.put("Category", status.Category);
         contentValues.put("Info", status.Info);
         contentValues.put("Created", dateFormat.format(status.Created));
         long ret = db.insert("Statuses", null, contentValues);

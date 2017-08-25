@@ -9,6 +9,8 @@ import java.util.Date;
 public class Status {
     public int Id;
     public String ApplicationId;
+    public String Code;
+    public String Category;
     public String Info;
     public Date Created;
 

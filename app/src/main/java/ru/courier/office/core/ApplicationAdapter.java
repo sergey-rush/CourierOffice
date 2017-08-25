@@ -1,80 +1,78 @@
 package ru.courier.office.core;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import ru.courier.office.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class ApplicationAdapter extends ArrayAdapter<String> {
+import ru.courier.office.R;
 
-    Context context;
-    List<Application> Applications;
+/**
+ * Created by rash on 25.08.2017.
+ */
 
-    public ApplicationAdapter(Context context, List<Application> Applications) {
-        super(context, R.layout.application_item);
-        this.context = context;
-        this.Applications = Applications;
-    }
+public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ApplicationViewHolder> {
 
-    @Override
-    public int getCount() {
-        return Applications.size();
-    }
+    private List<Application> applicationList;
 
-    @NonNull
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public class ApplicationViewHolder extends RecyclerView.ViewHolder {
 
-        ViewHolder holder = new ViewHolder();
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.application_item, parent, false);
-            holder.tvId = (TextView) convertView.findViewById(R.id.tvId);
-            holder.tvAmount = (TextView) convertView.findViewById(R.id.tvAmount);
-            holder.ivStatus = (ImageView) convertView.findViewById(R.id.ivStatus);
-            holder.tvCreated = (TextView) convertView.findViewById(R.id.tvCreated);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        Application Application = Applications.get(position);
-        holder.tvId.setText(Application.Id);
-        holder.tvAmount.setText(Application.Id);
-
-        Drawable myIcon = parent.getResources().getDrawable(R.drawable.ic_application);
-        myIcon.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
-        holder.ivStatus.setImageDrawable(myIcon);
-
-        //holder.ivStatus.setImageResource(R.drawable.ic_application);
-
-        holder.tvCreated.setText(dateFormat.format(Application.Created));
-        return convertView;
-    }
-
-    static class ViewHolder {
         TextView tvId;
         TextView tvAmount;
         TextView tvCreated;
         ImageView ivStatus;
+
+        public ApplicationViewHolder(View view) {
+            super(view);
+
+            tvId = (TextView) view.findViewById(R.id.tvId);
+            tvAmount = (TextView) view.findViewById(R.id.tvAmount);
+            ivStatus = (ImageView) view.findViewById(R.id.ivStatus);
+            tvCreated = (TextView) view.findViewById(R.id.tvCreated);
+        }
+    }
+
+
+    public ApplicationAdapter(List<Application> applicationList) {
+        this.applicationList = applicationList;
+    }
+
+    ViewGroup parent;
+
+    @Override
+    public ApplicationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        this.parent = parent;
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.application_item, parent, false);
+
+        return new ApplicationViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(ApplicationViewHolder holder, int position) {
+        Application application = applicationList.get(position);
+
+        holder.tvId.setText(application.Id);
+        holder.tvAmount.setText(application.Amount);
+
+        Drawable myIcon = parent.getResources().getDrawable(R.drawable.ic_application);
+        myIcon.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+        holder.ivStatus.setImageDrawable(myIcon);
+
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        holder.tvCreated.setText(dateFormat.format(application.Created));
+    }
+
+    @Override
+    public int getItemCount() {
+        return applicationList.size();
     }
 }
-
-

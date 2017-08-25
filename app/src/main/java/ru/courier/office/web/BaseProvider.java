@@ -1,6 +1,7 @@
 package ru.courier.office.web;
 
 import ru.courier.office.core.Application;
+import ru.courier.office.core.Merchant;
 import ru.courier.office.core.Person;
 import ru.courier.office.core.Status;
 import ru.courier.office.core.User;
@@ -20,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BaseProvider {
 
@@ -55,29 +57,58 @@ public class BaseProvider {
         Application application = new Application();
         JSONObject resultData = new JSONObject(input);
         application.Id = resultData.getString("Id");
-        application.MerchantId = resultData.getString("MerchantId");
-        application.PersonId = resultData.getString("PersonId");
         application.Amount = resultData.getString("Amount");
         application.DeliveryAddress = resultData.getString("DeliveryAddress");
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         application.Created = format.parse(resultData.getString("Created"));
-        application.StatusList = new ArrayList<Status>();
+        application.StatusList = parseToStatusList(resultData);
 
-        JSONArray items = resultData.getJSONArray("StatusList");
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject item = items.getJSONObject(i);
-            Status status = new Status();
-            status.ApplicationId = application.Id;
-            status.Info = item.getString("Info");
-            status.Created = format.parse(item.getString("Created"));
-            application.StatusList.add(status);
-        }
+        JSONObject merchantData = resultData.getJSONObject("Merchant");
+        application.Merchant = parseToMerchant(merchantData.toString());
+        application.Merchant.ApplicationId = application.Id;
+        application.MerchantId = application.Merchant.Id;
 
         JSONObject personData = resultData.getJSONObject("Person");
         application.Person = parseToPerson(personData.toString());
         application.Person.ApplicationId = application.Id;
+        application.PersonId = application.Person.Id;
 
         return application;
+    }
+
+    protected List<Status> parseToStatusList(JSONObject resultData) throws JSONException, ParseException {
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String id = resultData.getString("Id");
+        ArrayList<Status> statusList = new ArrayList<Status>();
+        JSONArray items = resultData.getJSONArray("StatusList");
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = items.getJSONObject(i);
+            Status status = new Status();
+            status.ApplicationId = id;
+            status.Code = item.getString("Code");
+            status.Category = item.getString("Category");
+            status.Info = item.getString("Info");
+            status.Created = format.parse(item.getString("Created"));
+            statusList.add(status);
+        }
+
+        return statusList;
+    }
+
+    protected Merchant parseToMerchant(String input) throws JSONException {
+
+        Merchant merchant = new Merchant();
+        JSONObject resultData = new JSONObject(input);
+        merchant.Id = resultData.getString("Id");
+        merchant.FullName = resultData.getString("FullName");
+        merchant.Inn = resultData.getString("Inn");
+        merchant.Email = resultData.getString("Email");
+        merchant.Site = resultData.getString("Site");
+        merchant.ManagerName = resultData.getString("ManagerName");
+        merchant.ManagerPhone = resultData.getString("ManagerPhone");
+        merchant.IsActive = resultData.getString("IsActive");
+        return merchant;
     }
 
     protected User parseToUser(String input) throws JSONException {
@@ -94,16 +125,15 @@ public class BaseProvider {
     
     protected Person parseToPerson(String input) throws JSONException, ParseException {
         
-        Person member = new Person();
+        Person person = new Person();
         JSONObject resultData = new JSONObject(input);
-
-        member.Id = resultData.getString("Id");
-        member.FirstName = resultData.getString("FirstName");
-        member.MiddleName = resultData.getString("MiddleName");
-        member.LastName = resultData.getString("LastName");
-        member.Gender = resultData.getString("Gender");
+        person.Id = resultData.getString("Id");
+        person.FirstName = resultData.getString("FirstName");
+        person.MiddleName = resultData.getString("MiddleName");
+        person.LastName = resultData.getString("LastName");
+        person.Gender = resultData.getString("Gender");
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        member.BirthDate = format.parse(resultData.getString("BirthDate"));
-        return member;
+        person.BirthDate = format.parse(resultData.getString("BirthDate"));
+        return person;
     }
 }

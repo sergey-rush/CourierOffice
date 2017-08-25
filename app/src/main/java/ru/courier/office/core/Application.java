@@ -11,6 +11,7 @@ public class Application {
     public String Amount;
     public String DeliveryAddress;
     public List<Status> StatusList;
+    public Merchant Merchant;
     public Person Person;
     public Date Created;
 }

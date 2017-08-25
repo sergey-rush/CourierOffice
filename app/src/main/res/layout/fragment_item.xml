@@ -1,0 +1,90 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ru.courier.office.views.ItemFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/form_margin"
+        android:paddingRight="@dimen/form_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Заявка №" />
+
+        <TextView
+            android:id="@+id/tvId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvId" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Фин орг №" />
+
+        <TextView
+            android:id="@+id/tvMerchantId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvMerchantId" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Заемщик №" />
+
+        <TextView
+            android:id="@+id/tvPersonId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvPersonId" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сумма" />
+
+        <TextView
+            android:id="@+id/tvAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvAmount" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Адрес:" />
+
+        <TextView
+            android:id="@+id/tvDeliveryAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvDeliveryAddress" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Дата заявки:" />
+
+        <TextView
+            android:id="@+id/tvCreated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="tvCreated" />
+
+    </LinearLayout>
+
+</FrameLayout>

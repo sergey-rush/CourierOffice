@@ -32,6 +32,9 @@
     <!-- Strings related to wizard -->
     <string name="scan_app_qrcode">Отсканируйте QR-код заявки</string>
 
+    <!-- Strings related to fragments -->
+    <string name="welcome">Это главная страница. Здесь предполагается отображать новости и другие служебные сообщения</string>
+
     <!-- titles -->
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_login">7 seconds</string>

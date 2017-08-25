@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import ru.courier.office.core.Application;
+import ru.courier.office.core.Merchant;
 import ru.courier.office.core.Person;
 import ru.courier.office.core.Status;
 
@@ -54,6 +55,10 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract Person getPersonById(String personId);
     public abstract long countPersons();
     public abstract long insertPerson(Person person);
+
+    public abstract Merchant getMerchantById(String merchantId);
+    public abstract long countMerchants();
+    public abstract long insertMerchant(Merchant merchant);
 
     public abstract List<Status> getStatuses(String applicationId);
     public abstract long countStatuses();
@@ -120,14 +125,16 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public void onSetup() {
         Status status = getVersion();
         if(status.Id > 0) {
+
             db.execSQL("DROP TABLE IF EXISTS Applications");
+            db.execSQL("DROP TABLE IF EXISTS Merchants");
             db.execSQL("DROP TABLE IF EXISTS Statuses");
             db.execSQL("DROP TABLE IF EXISTS Persons");
-            Log.d("Drop", "Tables were dropped");
+
             db.execSQL("CREATE TABLE Applications(Id TEXT PRIMARY KEY, MerchantId TEXT, PersonId TEXT, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
-            db.execSQL("CREATE TABLE Statuses(Id TEXT PRIMARY KEY, Info TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Merchants(Id TEXT PRIMARY KEY, ApplicationId TEXT, FullName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, IsActive INTEGER)");
             db.execSQL("CREATE TABLE Persons(Id TEXT PRIMARY KEY, ApplicationId TEXT, FirstName TEXT, MiddleName TEXT, LastName TEXT, BirthDate TEXT, Gender INTEGER)");
-            Log.d("Create", "Tables were created");
 
             IncrementVersion();
         }
@@ -145,6 +152,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Applications");
+        db.execSQL("DROP TABLE IF EXISTS Merchants");
         db.execSQL("DROP TABLE IF EXISTS Statuses");
         db.execSQL("DROP TABLE IF EXISTS Persons");
         onCreate(db);

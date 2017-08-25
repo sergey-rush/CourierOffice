@@ -2,6 +2,7 @@ package ru.courier.office.views;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -25,6 +26,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         AplicationFragment.OnFragmentInteractionListener,
         QrcodeFragment.OnFragmentInteractionListener {
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +42,10 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+
+        showFragment(new HomeFragment());
     }
 
     @Override
@@ -132,15 +139,20 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new AppListFragment();
         }
 
+        showFragment(fragment);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
 
+        return true;
+    }
+
+    private void showFragment(Fragment fragment)
+    {
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
         }
-
-        return true;
     }
 
     @Override
