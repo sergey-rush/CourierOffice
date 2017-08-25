@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,11 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.core.Product;
-import ru.courier.office.core.ProductAdapter;
-import ru.courier.office.web.WebContext;
-import ru.courier.office.web.MemberManager;
-import ru.courier.office.web.ProductManager;
+import ru.courier.office.core.Application;
+import ru.courier.office.core.ApplicationAdapter;
+import ru.courier.office.data.DataAccess;
 
 import java.util.List;
 
@@ -80,53 +80,30 @@ public class AppListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_applist, container, false);
 
-        ProductManager productManager = new ProductManager(view, "BC2533EF-A298-4BAA-9728-8A8C26DF4A1D");
-        productManager.execute();
+        List<Application> applications = DataAccess.getInstance(getContext()).getApplications(100);
 
-        List<Product> products = WebContext.getInstance().Products;
+        ApplicationAdapter adapter = new ApplicationAdapter(this.getContext(), applications);
 
-        ProductAdapter adapter = new ProductAdapter(this.getContext(), products);
+        ListView listView = (ListView) view.findViewById(R.id.listViewSection);
+        listView.setAdapter(adapter);
 
-        ListView listViewSection = (ListView) view.findViewById(R.id.listViewSection);
-        listViewSection.setAdapter(adapter);
-
-        listViewSection.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
                 LinearLayout layout = (LinearLayout)view;
                 TextView tvId = (TextView)layout.findViewById(R.id.tvId);
-                TextView tvName = (TextView)layout.findViewById(R.id.tvAmount);
-                Toast.makeText(view.getContext(), "Item: " + tvName.getText(), Toast.LENGTH_SHORT).show();
-                int itemId = Integer.parseInt(tvId.getText().toString());
-                AskOption(itemId, view).show();
+                String applicationid = tvId.getText().toString();
+
+                FragmentManager fm = getFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                AplicationFragment aplicationFragment = AplicationFragment.newInstance(applicationid);
+                ft.replace(R.id.container, aplicationFragment);
+                ft.commit();
             }
         });
 
         return view;
-    }
-
-    private AlertDialog AskOption(final int itemId, final View view) {
-        AlertDialog alertDialog = new AlertDialog.Builder(view.getContext())
-                //set message, title, and icon
-                .setTitle("Удаление")
-                .setMessage("Вы действительно желаете удалить?")
-                .setIcon(R.drawable.ic_menu_send)
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        //DataManager dataManager = new DataManager(view.getContext());
-                        //dataManager.deleteSection(itemId);
-                        dialog.dismiss();
-                    }
-
-                })
-                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        return alertDialog;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

@@ -22,6 +22,7 @@ import ru.courier.office.core.Person;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
+        AplicationFragment.OnFragmentInteractionListener,
         QrcodeFragment.OnFragmentInteractionListener {
 
     @Override
@@ -128,7 +129,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         } else if (id == R.id.nav_data) {
             fragment = new DatabaseFragment();
         } else if (id == R.id.nav_send) {
-
+            fragment = new AppListFragment();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

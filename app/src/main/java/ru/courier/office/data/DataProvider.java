@@ -59,12 +59,12 @@ public class DataProvider extends DataAccess {
     
     @Override
     public List<Application> getApplications(int limit) {
-        List<Application> applications = null;
+        List<Application> applications = new ArrayList<Application>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, MerchantId, PersonId, Amount, DeliveryAddress, Created FROM Applications ORDER BY Created DESC LIMIT = ?", new String[]{limit + ""});
+            cursor = db.rawQuery("SELECT Id, MerchantId, PersonId, Amount, DeliveryAddress, Created FROM Applications ORDER BY DATETIME(Created) DESC Limit ?;", new String[]{ String.valueOf(limit) });
             cursor.moveToFirst();
-            applications = new ArrayList<Application>();
+
             while (!cursor.isAfterLast()) {
                 Application application = new Application();
                 application.Id = cursor.getString(cursor.getColumnIndex("Id"));
