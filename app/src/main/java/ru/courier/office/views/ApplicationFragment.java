@@ -18,7 +18,7 @@ import ru.courier.office.web.WebContext;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AppFragment extends Fragment {
+public class ApplicationFragment extends Fragment {
 
     TextView tvId;
     TextView tvMerchantId;
@@ -27,15 +27,15 @@ public class AppFragment extends Fragment {
     TextView tvDeliveryAddress;
     TextView tvCreated;
 
-    public AppFragment() {
-        // Required empty public constructor
+    public ApplicationFragment() {
+
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_app, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_application, container, false);
 
         WebContext webContext = WebContext.getInstance();
         Application application = webContext.Application;

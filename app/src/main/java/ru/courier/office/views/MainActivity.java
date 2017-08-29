@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
             dots[i] = new TextView(this);
             dots[i].setText("\u25E6");
             dots[i].setTextSize(35);
-            dots[i].setTextColor(getResources().getColor(R.color.dotInactive));
+            dots[i].setTextColor(getResources().getColor(R.color.grey1));
             dotsLayout.addView(dots[i]);
         }
 

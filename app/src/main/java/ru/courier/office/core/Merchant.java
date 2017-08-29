@@ -1,9 +1,10 @@
 package ru.courier.office.core;
 
 public class Merchant {
-    public String Id;
+    public int Id;
+    public String MerchantId;
     public String ApplicationId;
-    public String FullName;
+    public String Name;
     public String Inn;
     public String Email;
     public String Site;

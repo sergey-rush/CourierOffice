@@ -54,14 +54,22 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
 
         DataAccess dataAccess = DataAccess.getInstance(_view);
         WebContext current = WebContext.getInstance();
-        dataAccess.insertApplication(current.Application);
-        dataAccess.insertMerchant(current.Application.Merchant);
+
+        long merchantId = dataAccess.insertMerchant(current.Application.Merchant);
 
         for(ru.courier.office.core.Status status:current.Application.StatusList) {
             dataAccess.insertStatus(status);
         }
+        current.Application.MerchantId = (int)merchantId;
 
-        dataAccess.insertPerson(current.Application.Person);
+        long personId = 0;
+        if(current.Application.Person!=null)
+        {
+            personId = dataAccess.insertPerson(current.Application.Person);
+        }
+        current.Application.PersonId = (int)personId;
+
+        dataAccess.insertApplication(current.Application);
         
         return null;
     }

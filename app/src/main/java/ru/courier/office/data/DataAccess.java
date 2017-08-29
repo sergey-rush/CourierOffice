@@ -52,11 +52,11 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract long countApplications();
     public abstract long insertApplication(Application application);
 
-    public abstract Person getPersonById(String personId);
+    public abstract Person getPersonById(int personId);
     public abstract long countPersons();
     public abstract long insertPerson(Person person);
 
-    public abstract Merchant getMerchantById(String merchantId);
+    public abstract Merchant getMerchantById(int merchantId);
     public abstract long countMerchants();
     public abstract long insertMerchant(Merchant merchant);
 
@@ -131,10 +131,10 @@ public abstract class DataAccess extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS Statuses");
             db.execSQL("DROP TABLE IF EXISTS Persons");
 
-            db.execSQL("CREATE TABLE Applications(Id TEXT PRIMARY KEY, MerchantId TEXT, PersonId TEXT, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Applications(Id TEXT PRIMARY KEY, MerchantId INTEGER, PersonId INTEGER, PersonName TEXT, MerchantName TEXT, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
             db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
-            db.execSQL("CREATE TABLE Merchants(Id TEXT PRIMARY KEY, ApplicationId TEXT, FullName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, IsActive INTEGER)");
-            db.execSQL("CREATE TABLE Persons(Id TEXT PRIMARY KEY, ApplicationId TEXT, FirstName TEXT, MiddleName TEXT, LastName TEXT, BirthDate TEXT, Gender INTEGER)");
+            db.execSQL("CREATE TABLE Merchants(Id INTEGER PRIMARY KEY AUTOINCREMENT, MerchantId TEXT, ApplicationId TEXT, Name TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, IsActive INTEGER)");
+            db.execSQL("CREATE TABLE Persons(Id INTEGER PRIMARY KEY AUTOINCREMENT, PersonId TEXT, ApplicationId TEXT, FirstName TEXT, MiddleName TEXT, LastName TEXT, BirthDate TEXT, Gender INTEGER)");
 
             IncrementVersion();
         }

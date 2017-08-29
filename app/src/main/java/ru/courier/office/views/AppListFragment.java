@@ -2,6 +2,7 @@ package ru.courier.office.views;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -52,7 +53,7 @@ public class AppListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_applist, container, false);
 
         List<Application> applications = DataAccess.getInstance(getContext()).getApplications(100);
@@ -60,7 +61,6 @@ public class AppListFragment extends Fragment {
         adapter = new ApplicationAdapter(applications);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -72,14 +72,13 @@ public class AppListFragment extends Fragment {
             @Override
             public void onClick(View view, int position) {
 
-                LinearLayout layout = (LinearLayout) view;
-                TextView tvId = (TextView) layout.findViewById(R.id.tvId);
-                String applicationid = tvId.getText().toString();
+                TextView tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
+                String applicationId = tvPersonName.getTag().toString();
 
                 FragmentManager fm = getFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
-                AplicationFragment aplicationFragment = AplicationFragment.newInstance(applicationid);
-                ft.replace(R.id.container, aplicationFragment);
+                AppViewFragment appViewFragment = AppViewFragment.newInstance(applicationId);
+                ft.replace(R.id.container, appViewFragment);
                 ft.commit();
             }
 
@@ -91,7 +90,7 @@ public class AppListFragment extends Fragment {
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

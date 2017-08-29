@@ -6,10 +6,7 @@
     android:background="@drawable/side_nav_bar"
     android:gravity="bottom"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/form_margin"
-    android:paddingLeft="@dimen/form_margin"
-    android:paddingRight="@dimen/form_margin"
-    android:paddingTop="@dimen/form_margin"
+    android:padding="@dimen/dimen16"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <ImageView

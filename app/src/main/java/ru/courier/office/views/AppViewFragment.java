@@ -26,18 +26,18 @@ import ru.courier.office.core.Application;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.WebContext;
 
-public class AplicationFragment extends Fragment {
+public class AppViewFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "appId";
     private String applicationId;
 
     private OnFragmentInteractionListener mListener;
 
-    public AplicationFragment() {
+    public AppViewFragment() {
     }
 
-    public static AplicationFragment newInstance(String appId) {
-        AplicationFragment fragment = new AplicationFragment();
+    public static AppViewFragment newInstance(String appId) {
+        AppViewFragment fragment = new AppViewFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, appId);
         fragment.setArguments(args);
@@ -58,7 +58,7 @@ public class AplicationFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_aplication, container, false);
+        View view = inflater.inflate(R.layout.fragment_appview, container, false);
 
         DataAccess dataAccess = DataAccess.getInstance(view.getContext());
         WebContext webContext = WebContext.getInstance();
@@ -78,10 +78,10 @@ public class AplicationFragment extends Fragment {
 
     private void setupViewPager(View view, ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
-        adapter.addFrag(new AppFragment(), "APP");
-        adapter.addFrag(new MerchantFragment(), "MERCHANT");
-        adapter.addFrag(new PersonFragment(), "PERSON");
-        adapter.addFrag(new StatusFragment(), "STATUS");
+        adapter.addFrag(new ApplicationFragment(), "ЗАЯВКА");
+        adapter.addFrag(new MerchantFragment(), "МАГАЗИН");
+        adapter.addFrag(new PersonFragment(), "ЗАЯВИТЕЛЬ");
+        adapter.addFrag(new StatusFragment(), "СТАТУСЫ");
         viewPager.setAdapter(adapter);
     }
 

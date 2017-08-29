@@ -67,11 +67,15 @@ public class BaseProvider {
         application.Merchant = parseToMerchant(merchantData.toString());
         application.Merchant.ApplicationId = application.Id;
         application.MerchantId = application.Merchant.Id;
+        application.MerchantName = application.Merchant.Name;
 
         JSONObject personData = resultData.getJSONObject("Person");
         application.Person = parseToPerson(personData.toString());
-        application.Person.ApplicationId = application.Id;
-        application.PersonId = application.Person.Id;
+        if (application.Person != null) {
+            application.Person.ApplicationId = application.Id;
+            application.PersonId = application.Person.Id;
+            application.PersonName = application.Person.getName();
+        }
 
         return application;
     }
@@ -100,8 +104,8 @@ public class BaseProvider {
 
         Merchant merchant = new Merchant();
         JSONObject resultData = new JSONObject(input);
-        merchant.Id = resultData.getString("Id");
-        merchant.FullName = resultData.getString("FullName");
+        merchant.MerchantId = resultData.getString("Id");
+        merchant.Name = resultData.getString("Name");
         merchant.Inn = resultData.getString("Inn");
         merchant.Email = resultData.getString("Email");
         merchant.Site = resultData.getString("Site");
@@ -127,7 +131,7 @@ public class BaseProvider {
         
         Person person = new Person();
         JSONObject resultData = new JSONObject(input);
-        person.Id = resultData.getString("Id");
+        person.PersonId = resultData.getString("Id");
         person.FirstName = resultData.getString("FirstName");
         person.MiddleName = resultData.getString("MiddleName");
         person.LastName = resultData.getString("LastName");

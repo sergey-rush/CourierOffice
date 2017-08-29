@@ -15,6 +15,11 @@
 <color name="bg_screen3">#74a443</color>
 
 <!-- Introduction wizard background -->
-<color name="dotInactive">#cccccc</color>
+
+
+    <color name="grey4">#333333</color>
+    <color name="grey3">#666666</color>
+    <color name="grey2">#999999</color>
+    <color name="grey1">#cccccc</color>
 
 </resources>

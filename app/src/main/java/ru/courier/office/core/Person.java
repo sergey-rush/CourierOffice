@@ -7,11 +7,18 @@ import java.util.Date;
  */
 public class Person {
 
-    public String Id;
+    public int Id;
+    public String PersonId;
     public String ApplicationId;
     public String FirstName;
     public String MiddleName;
     public String LastName;
     public Date BirthDate;
     public String Gender;
+
+    public String getName()
+    {
+        String fullName = String.format("%s %s", FirstName, LastName);
+        return fullName;
+    }
 }

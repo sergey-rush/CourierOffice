@@ -18,12 +18,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.List;
+
 import ru.courier.office.R;
 import ru.courier.office.core.Person;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
-        AplicationFragment.OnFragmentInteractionListener,
+        AppViewFragment.OnFragmentInteractionListener,
         QrcodeFragment.OnFragmentInteractionListener {
 
 
@@ -43,19 +45,47 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-
         showFragment(new HomeFragment());
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
+
+        boolean handled = false;
+
+        android.app.FragmentManager fragmentManager = getFragmentManager();
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+
+        Fragment fragment = getVisibleFragment();
+
+        if (fragment instanceof AppViewFragment) {
+            //Toast.makeText(this, "AppViewFragment", Toast.LENGTH_LONG).show();
+            showFragment(new AppListFragment());
+            handled = true;
+        }
+
+        for (Fragment f : fragmentList) {
+
+            if (f instanceof Fragment) {
+
+            }
+        }
+
+        if (!handled) {
             super.onBackPressed();
         }
+    }
+
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if(fragments != null){
+            for(Fragment fragment : fragments){
+                if(fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
     }
 
     public void onbuttonSaveClick(View view) {

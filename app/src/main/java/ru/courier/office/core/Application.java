@@ -6,8 +6,10 @@ import java.util.List;
 
 public class Application {
     public String Id;
-    public String MerchantId;
-    public String PersonId;
+    public int MerchantId;
+    public int PersonId;
+    public String PersonName;
+    public String MerchantName;
     public String Amount;
     public String DeliveryAddress;
     public List<Status> StatusList;

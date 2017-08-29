@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.data.DataProvider;
 
 /**
  * Created by rash on 25.08.2017.
@@ -26,7 +27,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     public class ApplicationViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvId;
+        TextView tvPersonName;
+        TextView tvMerchantName;
         TextView tvAmount;
         TextView tvCreated;
         ImageView ivStatus;
@@ -34,7 +36,8 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         public ApplicationViewHolder(View view) {
             super(view);
 
-            tvId = (TextView) view.findViewById(R.id.tvId);
+            tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
+            tvMerchantName = (TextView) view.findViewById(R.id.tvMerchantName);
             tvAmount = (TextView) view.findViewById(R.id.tvAmount);
             ivStatus = (ImageView) view.findViewById(R.id.ivStatus);
             tvCreated = (TextView) view.findViewById(R.id.tvCreated);
@@ -60,14 +63,16 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
     public void onBindViewHolder(ApplicationViewHolder holder, int position) {
         Application application = applicationList.get(position);
 
-        holder.tvId.setText(application.Id);
         holder.tvAmount.setText(application.Amount);
+        holder.tvPersonName.setText(application.PersonName);
+        holder.tvPersonName.setTag(application.Id);
+        holder.tvMerchantName.setText(application.MerchantName);
 
         Drawable myIcon = parent.getResources().getDrawable(R.drawable.ic_application);
         myIcon.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
         holder.ivStatus.setImageDrawable(myIcon);
 
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         holder.tvCreated.setText(dateFormat.format(application.Created));
     }
 
