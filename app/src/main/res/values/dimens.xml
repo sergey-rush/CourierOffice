@@ -14,6 +14,9 @@
     <dimen name="desc_padding">40dp</dimen>
     <dimen name="button_padding">16dp</dimen>
     <dimen name="button_side_padding">44dp</dimen>
+
+    <dimen name="dots_width">20dp</dimen>
+    <dimen name="dots_height">30dp</dimen>
     <!-- Common dimensions -->
     <dimen name="dimen16">16dp</dimen>
     <dimen name="dimen32">32dp</dimen>

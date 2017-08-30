@@ -47,22 +47,30 @@ public abstract class DataAccess extends SQLiteOpenHelper {
         return _instance;
     }
 
-    public abstract Application getApplicationById(String applicationId);
+    public abstract Application getApplicationById(int id);
+    public abstract Application getApplicationByApplicationId(String applicationId);
     public abstract List<Application> getApplications(int limit);
-    public abstract long countApplications();
-    public abstract long insertApplication(Application application);
+    public abstract int countApplications();
+    public abstract int insertApplication(Application application);
+    public abstract boolean refreshApplication(Application application);
+    public abstract boolean deleteApplicationById(int id);
+    public abstract int addApplication(Application application);
+    public abstract boolean removeApplication(int id);
 
     public abstract Person getPersonById(int personId);
-    public abstract long countPersons();
-    public abstract long insertPerson(Person person);
+    public abstract int countPersons();
+    public abstract int insertPerson(Person person);
+    public abstract boolean deletePersonById(int id);
 
     public abstract Merchant getMerchantById(int merchantId);
-    public abstract long countMerchants();
-    public abstract long insertMerchant(Merchant merchant);
+    public abstract int countMerchants();
+    public abstract int insertMerchant(Merchant merchant);
+    public abstract boolean deleteMerchantById(int id);
 
     public abstract List<Status> getStatuses(String applicationId);
-    public abstract long countStatuses();
-    public abstract long insertStatus(Status status);
+    public abstract int countStatuses();
+    public abstract int insertStatus(Status status);
+    public abstract boolean deleteStatusesByApplicationId(String applicationId);
 
     public void createDatabase() {
         onCreate(db);
@@ -109,14 +117,14 @@ public abstract class DataAccess extends SQLiteOpenHelper {
         }
     }
 
-    private void IncrementVersion()
+    private int IncrementVersion()
     {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         Date date = new Date();
         ContentValues contentValues = new ContentValues();
         contentValues.put("Created", dateFormat.format(date));
-        long ret = db.insert("Versions", null, contentValues);
-        //Status status = new Status((int)ret, date);
+        int ret = (int)db.insert("Versions", null, contentValues);
+        return ret;
     }
 
     /**
@@ -131,7 +139,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS Statuses");
             db.execSQL("DROP TABLE IF EXISTS Persons");
 
-            db.execSQL("CREATE TABLE Applications(Id TEXT PRIMARY KEY, MerchantId INTEGER, PersonId INTEGER, PersonName TEXT, MerchantName TEXT, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY, ApplicationId TEXT, MerchantId INTEGER, PersonId INTEGER, PersonName TEXT, MerchantName TEXT, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
             db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
             db.execSQL("CREATE TABLE Merchants(Id INTEGER PRIMARY KEY AUTOINCREMENT, MerchantId TEXT, ApplicationId TEXT, Name TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, IsActive INTEGER)");
             db.execSQL("CREATE TABLE Persons(Id INTEGER PRIMARY KEY AUTOINCREMENT, PersonId TEXT, ApplicationId TEXT, FirstName TEXT, MiddleName TEXT, LastName TEXT, BirthDate TEXT, Gender INTEGER)");

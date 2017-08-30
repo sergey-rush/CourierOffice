@@ -16,6 +16,8 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -34,8 +36,10 @@ import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
 import ru.courier.office.R;
+import ru.courier.office.core.Application;
 import ru.courier.office.core.CameraPreview;
 import ru.courier.office.core.LocalSettings;
+import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.ApplicationManager;
 
 import java.io.File;
@@ -55,7 +59,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
     private static final int PERMISSION_CAMERA_REQUEST_CODE = 0;
     public boolean showQRScannerPageOnResume = false;
-    private Camera mCamera;
+    private static Camera mCamera;
     private CameraPreview mPreview;
     private Handler autoFocusHandler;
     private ImageScanner scanner;
@@ -63,7 +67,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
     private boolean previewing = true;
     private boolean checkScanResult = true;
     private ProgressDialog progressDialog;
-    private String qrCodeValue = "";
+    private String applicationId;
     private FrameLayout cameraPreview;
 
     static {
@@ -88,8 +92,12 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        releaseCamera();
+
         View view = inflater.inflate(R.layout.fragment_qrcode, container, false);
         cameraPreview = (FrameLayout) view.findViewById(R.id.cameraPreview);
+
         if(!backCameraExists()){
             showNoCameraDialog();
         }
@@ -186,7 +194,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
                 for (Symbol sym : syms) {
                     Log.i("rlf_app", "<<<<Bar Code>>> " + sym.getData());
                     String scanResult = sym.getData().trim();
-                    //Toast.makeText(getActivity(), scanResult, Toast.LENGTH_SHORT).show();
+
                     barcodeScanned = true;
                     //Log.i("rlf_app", "checkScanResult " + checkScanResult);
                     if(checkScanResult) {
@@ -199,11 +207,45 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         }
     };
 
-    private void checkBarCode(String scanResult) {
-        //Log.d("rlf_app", "scanResult " + scanResult);
-        qrCodeValue = scanResult;
-        ApplicationManager applicationManager = new ApplicationManager(getContext(), this, qrCodeValue);
-        final AsyncTask<Void, Void, Void> execute = applicationManager.execute();
+    private void checkBarCode(String applicationId) {
+
+        this.applicationId = applicationId;
+
+        DataAccess dataAccess = DataAccess.getInstance(getContext());
+        Application application = dataAccess.getApplicationByApplicationId(applicationId);
+        if(application!=null)
+        {
+            String message = String.format("Заявка %s уже зарегистрирована в базе данных приложения", applicationId);
+            ApplicationExistsDialog(message).show();
+            setFragment(new HomeFragment());
+
+        }
+        else {
+            ApplicationManager applicationManager = new ApplicationManager(getContext(), this, applicationId);
+            final AsyncTask<Void, Void, Void> execute = applicationManager.execute();
+        }
+    }
+
+    private AlertDialog ApplicationExistsDialog(String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom)
+                .setTitle("Заявка уже зарегистрирована")
+                .setMessage(message)
+                .setIcon(R.drawable.ic_error)
+                .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+
+                }).create();
+        return alertDialog;
+    }
+
+    private void setFragment(Fragment fragment)
+    {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.container, fragment);
+        ft.commit();
     }
 
     // Mimic continuous auto-focusing
@@ -266,7 +308,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -277,12 +319,13 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
      * A safe way to get an instance of the Camera object.
      */
     public static Camera getCameraInstance() {
-        Camera c = null;
+        //Camera camera = null;
         try {
-            c = Camera.open();
+            mCamera = Camera.open();
         } catch (Exception e) {
+            e.printStackTrace();
         }
-        return c;
+        return mCamera;
     }
 
     public static boolean backCameraExists() {

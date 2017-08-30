@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 public class Application {
-    public String Id;
+
+    public int Id;
+    public String ApplicationId;
     public int MerchantId;
     public int PersonId;
     public String PersonName;

@@ -73,11 +73,11 @@ public class AppListFragment extends Fragment {
             public void onClick(View view, int position) {
 
                 TextView tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
-                String applicationId = tvPersonName.getTag().toString();
+                int id = (int)tvPersonName.getTag();
 
                 FragmentManager fm = getFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
-                AppViewFragment appViewFragment = AppViewFragment.newInstance(applicationId);
+                AppViewFragment appViewFragment = AppViewFragment.newInstance(id);
                 ft.replace(R.id.container, appViewFragment);
                 ft.commit();
             }

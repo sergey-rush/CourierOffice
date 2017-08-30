@@ -52,6 +52,10 @@
     <string name="title_slide3">Одобрение банка</string>
     <string name="desc_slide3">Банк примет решение в течение 10 минут</string>
 
+    <!-- Strings related to app menu -->
+    <string name="app_menu_update">Обновить</string>
+    <string name="app_menu_delete">Удалить</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

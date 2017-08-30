@@ -29,17 +29,17 @@ import ru.courier.office.web.WebContext;
 public class AppViewFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "appId";
-    private String applicationId;
+    private int id;
 
     private OnFragmentInteractionListener mListener;
 
     public AppViewFragment() {
     }
 
-    public static AppViewFragment newInstance(String appId) {
+    public static AppViewFragment newInstance(int id) {
         AppViewFragment fragment = new AppViewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, appId);
+        args.putInt(ARG_PARAM1, id);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,10 +48,9 @@ public class AppViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            applicationId = getArguments().getString(ARG_PARAM1);
+            id = getArguments().getInt(ARG_PARAM1);
         }
     }
-
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -62,10 +61,10 @@ public class AppViewFragment extends Fragment {
 
         DataAccess dataAccess = DataAccess.getInstance(view.getContext());
         WebContext webContext = WebContext.getInstance();
-        webContext.Application = dataAccess.getApplicationById(applicationId);
+        webContext.Application = dataAccess.getApplicationById(id);
         webContext.Application.Merchant = dataAccess.getMerchantById(webContext.Application.MerchantId);
         webContext.Application.Person = dataAccess.getPersonById(webContext.Application.PersonId);
-        webContext.Application.StatusList = dataAccess.getStatuses(webContext.Application.Id);
+        webContext.Application.StatusList = dataAccess.getStatuses(webContext.Application.ApplicationId);
 
         viewPager = (ViewPager) view.findViewById(R.id.viewpager);
         setupViewPager(view, viewPager);

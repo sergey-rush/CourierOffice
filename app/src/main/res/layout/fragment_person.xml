@@ -4,10 +4,87 @@
     android:layout_height="match_parent"
     tools:context="ru.courier.office.views.PersonFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:elevation="3dp">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/dimen16"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Заемщик №" />
+
+            <TextView
+                android:id="@+id/tvPersonId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tvPersonId" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Имя" />
+
+            <TextView
+                android:id="@+id/tvFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tvFirstName" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Отчество" />
+
+            <TextView
+                android:id="@+id/tvMiddleName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tvMiddleName" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Фамилия" />
+
+            <TextView
+                android:id="@+id/tvLastName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tvLastName" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Пол:" />
+
+            <TextView
+                android:id="@+id/tvGender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tvGender" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Дата рождения" />
+
+            <TextView
+                android:id="@+id/tvBirthDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="tvBirthDate" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
 
 </FrameLayout>

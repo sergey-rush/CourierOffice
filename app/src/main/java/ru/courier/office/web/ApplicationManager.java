@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.Toast;
 
 import ru.courier.office.R;
 import ru.courier.office.data.DataAccess;
@@ -29,7 +30,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
 
     public ApplicationManager(Context context, QrcodeFragment fragment, String qrCodeValue) {
         _view = context;
-        _fragment=fragment;
+        _fragment = fragment;
         _qrCodeValue = qrCodeValue;
     }
 
@@ -38,39 +39,26 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        // Showing progress dialog
+
+        _fragment.releaseCamera();
         pDialog = new ProgressDialog(_view);
         pDialog.setMessage("Пожалуйста, подождите...");
         pDialog.setCancelable(false);
         pDialog.show();
+
     }
 
     @Override
     protected Void doInBackground(Void... arg0) {
+
         String postData = String.format("{\"ApplicationId\":\"%s\"}", _qrCodeValue);
         ApplicationProvider applicationProvider = new ApplicationProvider();
         responseCode = applicationProvider.postApplication(postData);
-        _fragment.releaseCamera();
 
         DataAccess dataAccess = DataAccess.getInstance(_view);
         WebContext current = WebContext.getInstance();
+        dataAccess.addApplication(current.Application);
 
-        long merchantId = dataAccess.insertMerchant(current.Application.Merchant);
-
-        for(ru.courier.office.core.Status status:current.Application.StatusList) {
-            dataAccess.insertStatus(status);
-        }
-        current.Application.MerchantId = (int)merchantId;
-
-        long personId = 0;
-        if(current.Application.Person!=null)
-        {
-            personId = dataAccess.insertPerson(current.Application.Person);
-        }
-        current.Application.PersonId = (int)personId;
-
-        dataAccess.insertApplication(current.Application);
-        
         return null;
     }
 
@@ -79,6 +67,8 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(output);
         if (pDialog.isShowing())
             pDialog.dismiss();
+
+        Toast.makeText(_view, "ApplicationManager.onPostExecute", Toast.LENGTH_SHORT).show();
 
         if (responseCode == 200) {
             Intent intent = new Intent(_view, DrawerActivity.class);

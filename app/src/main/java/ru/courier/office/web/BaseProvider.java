@@ -56,7 +56,7 @@ public class BaseProvider {
 
         Application application = new Application();
         JSONObject resultData = new JSONObject(input);
-        application.Id = resultData.getString("Id");
+        application.ApplicationId = resultData.getString("Id");
         application.Amount = resultData.getString("Amount");
         application.DeliveryAddress = resultData.getString("DeliveryAddress");
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -65,14 +65,14 @@ public class BaseProvider {
 
         JSONObject merchantData = resultData.getJSONObject("Merchant");
         application.Merchant = parseToMerchant(merchantData.toString());
-        application.Merchant.ApplicationId = application.Id;
+        application.Merchant.ApplicationId = application.ApplicationId;
         application.MerchantId = application.Merchant.Id;
         application.MerchantName = application.Merchant.Name;
 
         JSONObject personData = resultData.getJSONObject("Person");
         application.Person = parseToPerson(personData.toString());
         if (application.Person != null) {
-            application.Person.ApplicationId = application.Id;
+            application.Person.ApplicationId = application.ApplicationId;
             application.PersonId = application.Person.Id;
             application.PersonName = application.Person.getName();
         }
