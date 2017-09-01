@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import ru.courier.office.core.AppMode;
 import ru.courier.office.core.Application;
 import ru.courier.office.core.HttpMethod;
-import ru.courier.office.core.Person;
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.User;
 import ru.courier.office.core.Product;
@@ -28,7 +27,6 @@ public class WebContext {
 
     public AppMode Mode = AppMode.Develop;
     public User User = new User();
-    public Person Person = new Person();
     public Application Application = new Application();
     public List<Product> Products = new ArrayList<>();
     private CookieManager CookieManager = new CookieManager();

@@ -11,7 +11,6 @@
         android:paddingRight="@dimen/dimen16"
         android:orientation="vertical">
 
-
         <TextView
             android:id="@+id/tvInfo"
             android:layout_width="match_parent"
@@ -29,20 +28,20 @@
             android:text="tvApps" />
 
         <TextView
-            android:id="@+id/tvMerchants"
+            android:id="@+id/tvDocuments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/white"
-            android:text="tvMerchants" />
+            android:text="tvDocuments" />
 
         <TextView
-            android:id="@+id/tvPersons"
+            android:id="@+id/tvScans"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/white"
-            android:text="tvPersons" />
+            android:text="tvScans" />
 
         <TextView
             android:id="@+id/tvStatuses"
@@ -57,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
-            android:padding="@dimen/button_padding"
+            android:padding="@dimen/button_padding" android:layout_margin="@dimen/dimen16"
             android:text="Create Database"
             android:textColor="@android:color/white" />
 
@@ -66,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
-            android:padding="@dimen/button_padding"
+            android:padding="@dimen/button_padding" android:layout_margin="@dimen/dimen16"
             android:text="Setup Database"
             android:textColor="@android:color/white" />
 
@@ -75,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
-            android:padding="@dimen/button_padding"
+            android:padding="@dimen/button_padding" android:layout_margin="@dimen/dimen16"
             android:text="Drop Database"
             android:textColor="@android:color/white" />
 

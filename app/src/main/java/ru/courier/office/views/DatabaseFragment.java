@@ -71,8 +71,8 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
     private Button btnDropDatabase;
     private TextView tvInfo;
     private TextView tvApps;
-    private TextView tvMerchants;
-    private TextView tvPersons;
+    private TextView tvDocuments;
+    private TextView tvScans;
     private TextView tvStatuses;
 
     @Override
@@ -91,8 +91,9 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
 
         tvInfo = (TextView) view.findViewById(R.id.tvInfo);
         tvApps = (TextView) view.findViewById(R.id.tvApps);
-        tvMerchants = (TextView) view.findViewById(R.id.tvMerchants);
-        tvPersons = (TextView) view.findViewById(R.id.tvPersons);
+
+        tvDocuments = (TextView) view.findViewById(R.id.tvDocuments);
+        tvScans = (TextView) view.findViewById(R.id.tvScans);
         tvStatuses = (TextView) view.findViewById(R.id.tvStatuses);
 
         dataAccess = DataAccess.getInstance(getContext());
@@ -106,10 +107,10 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
         tvInfo.setText(String.format("%s \nVersion: %s \nCreated: %s", status.Info, status.Id, status.Created));
         long countApplications = dataAccess.countApplications();
         tvApps.setText(String.format("Applications count: %s", countApplications));
-        long countMerchants = dataAccess.countMerchants();
-        tvMerchants.setText(String.format("Merchants count: %s", countMerchants));
-        long countPersons = dataAccess.countPersons();
-        tvPersons.setText(String.format("Persons count: %s", countPersons));
+        long countDocuments = dataAccess.countDocuments();
+        tvDocuments.setText(String.format("Documents count: %s", countDocuments));
+        long countScans = dataAccess.countScans();
+        tvScans.setText(String.format("Scans count: %s", countScans));
         long countStatuses = dataAccess.countStatuses();
         tvStatuses.setText(String.format("Statuses count: %s", countStatuses));
     }

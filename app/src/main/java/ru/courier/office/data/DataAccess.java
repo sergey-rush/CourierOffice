@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.text.DateFormat;
@@ -16,8 +15,9 @@ import java.util.Date;
 import java.util.List;
 
 import ru.courier.office.core.Application;
-import ru.courier.office.core.Merchant;
-import ru.courier.office.core.Person;
+import ru.courier.office.core.Document;
+import ru.courier.office.core.OperationType;
+import ru.courier.office.core.Scan;
 import ru.courier.office.core.Status;
 
 /**
@@ -57,15 +57,19 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract int addApplication(Application application);
     public abstract boolean removeApplication(int id);
 
-    public abstract Person getPersonById(int personId);
-    public abstract int countPersons();
-    public abstract int insertPerson(Person person);
-    public abstract boolean deletePersonById(int id);
+    public abstract List<Document> getDocumentsByApplicationId(String applicationId);
+    public abstract int countDocuments();
+    public abstract int insertDocument(Document document);
+    public abstract void updateDocumentCountByScan(int id, OperationType operationType);
+    public abstract boolean deleteDocumentsByApplicationId(String applicationId);
 
-    public abstract Merchant getMerchantById(int merchantId);
-    public abstract int countMerchants();
-    public abstract int insertMerchant(Merchant merchant);
-    public abstract boolean deleteMerchantById(int id);
+    public abstract List<Scan> getScansByDocumentId(int documentId);
+    public abstract int countScans();
+    public abstract int countScansByDocumentId(int documentId);
+    public abstract int insertScan(Scan scan);
+    public abstract boolean deleteScansByApplicationId(String applicationId);
+    public abstract boolean deleteScansByDocumentId(int documentId);
+    public abstract boolean deleteScanById(int id);
 
     public abstract List<Status> getStatuses(String applicationId);
     public abstract int countStatuses();
@@ -135,14 +139,14 @@ public abstract class DataAccess extends SQLiteOpenHelper {
         if(status.Id > 0) {
 
             db.execSQL("DROP TABLE IF EXISTS Applications");
-            db.execSQL("DROP TABLE IF EXISTS Merchants");
             db.execSQL("DROP TABLE IF EXISTS Statuses");
-            db.execSQL("DROP TABLE IF EXISTS Persons");
+            db.execSQL("DROP TABLE IF EXISTS Documents");
+            db.execSQL("DROP TABLE IF EXISTS Scans");
 
-            db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY, ApplicationId TEXT, MerchantId INTEGER, PersonId INTEGER, PersonName TEXT, MerchantName TEXT, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, MerchantId TEXT, MerchantName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, PersonId TEXT, PersonName TEXT, BirthDate TEXT, Gender INTEGER, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
             db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
-            db.execSQL("CREATE TABLE Merchants(Id INTEGER PRIMARY KEY AUTOINCREMENT, MerchantId TEXT, ApplicationId TEXT, Name TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, IsActive INTEGER)");
-            db.execSQL("CREATE TABLE Persons(Id INTEGER PRIMARY KEY AUTOINCREMENT, PersonId TEXT, ApplicationId TEXT, FirstName TEXT, MiddleName TEXT, LastName TEXT, BirthDate TEXT, Gender INTEGER)");
+            db.execSQL("CREATE TABLE Documents(Id INTEGER PRIMARY KEY AUTOINCREMENT, DocumentId TEXT, ApplicationId TEXT, Title TEXT, Count INTEGER)");
+            db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, DocumentId INTEGER, Page INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
 
             IncrementVersion();
         }
@@ -160,9 +164,9 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS Applications");
-        db.execSQL("DROP TABLE IF EXISTS Merchants");
         db.execSQL("DROP TABLE IF EXISTS Statuses");
-        db.execSQL("DROP TABLE IF EXISTS Persons");
+        db.execSQL("DROP TABLE IF EXISTS Documents");
+        db.execSQL("DROP TABLE IF EXISTS Scans");
         onCreate(db);
     }
 

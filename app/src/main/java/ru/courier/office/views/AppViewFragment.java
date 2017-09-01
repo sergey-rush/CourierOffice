@@ -62,8 +62,6 @@ public class AppViewFragment extends Fragment {
         DataAccess dataAccess = DataAccess.getInstance(view.getContext());
         WebContext webContext = WebContext.getInstance();
         webContext.Application = dataAccess.getApplicationById(id);
-        webContext.Application.Merchant = dataAccess.getMerchantById(webContext.Application.MerchantId);
-        webContext.Application.Person = dataAccess.getPersonById(webContext.Application.PersonId);
         webContext.Application.StatusList = dataAccess.getStatuses(webContext.Application.ApplicationId);
 
         viewPager = (ViewPager) view.findViewById(R.id.viewpager);
@@ -77,9 +75,8 @@ public class AppViewFragment extends Fragment {
 
     private void setupViewPager(View view, ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        adapter.addFrag(new DocumentFragment(), "ДОКУМЕНТЫ");
         adapter.addFrag(new ApplicationFragment(), "ЗАЯВКА");
-        adapter.addFrag(new MerchantFragment(), "МАГАЗИН");
-        adapter.addFrag(new PersonFragment(), "ЗАЯВИТЕЛЬ");
         adapter.addFrag(new StatusFragment(), "СТАТУСЫ");
         viewPager.setAdapter(adapter);
     }

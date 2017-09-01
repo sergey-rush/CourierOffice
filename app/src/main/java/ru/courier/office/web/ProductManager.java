@@ -13,7 +13,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import ru.courier.office.core.Person;
 import ru.courier.office.views.DrawerActivity;
 
 import org.json.JSONArray;

@@ -240,7 +240,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         return alertDialog;
     }
 
-    private void setFragment(Fragment fragment)
+    public void setFragment(Fragment fragment)
     {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
@@ -340,26 +340,6 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         }
         return (backCameraId > -1);
     }
-
-//    private void updateLocalSettings(ActivationResultModel response) {
-//
-//        LocalSettings.setToken(getContext(), response.token);
-//        LocalSettings.setTdesKey(getContext(), response.tdesKey);
-//        LocalSettings.setTdesIV(getContext(), response.tdesIV);
-//
-//        LocalSettings.setOrderId(QRActivity.getContext(), qrCodeValue);
-//
-//        SUtils.clearSettings(QRActivity.getContext());
-//        //SUtils.removeOrderEncodedFiles(QRActivity.getContext(), qrCodeValue);
-//
-//        SUtils.deleteAllTemporaryPictures(QRActivity.getContext());
-//
-//        ImageLoader.getInstance().clearMemoryCache();
-//
-//        DatabaseHelper.clearDocs();
-//        DatabaseHelper.saveDocs(response.docs);
-//
-//    }
 
     @Override
     public void onAttach(Context context) {

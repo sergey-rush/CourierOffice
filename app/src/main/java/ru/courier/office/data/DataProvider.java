@@ -3,23 +3,20 @@ package ru.courier.office.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import ru.courier.office.core.Application;
-import ru.courier.office.core.Merchant;
-import ru.courier.office.core.Person;
+import ru.courier.office.core.Document;
+import ru.courier.office.core.OperationType;
+import ru.courier.office.core.Scan;
+import ru.courier.office.core.ScanStatus;
 import ru.courier.office.core.Status;
-import ru.courier.office.web.ApplicationManager;
 
 /**
  * Created by rash on 23.08.2017.
@@ -35,21 +32,29 @@ public class DataProvider extends DataAccess {
         Application application = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationId, MerchantId, PersonId, PersonName, MerchantName, Amount, DeliveryAddress, Created FROM Applications WHERE Id = ?", new String[]{String.valueOf(String.valueOf(id))});
+            cursor = db.rawQuery("SELECT Id, ApplicationId, MerchantId, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonId, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE Id = ?", new String[]{String.valueOf(String.valueOf(id))});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 application = new Application();
                 application.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 application.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
-                application.MerchantId = cursor.getInt(cursor.getColumnIndex("MerchantId"));
-                application.PersonId = cursor.getInt(cursor.getColumnIndex("PersonId"));
-                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                application.MerchantId = cursor.getString(cursor.getColumnIndex("MerchantId"));
                 application.MerchantName = cursor.getString(cursor.getColumnIndex("MerchantName"));
+                application.Inn = cursor.getString(cursor.getColumnIndex("Inn"));
+                application.Email = cursor.getString(cursor.getColumnIndex("Email"));
+                application.Site = cursor.getString(cursor.getColumnIndex("Site"));
+                application.ManagerName = cursor.getString(cursor.getColumnIndex("ManagerName"));
+                application.ManagerPhone = cursor.getString(cursor.getColumnIndex("ManagerPhone"));
+                application.PersonId = cursor.getString(cursor.getColumnIndex("PersonId"));
+                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                String birthDate = cursor.getString(cursor.getColumnIndex("BirthDate"));
+                application.Gender = cursor.getInt(cursor.getColumnIndex("Gender"));
                 application.Amount = cursor.getString(cursor.getColumnIndex("Amount"));
                 application.DeliveryAddress = cursor.getString(cursor.getColumnIndex("DeliveryAddress"));
-                String datetime = cursor.getString(cursor.getColumnIndex("Created"));
+                String created = cursor.getString(cursor.getColumnIndex("Created"));
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                application.Created = format.parse(datetime);
+                application.Created = format.parse(created);
+                application.BirthDate = format.parse(birthDate);
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -68,21 +73,29 @@ public class DataProvider extends DataAccess {
         Application application = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationId, MerchantId, PersonId, PersonName, MerchantName, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationId = ? COLLATE NOCASE", new String[]{String.valueOf(applicationId)});
+            cursor = db.rawQuery("SELECT Id, ApplicationId, MerchantId, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonId, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationId = ? COLLATE NOCASE", new String[]{String.valueOf(String.valueOf(applicationId))});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 application = new Application();
                 application.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 application.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
-                application.MerchantId = cursor.getInt(cursor.getColumnIndex("MerchantId"));
-                application.PersonId = cursor.getInt(cursor.getColumnIndex("PersonId"));
-                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                application.MerchantId = cursor.getString(cursor.getColumnIndex("MerchantId"));
                 application.MerchantName = cursor.getString(cursor.getColumnIndex("MerchantName"));
+                application.Inn = cursor.getString(cursor.getColumnIndex("Inn"));
+                application.Email = cursor.getString(cursor.getColumnIndex("Email"));
+                application.Site = cursor.getString(cursor.getColumnIndex("Site"));
+                application.ManagerName = cursor.getString(cursor.getColumnIndex("ManagerName"));
+                application.ManagerPhone = cursor.getString(cursor.getColumnIndex("ManagerPhone"));
+                application.PersonId = cursor.getString(cursor.getColumnIndex("PersonId"));
+                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                String birthDate = cursor.getString(cursor.getColumnIndex("BirthDate"));
+                application.Gender = cursor.getInt(cursor.getColumnIndex("Gender"));
                 application.Amount = cursor.getString(cursor.getColumnIndex("Amount"));
                 application.DeliveryAddress = cursor.getString(cursor.getColumnIndex("DeliveryAddress"));
-                String datetime = cursor.getString(cursor.getColumnIndex("Created"));
+                String created = cursor.getString(cursor.getColumnIndex("Created"));
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                application.Created = format.parse(datetime);
+                application.Created = format.parse(created);
+                application.BirthDate = format.parse(birthDate);
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -101,22 +114,28 @@ public class DataProvider extends DataAccess {
         List<Application> applications = new ArrayList<Application>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationId, MerchantId, PersonId, PersonName, MerchantName, Amount, DeliveryAddress, Created FROM Applications ORDER BY DATETIME(Created) DESC Limit ?;", new String[]{ String.valueOf(limit) });
-            cursor.moveToFirst();
-
+            cursor = db.rawQuery("SELECT Id, ApplicationId, MerchantId, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonId, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications ORDER BY DATETIME(Created) DESC Limit ?", new String[]{String.valueOf(String.valueOf(limit))});           cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 Application application = new Application();
                 application.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 application.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
-                application.MerchantId = cursor.getInt(cursor.getColumnIndex("MerchantId"));
-                application.PersonId = cursor.getInt(cursor.getColumnIndex("PersonId"));
-                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                application.MerchantId = cursor.getString(cursor.getColumnIndex("MerchantId"));
                 application.MerchantName = cursor.getString(cursor.getColumnIndex("MerchantName"));
+                application.Inn = cursor.getString(cursor.getColumnIndex("Inn"));
+                application.Email = cursor.getString(cursor.getColumnIndex("Email"));
+                application.Site = cursor.getString(cursor.getColumnIndex("Site"));
+                application.ManagerName = cursor.getString(cursor.getColumnIndex("ManagerName"));
+                application.ManagerPhone = cursor.getString(cursor.getColumnIndex("ManagerPhone"));
+                application.PersonId = cursor.getString(cursor.getColumnIndex("PersonId"));
+                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                String birthDate = cursor.getString(cursor.getColumnIndex("BirthDate"));
+                application.Gender = cursor.getInt(cursor.getColumnIndex("Gender"));
                 application.Amount = cursor.getString(cursor.getColumnIndex("Amount"));
                 application.DeliveryAddress = cursor.getString(cursor.getColumnIndex("DeliveryAddress"));
-                String datetime = cursor.getString(cursor.getColumnIndex("Created"));
+                String created = cursor.getString(cursor.getColumnIndex("Created"));
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                application.Created = format.parse(datetime);
+                application.Created = format.parse(created);
+                application.BirthDate = format.parse(birthDate);
                 applications.add(application);
                 cursor.moveToNext();
             }
@@ -158,9 +177,16 @@ public class DataProvider extends DataAccess {
         ContentValues contentValues = new ContentValues();
         contentValues.put("ApplicationId", application.ApplicationId);
         contentValues.put("MerchantId", application.MerchantId);
+        contentValues.put("MerchantName", application.MerchantName);
+        contentValues.put("Inn", application.Inn);
+        contentValues.put("Email", application.Email);
+        contentValues.put("Site", application.Site);
+        contentValues.put("ManagerName", application.ManagerName);
+        contentValues.put("ManagerPhone", application.ManagerPhone);
         contentValues.put("PersonId", application.PersonId);
         contentValues.put("PersonName", application.PersonName);
-        contentValues.put("MerchantName", application.MerchantName);
+        contentValues.put("BirthDate", dateFormat.format(application.BirthDate));
+        contentValues.put("Gender", application.Gender);
         contentValues.put("Amount", application.Amount);
         contentValues.put("DeliveryAddress", application.DeliveryAddress);
         contentValues.put("Created", dateFormat.format(application.Created));        
@@ -185,24 +211,14 @@ public class DataProvider extends DataAccess {
 
     @Override
     public int addApplication(Application application) {
-
-        application.MerchantId = insertMerchant(application.Merchant);
-
-        if (application.Person != null) {
-            application.PersonId = insertPerson(application.Person);
-        }
-
         int appId = insertApplication(application);
-
-        if (appId == -1) {
-            deleteMerchantById(application.MerchantId);
-            deletePersonById(application.PersonId);
-        } else {
-            for (ru.courier.office.core.Status status : application.StatusList) {
-                insertStatus(status);
-            }
+        for (ru.courier.office.core.Document document : application.DocumentList) {
+            insertDocument(document);
         }
 
+        for (ru.courier.office.core.Status status : application.StatusList) {
+            insertStatus(status);
+        }
         return appId;
     }
 
@@ -210,35 +226,36 @@ public class DataProvider extends DataAccess {
     public boolean removeApplication(int id) {
 
         Application application = getApplicationById(id);
-        deleteMerchantById(application.MerchantId);
-        deletePersonById(application.PersonId);
+        deleteScansByApplicationId(application.ApplicationId);
+        deleteDocumentsByApplicationId(application.ApplicationId);
         deleteStatusesByApplicationId(application.ApplicationId);
         deleteApplicationById(id);
         return true;
     }
 
+//    public int Id;
+//    public String DocumentId;
+//    public String ApplicationId;
+//    public String Title;
+//    public List<Scan> ScanList;
     @Override
-    public Person getPersonById(int personId) {
-        Person person = null;
+    public List<Document> getDocumentsByApplicationId(String applicationId) {
+        List<Document> documents = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, PersonId, ApplicationId, FirstName, MiddleName, LastName, BirthDate, Gender FROM Persons WHERE Id = ?", new String[]{String.valueOf(personId)});
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                person = new Person();
-                person.Id = cursor.getInt(cursor.getColumnIndex("Id"));
-                person.PersonId = cursor.getString(cursor.getColumnIndex("PersonId"));
-                person.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
-                person.FirstName = cursor.getString(cursor.getColumnIndex("FirstName"));
-                person.MiddleName = cursor.getString(cursor.getColumnIndex("MiddleName"));
-                person.LastName = cursor.getString(cursor.getColumnIndex("LastName"));
-                String datetime = cursor.getString(cursor.getColumnIndex("BirthDate"));
-                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                person.BirthDate = format.parse(datetime);
-                person.Gender = cursor.getString(cursor.getColumnIndex("Gender"));
+            cursor = db.rawQuery("SELECT Id, DocumentId, ApplicationId, Title, Count FROM Documents WHERE ApplicationId = ? COLLATE NOCASE ORDER BY Id", new String[]{String.valueOf(applicationId)});
+            cursor.moveToFirst();
+            documents = new ArrayList<Document>();
+            while (!cursor.isAfterLast()) {
+                Document document = new Document();
+                document.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                document.DocumentId = cursor.getString(cursor.getColumnIndex("DocumentId"));
+                document.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
+                document.Title = cursor.getString(cursor.getColumnIndex("Title"));
+                document.Count = cursor.getInt(cursor.getColumnIndex("Count"));
+                documents.add(document);
+                cursor.moveToNext();
             }
-        } catch (ParseException e) {
-            e.printStackTrace();
         } catch (SQLiteException ex) {
             ex.printStackTrace();
         } finally {
@@ -246,15 +263,15 @@ public class DataProvider extends DataAccess {
                 cursor.close();
             }
         }
-        return person;
+        return documents;
     }
 
     @Override
-    public int countPersons() {
+    public int countDocuments() {
         int count = 0;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Persons", null);
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Documents", null);
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 count = cursor.getInt(cursor.getColumnIndex("Total"));
@@ -270,94 +287,144 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
-    public int insertPerson(Person person) {
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    public int insertDocument(Document document) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put("PersonId", person.PersonId);
-        contentValues.put("ApplicationId", person.ApplicationId);
-        contentValues.put("FirstName", person.FirstName);
-        contentValues.put("MiddleName", person.MiddleName);
-        contentValues.put("LastName", person.LastName);
-        contentValues.put("Gender", person.Gender);
-        contentValues.put("BirthDate", dateFormat.format(person.BirthDate));
-        int ret = (int)db.insert("Persons", null, contentValues);
+        contentValues.put("DocumentId", document.DocumentId);
+        contentValues.put("ApplicationId", document.ApplicationId);
+        contentValues.put("Title", document.Title);
+        contentValues.put("Count", document.Count);
+        int ret = (int)db.insert("Documents", null, contentValues);
         return ret;
     }
 
     @Override
-    public boolean deletePersonById(int id) {
-        int ret = db.delete("Persons", "Id = ?", new String[]{String.valueOf(id)});
+    public void updateDocumentCountByScan(int id, OperationType operationType) {
+        try {
+            if (operationType == OperationType.Increment) {
+                db.execSQL("UPDATE Documents SET Count = Count + 1 WHERE Id = ?", new String[]{String.valueOf(id)});
+            } else {
+                db.execSQL("UPDATE Documents SET Count = Count - 1 WHERE Id = ?", new String[]{String.valueOf(id)});
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+
+        }
+    }
+
+    @Override
+    public boolean deleteDocumentsByApplicationId(String applicationId) {
+        int ret = db.delete("Documents", "ApplicationId = ?", new String[]{String.valueOf(applicationId)});
+        return ret == 1;
+    }
+
+//    public int Id;
+//    public int DocumentId;
+//    public int Page;
+//    public byte[] Photo;
+
+    @Override
+    public List<Scan> getScansByDocumentId(int documentId) {
+        List<Scan> scans = null;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT Id, ApplicationId, DocumentId, Page, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY Page", new String[]{String.valueOf(documentId)});
+            cursor.moveToFirst();
+            scans = new ArrayList<Scan>();
+            while (!cursor.isAfterLast()) {
+                Scan scan = new Scan();
+                scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                scan.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
+                scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
+                scan.Page = cursor.getInt(cursor.getColumnIndex("Page"));
+                scan.ScanStatus = ScanStatus.fromInt(cursor.getInt(cursor.getColumnIndex("ScanStatus")));
+                scan.SmallPhoto = cursor.getBlob(cursor.getColumnIndex("SmallPhoto"));
+                scans.add(scan);
+                cursor.moveToNext();
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return scans;
+    }
+
+    @Override
+    public int countScans() {
+        int count = 0;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Scans", null);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(cursor.getColumnIndex("Total"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public int countScansByDocumentId(int documentId){
+        int count = 0;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Scans WHERE DocumentId = ?", new String[]{String.valueOf(documentId)});
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(cursor.getColumnIndex("Total"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public int insertScan(Scan scan) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("ApplicationId", scan.ApplicationId);
+        contentValues.put("DocumentId", scan.DocumentId);
+        contentValues.put("Page", scan.Page);
+        contentValues.put("ScanStatus", scan.ScanStatus.ordinal());
+        contentValues.put("SmallPhoto", scan.SmallPhoto);
+        contentValues.put("LargePhoto", scan.LargePhoto);
+        int ret = (int) db.insert("Scans", null, contentValues);
+
+        if (ret > 0) {
+            updateDocumentCountByScan(scan.DocumentId, OperationType.Increment);
+        }
+
+        return ret;
+    }
+
+    @Override
+    public boolean deleteScansByApplicationId(String applicationId) {
+        int ret = db.delete("Scans", "ApplicationId = ?", new String[]{String.valueOf(applicationId)});
         return ret == 1;
     }
 
     @Override
-    public Merchant getMerchantById(int merchantId) {
-        Merchant merchant = null;
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery("SELECT Id, MerchantId, ApplicationId, Name, Inn, Email, Site, ManagerName, ManagerPhone FROM Merchants WHERE Id = ?", new String[]{String.valueOf(merchantId)});
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                merchant = new Merchant();
-                merchant.Id = cursor.getInt(cursor.getColumnIndex("Id"));
-                merchant.MerchantId = cursor.getString(cursor.getColumnIndex("MerchantId"));
-                merchant.ApplicationId = cursor.getString(cursor.getColumnIndex("ApplicationId"));
-                merchant.Name = cursor.getString(cursor.getColumnIndex("Name"));
-                merchant.Inn = cursor.getString(cursor.getColumnIndex("Inn"));
-                merchant.Email = cursor.getString(cursor.getColumnIndex("Email"));
-                merchant.Site = cursor.getString(cursor.getColumnIndex("Site"));
-                merchant.ManagerName = cursor.getString(cursor.getColumnIndex("ManagerName"));
-                merchant.ManagerPhone = cursor.getString(cursor.getColumnIndex("ManagerPhone"));
-            }
-        } catch (SQLiteException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return merchant;
+    public boolean deleteScansByDocumentId(int documentId) {
+        int ret = db.delete("Scans", "DocumentId = ?", new String[]{String.valueOf(documentId)});
+        return ret == 1;
     }
 
     @Override
-    public int countMerchants() {
-        int count = 0;
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Merchants", null);
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                count = cursor.getInt(cursor.getColumnIndex("Total"));
-            }
-        } catch (SQLiteException ex) {
-            ex.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return count;
-    }
-
-    @Override
-    public int insertMerchant(Merchant merchant) {
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("MerchantId", merchant.MerchantId);
-        contentValues.put("ApplicationId", merchant.ApplicationId);
-        contentValues.put("Name", merchant.Name);
-        contentValues.put("Inn", merchant.Inn);
-        contentValues.put("Email", merchant.Email);
-        contentValues.put("Site", merchant.Site);
-        contentValues.put("ManagerName", merchant.ManagerName);
-        contentValues.put("ManagerPhone", merchant.ManagerPhone);
-        int ret = (int)db.insert("Merchants", null, contentValues);
-        return ret;
-    }
-
-    @Override
-    public boolean deleteMerchantById(int id) {
-        int ret = db.delete("Merchants", "Id = ?", new String[]{String.valueOf(id)});
+    public boolean deleteScanById(int id) {
+        int ret = db.delete("Scans", "Id = ?", new String[]{String.valueOf(id)});
         return ret == 1;
     }
 

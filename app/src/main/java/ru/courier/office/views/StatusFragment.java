@@ -25,11 +25,9 @@ import ru.courier.office.web.WebContext;
  */
 public class StatusFragment extends Fragment {
 
-
     public StatusFragment() {
         // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

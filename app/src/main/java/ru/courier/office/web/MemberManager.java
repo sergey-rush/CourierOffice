@@ -12,7 +12,6 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.core.Person;
 import ru.courier.office.views.DrawerActivity;
 
 import org.json.JSONArray;
@@ -60,24 +59,6 @@ public class MemberManager extends AsyncTask<Void, Void, Void> {
         // Dismiss the progress dialog
         if (pDialog.isShowing())
             pDialog.dismiss();
-
-        Person member = WebContext.getInstance().Person;
-
-        EditText editTextFirstName = (EditText) _view.findViewById(R.id.editTextFirstName);
-        editTextFirstName.setText(member.FirstName);
-
-        EditText editTextMiddleName = (EditText) _view.findViewById(R.id.editTextMiddleName);
-        editTextMiddleName.setText(member.MiddleName);
-
-        EditText editTextLastName = (EditText) _view.findViewById(R.id.editTextLastName);
-        editTextLastName.setText(member.LastName);
-
-
-        Toast.makeText(_view.getContext(), "Person LastName: " + member.LastName, Toast.LENGTH_SHORT).show();
-
-        //Intent intent = new Intent(_view.getContext(), DrawerActivity.class);
-        //_view.getContext().startActivity(intent);
-
     }
 
 }
