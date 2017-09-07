@@ -16,6 +16,7 @@ import java.util.List;
 
 import ru.courier.office.core.Application;
 import ru.courier.office.core.Document;
+import ru.courier.office.core.Note;
 import ru.courier.office.core.OperationType;
 import ru.courier.office.core.Scan;
 import ru.courier.office.core.Status;
@@ -57,24 +58,33 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract int addApplication(Application application);
     public abstract boolean removeApplication(int id);
 
-    public abstract List<Document> getDocumentsByApplicationId(String applicationId);
+    public abstract List<Document> getDocumentsByApplicationGuid(String applicationGuid);
     public abstract int countDocuments();
     public abstract int insertDocument(Document document);
     public abstract void updateDocumentCountByScan(int id, OperationType operationType);
-    public abstract boolean deleteDocumentsByApplicationId(String applicationId);
+    public abstract boolean deleteDocumentsByApplicationGuid(String applicationGuid);
 
     public abstract List<Scan> getScansByDocumentId(int documentId);
     public abstract int countScans();
     public abstract int countScansByDocumentId(int documentId);
     public abstract int insertScan(Scan scan);
-    public abstract boolean deleteScansByApplicationId(String applicationId);
+    public abstract byte[] getScanImage(int scanId, int offset, int length);
+    public abstract Scan getScanById(int scanId);
+
+    public abstract boolean deleteScansByApplicationGuid(String applicationGuid);
     public abstract boolean deleteScansByDocumentId(int documentId);
     public abstract boolean deleteScanById(int id);
 
-    public abstract List<Status> getStatuses(String applicationId);
+    public abstract List<Status> getStatusesByApplicationId(int applicationId);
     public abstract int countStatuses();
     public abstract int insertStatus(Status status);
-    public abstract boolean deleteStatusesByApplicationId(String applicationId);
+    public abstract boolean deleteStatusesByApplicationId(int applicationId);
+
+    public abstract List<Note> getNotesByLimit(int limit);
+    public abstract int getNoteMaxId();
+    public abstract int insertNote(Note note);
+    public abstract boolean deleteNotesById(int id);
+    public abstract void addNotes(List<Note> notes);
 
     public void createDatabase() {
         onCreate(db);
@@ -142,12 +152,13 @@ public abstract class DataAccess extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS Statuses");
             db.execSQL("DROP TABLE IF EXISTS Documents");
             db.execSQL("DROP TABLE IF EXISTS Scans");
+            db.execSQL("DROP TABLE IF EXISTS Notes");
 
-            db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, MerchantId TEXT, MerchantName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, PersonId TEXT, PersonName TEXT, BirthDate TEXT, Gender INTEGER, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
-            db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
-            db.execSQL("CREATE TABLE Documents(Id INTEGER PRIMARY KEY AUTOINCREMENT, DocumentId TEXT, ApplicationId TEXT, Title TEXT, Count INTEGER)");
-            db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId TEXT, DocumentId INTEGER, Page INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
-
+            db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationGuid TEXT, MerchantGuid TEXT, MerchantName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, PersonGuid TEXT, PersonName TEXT, BirthDate TEXT, Gender INTEGER, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId INTEGER, ApplicationGuid TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
+            db.execSQL("CREATE TABLE Documents(Id INTEGER PRIMARY KEY AUTOINCREMENT, DocumentGuid TEXT, ApplicationGuid TEXT, Title TEXT, Count INTEGER)");
+            db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationGuid TEXT, DocumentGuid TEXT, DocumentId INTEGER, PageNum INTEGER, ImageLength INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
+            db.execSQL("CREATE TABLE Notes(Id INTEGER PRIMARY KEY, Info TEXT, Created TEXT)");
             IncrementVersion();
         }
     }

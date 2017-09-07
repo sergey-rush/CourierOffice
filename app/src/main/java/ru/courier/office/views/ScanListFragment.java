@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,10 +90,13 @@ public class ScanListFragment extends Fragment {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-
                 TextView tvTitle = (TextView) view.findViewById(R.id.tvTitle);
                 String title = tvTitle.getText().toString();
                 int scanId = Integer.parseInt(tvTitle.getTag().toString());
+
+                ScanViewFragment scanListFragment = ScanViewFragment.newInstance(documentId, scanId);
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
 
                 Toast.makeText(getContext(), String.format("Title: %s ScanId: %s", title, scanId), Toast.LENGTH_SHORT).show();
 

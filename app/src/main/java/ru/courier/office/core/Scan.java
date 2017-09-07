@@ -6,9 +6,11 @@ package ru.courier.office.core;
 
 public class Scan {
     public int Id;
-    public String ApplicationId;
+    public String ApplicationGuid;
+    public String DocumentGuid;
     public int DocumentId;
-    public int Page;
+    public int PageNum;
+    public int ImageLength;
     public ScanStatus ScanStatus;
     public byte[] SmallPhoto;
     public byte[] LargePhoto;

@@ -1,28 +1,27 @@
 package ru.courier.office.web;
 
-import ru.courier.office.core.Product;
-import ru.courier.office.core.UrlType;
-
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ProductProvider extends BaseProvider {
+import ru.courier.office.core.UrlObject;
+import ru.courier.office.core.UrlType;
 
-    public int getProducts(String memberId) {
+public class NoteProvider extends BaseProvider {
+
+    public int getNotes(int id) {
 
         HttpURLConnection connection = null;
 
         try {
-
-            URL url = new URL(String.format("%s=%s", webContext.getUrl(UrlType.Products), memberId));
+            UrlObject urlObject = webContext.getUrl(UrlType.Note);
+            URL url = new URL(String.format("%s?id=%d", urlObject.Url, id));
             connection = (HttpURLConnection) url.openConnection();
             webContext.attachCookieTo(connection);
             connection.connect();
@@ -30,28 +29,17 @@ public class ProductProvider extends BaseProvider {
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-
-                JSONObject jsonObj = new JSONObject(output);
-                //JSONObject resultData = jsonObj.getJSONObject("ResultData");
-                JSONArray items = jsonObj.getJSONArray("ResultData");
-                for (int i = 0; i < items.length(); i++) {
-                    JSONObject item = items.getJSONObject(i);
-                    Product product = new Product();
-                    product.Id = item.getString("Id");
-                    product.Amount = item.getString("Amount");
-                    product.Created = item.getString("Created");
-                    webContext.Products.add(product);
-                }
-
+                webContext.Notes = parseToNoteList(output);
             } else {
                 return responseCode;
-
             }
 
         } catch (MalformedURLException mex) {
             mex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {

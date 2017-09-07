@@ -1,30 +1,28 @@
 package ru.courier.office.web;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import ru.courier.office.R;
-import ru.courier.office.views.DrawerActivity;
-import ru.courier.office.views.LoginActivity;
+import ru.courier.office.core.Scan;
 
 
-public class LoginManager extends AsyncTask<Void, Void, Void> {
+public class ImageManager extends AsyncTask<Void, Void, Void> {
 
-    private LoginActivity _view;
-    private String _postData;
+    private Context _context;
+    private byte[] _imageBytes;
     private int responseCode;
+    private Scan _scan;
 
     private WebContext webContext = WebContext.getInstance();
 
-    public LoginManager(LoginActivity view, String postData) {
-        _view = view;
-        _postData = postData;
+    public ImageManager(Context context, Scan scan, byte[] imageBytes) {
+        _context = context;
+        _scan = scan;
+        _imageBytes = imageBytes;
     }
 
     private ProgressDialog pDialog;
@@ -33,7 +31,7 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
     protected void onPreExecute() {
         super.onPreExecute();
         // Showing progress dialog
-        pDialog = new ProgressDialog(_view);
+        pDialog = new ProgressDialog(_context);
         pDialog.setMessage("Пожалуйста, подождите...");
         pDialog.setCancelable(false);
         pDialog.show();
@@ -41,8 +39,16 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... arg0) {
-        LoginProvider loginProvider = new LoginProvider();
-        responseCode = loginProvider.doSign(_postData);
+        String postData = String.format("id=%s&name=%s", "342", "App name");
+//        String applicationGuid
+//        String documentGuid
+//        int page
+
+        UploadProvider uploadProvider = new UploadProvider();
+        responseCode = uploadProvider.doUpload(_scan, _imageBytes);
+
+        //ImageProvider imageProvider = new ImageProvider();
+        //responseCode = imageProvider.doUpload(_scan, _imageBytes);
         return null;
     }
 
@@ -53,21 +59,21 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
             pDialog.dismiss();
 
         if (responseCode == 200) {
-            Intent intent = new Intent(_view, DrawerActivity.class);
-            _view.startActivity(intent);
+            //Intent intent = new Intent(_context, DrawerActivity.class);
+            //_context.startActivity(intent);
             return;
         }
 
         if (responseCode == 403) {
-            LoginFailed().show();
+            ImageFailed().show();
         }
         else {
             ConnectionFailed().show();
         }
     }
 
-    private AlertDialog LoginFailed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
+    private AlertDialog ImageFailed() {
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle("Ошибка входа")
                 .setMessage("Неверный телефон или пароль")
                 .setIcon(R.drawable.ic_error)
@@ -81,7 +87,7 @@ public class LoginManager extends AsyncTask<Void, Void, Void> {
     }
 
     private AlertDialog ConnectionFailed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle(R.string.connection_failed)
                 .setMessage(R.string.connection_not_available)
                 .setIcon(R.drawable.ic_error)

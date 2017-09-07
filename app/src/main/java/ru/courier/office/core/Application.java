@@ -6,15 +6,15 @@ import java.util.List;
 
 public class Application {
     public int Id;
-    public String ApplicationId;
-    public String MerchantId;
+    public String ApplicationGuid;
+    public String MerchantGuid;
     public String MerchantName;
     public String Inn;
     public String Email;
     public String Site;
     public String ManagerName;
     public String ManagerPhone;
-    public String PersonId;
+    public String PersonGuid;
     public String PersonName;
     public Date BirthDate;
     public int Gender;

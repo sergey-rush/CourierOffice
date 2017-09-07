@@ -5,9 +5,9 @@ import android.text.TextUtils;
 import ru.courier.office.core.AppMode;
 import ru.courier.office.core.Application;
 import ru.courier.office.core.HttpMethod;
+import ru.courier.office.core.Note;
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.User;
-import ru.courier.office.core.Product;
 import ru.courier.office.core.UrlType;
 
 import java.net.CookieManager;
@@ -28,7 +28,8 @@ public class WebContext {
     public AppMode Mode = AppMode.Develop;
     public User User = new User();
     public Application Application = new Application();
-    public List<Product> Products = new ArrayList<>();
+    public List<Note> Notes = new ArrayList<Note>();
+
     private CookieManager CookieManager = new CookieManager();
 
     private WebContext(){
@@ -62,9 +63,11 @@ public class WebContext {
     private void initUrls()
     {
         Map<UrlType, UrlObject> developMap = new HashMap<UrlType, UrlObject>();
+        developMap.put(UrlType.Note, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/note"));
         developMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/account/sign"));
         developMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/account"));
         developMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/application"));
+        developMap.put(UrlType.Image, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/document"));
         urlMap.put(AppMode.Develop, developMap);
     }
 

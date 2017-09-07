@@ -2,37 +2,32 @@ package ru.courier.office.views;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.List;
-
 import ru.courier.office.R;
-import ru.courier.office.core.Note;
-import ru.courier.office.core.NoteAdapter;
-import ru.courier.office.core.Status;
-import ru.courier.office.core.StatusAdapter;
+import ru.courier.office.core.Scan;
 import ru.courier.office.data.DataAccess;
-import ru.courier.office.web.NoteManager;
-import ru.courier.office.web.WebContext;
+import ru.courier.office.web.ImageManager;
+import ru.courier.office.web.LoginManager;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link UploadFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link UploadFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class UploadFragment extends Fragment implements View.OnClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -44,7 +39,7 @@ public class HomeFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public HomeFragment() {
+    public UploadFragment() {
         // Required empty public constructor
     }
 
@@ -54,11 +49,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment UploadFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static UploadFragment newInstance(String param1, String param2) {
+        UploadFragment fragment = new UploadFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -78,42 +73,54 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view =  inflater.inflate(R.layout.fragment_upload, container, false);
 
-        WebContext webContext = WebContext.getInstance();
-        DataAccess dataAccess = DataAccess.getInstance(view.getContext());
-        webContext.Notes = dataAccess.getNotesByLimit(10);
-
-        if(webContext.Notes.size()==0) {
-            int maxId = dataAccess.getNoteMaxId();
-            NoteManager noteManager = new NoteManager(view, maxId);
-            noteManager.execute();
-        }
-
-        if(webContext.Notes.size()>0) {
-
-            List<Note> noteList = webContext.Notes;
-            NoteAdapter adapter = new NoteAdapter(getContext(), noteList);
-
-            ListView listView = (ListView) view.findViewById(R.id.lvNotes);
-            listView.setAdapter(adapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                    RelativeLayout layout = (RelativeLayout) view;
-                    TextView tvInfo = (TextView) layout.findViewById(R.id.tvInfo);
-                    Toast.makeText(view.getContext(), tvInfo.getText(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
+        Button btnUpload = (Button) view.findViewById(R.id.btnUpload);
+        btnUpload.setOnClickListener(this);
 
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnUpload:
+                onButtonUploadClick(view);
+                break;
+        }
+    }
+
+    public void onButtonUploadClick(View view) {
+
+        //Toast.makeText(getContext(), "onButtonUploadClick", Toast.LENGTH_SHORT).show();
+
+        DataAccess dataAccess = DataAccess.getInstance(getContext());
+        Scan scan = dataAccess.getScanById(23);
+
+        int imageLength = scan.ImageLength;
+        int sendBytes = 0;
+        int bundle = 1024 * 1024;
+        int counter = 1;
+
+        while(sendBytes < imageLength) {
+
+            int bufferLength = counter * bundle;
+            if (bufferLength > imageLength - sendBytes) {
+                bufferLength = imageLength - sendBytes;
+            }
+
+            byte[] imageBytes = dataAccess.getScanImage(scan.Id, sendBytes, bufferLength);
+            int imageBytesLength = imageBytes.length;
+            ImageManager imageManager = new ImageManager(getContext(), scan, imageBytes);
+            final AsyncTask<Void, Void, Void> execute = imageManager.execute();
+            sendBytes = sendBytes + bufferLength;
+            Log.d("UPD", String.format("Counter: %s SendBytes: %s BufferLength: %s", Integer.toString(counter), Integer.toString(sendBytes), Integer.toString(bufferLength)));
+            counter++;
+        }
+
+        Log.d("UPD", String.format("SendBytes: %s", Integer.toString(sendBytes)));
+    }
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);

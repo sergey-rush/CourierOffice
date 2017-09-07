@@ -2,6 +2,7 @@ package ru.courier.office.web;
 
 import ru.courier.office.core.Application;
 import ru.courier.office.core.Document;
+import ru.courier.office.core.Note;
 import ru.courier.office.core.Status;
 import ru.courier.office.core.User;
 
@@ -27,7 +28,7 @@ public class BaseProvider {
     protected WebContext webContext = WebContext.getInstance();
 
     protected int responseCode = 0;
-    private String applicationId;
+    private String applicationGuid;
 
     protected void serialisePost(HttpURLConnection connection, String postData) throws IOException {
         OutputStream os = connection.getOutputStream();
@@ -56,7 +57,7 @@ public class BaseProvider {
 
         Application application = new Application();
         JSONObject resultData = new JSONObject(input);
-        application.ApplicationId = applicationId = resultData.getString("Id");
+        application.ApplicationGuid = applicationGuid = resultData.getString("Id");
         application.Amount = resultData.getString("Amount");
         application.DeliveryAddress = resultData.getString("DeliveryAddress");
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -80,8 +81,8 @@ public class BaseProvider {
         for (int i = 0; i < items.length(); i++) {
             JSONObject item = items.getJSONObject(i);
             Document document = new Document();
-            document.ApplicationId = applicationId;
-            document.DocumentId = item.getString("Id");
+            document.ApplicationGuid = applicationGuid;
+            document.DocumentGuid = item.getString("Id");
             document.Title = item.getString("Title");
             documentList.add(document);
         }
@@ -97,7 +98,7 @@ public class BaseProvider {
         for (int i = 0; i < items.length(); i++) {
             JSONObject item = items.getJSONObject(i);
             Status status = new Status();
-            status.ApplicationId = applicationId;
+            status.ApplicationGuid = applicationGuid;
             status.Code = item.getString("Code");
             status.Category = item.getString("Category");
             status.Info = item.getString("Info");
@@ -111,7 +112,7 @@ public class BaseProvider {
     protected Application parseToMerchant(String input, Application application) throws JSONException {
 
         JSONObject resultData = new JSONObject(input);
-        application.MerchantId = resultData.getString("Id");
+        application.MerchantGuid = resultData.getString("Id");
         application.MerchantName = resultData.getString("MerchantName");
         application.Inn = resultData.getString("Inn");
         application.Email = resultData.getString("Email");
@@ -136,7 +137,7 @@ public class BaseProvider {
     protected Application parseToPerson(String input, Application application) throws JSONException, ParseException {
 
         JSONObject resultData = new JSONObject(input);
-        application.PersonId = resultData.getString("Id");
+        application.PersonGuid = resultData.getString("Id");
         application.PersonName = resultData.getString("PersonName");
         boolean sex = resultData.getBoolean("Gender");
         if(sex)
@@ -146,5 +147,28 @@ public class BaseProvider {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         application.BirthDate = format.parse(resultData.getString("BirthDate"));
         return application;
+    }
+
+    protected List<Note> parseToNoteList(String input) throws JSONException, ParseException {
+
+        //JSONObject resultData = new JSONObject(input);
+
+        JSONArray items = new JSONArray(input);
+        
+        ArrayList<Note> noteList = new ArrayList<Note>();
+        
+        //JSONArray items = resultData.getJSONArray("NoteList");
+
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = items.getJSONObject(i);
+            Note note = new Note();
+            note.Id = item.getInt("Id");
+            note.Info = item.getString("Info");
+            note.Created = format.parse(item.getString("Created"));
+            noteList.add(note);
+        }
+
+        return noteList;
     }
 }

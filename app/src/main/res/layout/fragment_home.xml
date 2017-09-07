@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     tools:context="ru.courier.office.views.HomeFragment">
 
-    <TextView
+    <ListView
+        android:id="@+id/lvNotes"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/welcome" />
+        android:layout_height="match_parent" />
 
 
 </FrameLayout>

@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Document {
     public int Id;
-    public String DocumentId;
-    public String ApplicationId;
+    public String DocumentGuid;
+    public String ApplicationGuid;
     public String Title;
     public List<Scan> ScanList;
     public int Count = 0;

@@ -27,8 +27,10 @@
     <string name="nav_service">Служебные</string>
     <string name="nav_data">База данных</string>
 
-    <!-- Strings related to hardware -->
+    <!-- Strings related to hardware and network-->
     <string name="camera_not_available">Камера недоступна</string>
+    <string name="connection_failed">Ошибка подключения</string>
+    <string name="connection_not_available">Не удалось подключиться к серверу. Проверьте подключение к интернету.</string>
 
     <!-- Strings related to wizard -->
     <string name="scan_app_qrcode">Отсканируйте QR-код заявки</string>

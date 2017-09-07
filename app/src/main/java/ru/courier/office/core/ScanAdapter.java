@@ -24,8 +24,8 @@ import ru.courier.office.R;
 
 public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder> {
 
-    private Context mContext;
-    private List<Scan> scanList;
+    private Context _context;
+    private List<Scan> _scanList;
 
     public class ScanViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitle, tvStatus;
@@ -40,10 +40,9 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         }
     }
 
-
-    public ScanAdapter(Context mContext, List<Scan> scanList) {
-        this.mContext = mContext;
-        this.scanList = scanList;
+    public ScanAdapter(Context context, List<Scan> scanList) {
+        _context = context;
+        _scanList = scanList;
     }
 
     @Override
@@ -54,8 +53,8 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
 
     @Override
     public void onBindViewHolder(final ScanViewHolder holder, int position) {
-        Scan scan = scanList.get(position);
-        holder.tvTitle.setText(String.format("Страница: %s", scan.Page));
+        Scan scan = _scanList.get(position);
+        holder.tvTitle.setText(String.format("Страница: %s", scan.PageNum));
         holder.tvTitle.setTag(scan.Id);
         holder.tvStatus.setText(toString(scan.ScanStatus));
         byte[] imageBytes = scan.SmallPhoto;
@@ -63,7 +62,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         holder.ivScan.setImageBitmap(bitmap);
 
         // loading scan cover using Glide library
-        //Glide.with(mContext).load(scan.getThumbnail()).into(holder.ivScan);
+        //Glide.with(_context).load(scan.getThumbnail()).into(holder.ivScan);
 
         holder.ivMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +96,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
      */
     private void showPopupMenu(View view) {
         // inflate menu
-        PopupMenu popup = new PopupMenu(mContext, view);
+        PopupMenu popup = new PopupMenu(_context, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.scan_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(new ScanMenuItemClickListener());
@@ -116,10 +115,10 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         public boolean onMenuItemClick(MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 case R.id.scan_menu_show:
-                    Toast.makeText(mContext, "Показать", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "Показать", Toast.LENGTH_SHORT).show();
                     return true;
                 case R.id.scan_menu_delete:
-                    Toast.makeText(mContext, "Удалить", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "Удалить", Toast.LENGTH_SHORT).show();
                     return true;
                 default:
             }
@@ -129,6 +128,6 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
 
     @Override
     public int getItemCount() {
-        return scanList.size();
+        return _scanList.size();
     }
 }

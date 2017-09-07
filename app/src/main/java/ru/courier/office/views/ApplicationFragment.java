@@ -50,7 +50,7 @@ public class ApplicationFragment extends Fragment {
         application = webContext.Application;
 
         tvId = (TextView) view.findViewById(R.id.tvId);
-        tvId.setText(application.ApplicationId);
+        tvId.setText(application.ApplicationGuid);
         tvMerchantName = (TextView) view.findViewById(R.id.tvMerchantName);
         tvMerchantName.setText(application.MerchantName);
         tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
@@ -115,7 +115,7 @@ public class ApplicationFragment extends Fragment {
                 .setTitle("Удаление заявки")
                 .setMessage("Вы действительно желаете удалить эту заявку?")
                 .setIcon(R.drawable.ic_question)
-                .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
                         DataAccess dataAccess = DataAccess.getInstance(getContext());

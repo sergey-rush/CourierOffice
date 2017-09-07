@@ -18,6 +18,7 @@ import java.util.List;
 import ru.courier.office.R;
 import ru.courier.office.core.Status;
 import ru.courier.office.core.StatusAdapter;
+import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.WebContext;
 
 /**
@@ -34,6 +35,9 @@ public class StatusFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_status, container, false);
 
         WebContext webContext = WebContext.getInstance();
+        DataAccess dataAccess = DataAccess.getInstance(view.getContext());
+        webContext.Application.StatusList = dataAccess.getStatusesByApplicationId(webContext.Application.Id);
+
         List<Status> statusList = webContext.Application.StatusList;
         StatusAdapter adapter = new StatusAdapter(this.getContext(), statusList);
 

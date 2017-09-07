@@ -23,13 +23,14 @@
     <item android:title="@string/nav_service">
         <menu>
             <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Upload image" />
+            <item
                 android:id="@+id/nav_data"
                 android:icon="@drawable/ic_info"
                 android:title="@string/nav_data" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="История" />
+
         </menu>
     </item>
 

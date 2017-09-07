@@ -8,7 +8,8 @@ import java.util.Date;
 
 public class Status {
     public int Id;
-    public String ApplicationId;
+    public int ApplicationId;
+    public String ApplicationGuid;
     public String Code;
     public String Category;
     public String Info;

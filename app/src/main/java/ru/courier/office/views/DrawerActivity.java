@@ -24,8 +24,8 @@ import ru.courier.office.R;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
-        AppViewFragment.OnFragmentInteractionListener, TakePhotoFragment.OnFragmentInteractionListener,
-        QrcodeFragment.OnFragmentInteractionListener {
+        AppViewFragment.OnFragmentInteractionListener, TakePhotoFragment.OnFragmentInteractionListener, ScanViewFragment.OnFragmentInteractionListener,
+        QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener {
 
 
 
@@ -147,7 +147,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         } else if (id == R.id.nav_data) {
             fragment = new DatabaseFragment();
         } else if (id == R.id.nav_send) {
-            fragment = new AppListFragment();
+            fragment = new UploadFragment();
         }
 
         showFragment(fragment);

@@ -59,7 +59,7 @@ public class TakePhotoFragment extends Fragment {
     private static final String ARG_DOCUMENT_ID = "documentId";
     private static final String ARG_APPLICATION_ID = "applicationId";
 
-    private String applicationId;
+    private String applicationGuid;
     private int documentId;
 
     public TakePhotoFragment() {
@@ -88,7 +88,7 @@ public class TakePhotoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             documentId = getArguments().getInt(ARG_DOCUMENT_ID);
-            applicationId = getArguments().getString(ARG_APPLICATION_ID);
+            applicationGuid = getArguments().getString(ARG_APPLICATION_ID);
         }
     }
 
@@ -360,23 +360,21 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
         DataAccess dataAccess = DataAccess.getInstance(getContext());
         WebContext current = WebContext.getInstance();
-        applicationId = current.Application.ApplicationId;
-        List<Document> documents = dataAccess.getDocumentsByApplicationId(applicationId);
+        applicationGuid = current.Application.ApplicationGuid;
+        List<Document> documents = dataAccess.getDocumentsByApplicationGuid(applicationGuid);
         Document document = documents.get(0);
         documentId = document.Id;
 
         Scan scan = new Scan();
-        scan.ApplicationId = applicationId;
+        scan.ApplicationGuid = applicationGuid;
+        scan.DocumentGuid = document.DocumentGuid;
         scan.DocumentId = documentId;
         int count = dataAccess.countScansByDocumentId(documentId);
-        scan.Page = ++count;
+        scan.PageNum = ++count;
         scan.ScanStatus = ScanStatus.Created;
-
-        byte[] smallPhoto = resizeBitmap(imageBytes);
-        byte[] largePhoto = imageBytes;
-
-        scan.SmallPhoto = smallPhoto;
-        scan.LargePhoto = largePhoto;
+        scan.ImageLength = imageBytes.length;
+        scan.SmallPhoto = resizeBitmap(imageBytes);
+        scan.LargePhoto = imageBytes;
 
         int result = dataAccess.insertScan(scan);
         return result > 0;
@@ -399,8 +397,8 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
         int inputBytesLength = inputBytes.length;
 
-        int targetW = 100;
-        int targetH = 100;
+        int targetW = 600;
+        int targetH = 600;
 
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;

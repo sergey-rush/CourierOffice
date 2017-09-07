@@ -118,7 +118,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
                 .setTitle("Ошибка входа")
                 .setMessage("Неверный телефон или пароль")
                 .setIcon(R.drawable.ic_error)
-                .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }
@@ -132,7 +132,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
                 .setTitle("Заявка недействительна")
                 .setMessage("Кредитная заявка недействительна")
                 .setIcon(R.drawable.ic_error)
-                .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }
@@ -143,10 +143,10 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
 
     private AlertDialog ConnectionFailed() {
         AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
-                .setTitle("Ошибка соединения")
-                .setMessage("Проверьте подключение к интернету")
+                .setTitle(R.string.connection_failed)
+                .setMessage(R.string.connection_not_available)
                 .setIcon(R.drawable.ic_error)
-                .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }

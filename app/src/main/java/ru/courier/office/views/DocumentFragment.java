@@ -36,7 +36,7 @@ public class DocumentFragment extends Fragment {
         List<Document> documentList = webContext.Application.DocumentList;
 
         if (documentList == null) {
-            documentList = DataAccess.getInstance(getContext()).getDocumentsByApplicationId(webContext.Application.ApplicationId);
+            documentList = DataAccess.getInstance(getContext()).getDocumentsByApplicationGuid(webContext.Application.ApplicationGuid);
         }
 
         if (documentList != null) {

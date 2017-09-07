@@ -62,7 +62,7 @@ public class AppViewFragment extends Fragment {
         DataAccess dataAccess = DataAccess.getInstance(view.getContext());
         WebContext webContext = WebContext.getInstance();
         webContext.Application = dataAccess.getApplicationById(id);
-        webContext.Application.StatusList = dataAccess.getStatuses(webContext.Application.ApplicationId);
+
 
         viewPager = (ViewPager) view.findViewById(R.id.viewpager);
         setupViewPager(view, viewPager);

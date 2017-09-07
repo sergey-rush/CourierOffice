@@ -231,7 +231,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
                 .setTitle("Заявка уже зарегистрирована")
                 .setMessage(message)
                 .setIcon(R.drawable.ic_error)
-                .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         dialog.dismiss();
                     }
