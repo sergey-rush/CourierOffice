@@ -16,12 +16,15 @@
 
 <!-- Introduction wizard background -->
 
-
     <color name="grey4">#333333</color>
     <color name="grey3">#666666</color>
     <color name="grey2">#999999</color>
     <color name="grey1">#cccccc</color>
 
     <color name="whiteAlpha">#01FFFFFF</color>
+
+    <color name="black">#000000</color>
+    <color name="green">#009900</color>
+    <color name="red">#FF3300</color>
 
 </resources>

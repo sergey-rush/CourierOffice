@@ -54,6 +54,11 @@
             android:name=".views.MainActivity"
             android:label="@string/title_activity_drawer"
             android:theme="@style/AppTheme.NoActionBar" />
+        <service
+            android:name=".services.PositionService"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="true" />
     </application>
 
 </manifest>

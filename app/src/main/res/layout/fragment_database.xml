@@ -51,6 +51,14 @@
             android:textColor="@android:color/white"
             android:text="tvStatuses" />
 
+        <TextView
+            android:id="@+id/tvNotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:text="tvNotes" />
+
         <Button
             android:id="@+id/btnCreateDatabase"
             android:layout_width="match_parent"

@@ -58,6 +58,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract int addApplication(Application application);
     public abstract boolean removeApplication(int id);
 
+    public abstract Document getDocumentById(int id);
     public abstract List<Document> getDocumentsByApplicationGuid(String applicationGuid);
     public abstract int countDocuments();
     public abstract int insertDocument(Document document);
@@ -68,6 +69,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract int countScans();
     public abstract int countScansByDocumentId(int documentId);
     public abstract int insertScan(Scan scan);
+    public abstract boolean updateScan(Scan scan);
     public abstract byte[] getScanImage(int scanId, int offset, int length);
     public abstract Scan getScanById(int scanId);
 
@@ -82,6 +84,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
 
     public abstract List<Note> getNotesByLimit(int limit);
     public abstract int getNoteMaxId();
+    public abstract int countNotes();
     public abstract int insertNote(Note note);
     public abstract boolean deleteNotesById(int id);
     public abstract void addNotes(List<Note> notes);
@@ -157,7 +160,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
             db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationGuid TEXT, MerchantGuid TEXT, MerchantName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, PersonGuid TEXT, PersonName TEXT, BirthDate TEXT, Gender INTEGER, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
             db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId INTEGER, ApplicationGuid TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
             db.execSQL("CREATE TABLE Documents(Id INTEGER PRIMARY KEY AUTOINCREMENT, DocumentGuid TEXT, ApplicationGuid TEXT, Title TEXT, Count INTEGER)");
-            db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationGuid TEXT, DocumentGuid TEXT, DocumentId INTEGER, PageNum INTEGER, ImageLength INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
+            db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, PhotoGuid TEXT, ApplicationGuid TEXT, DocumentGuid TEXT, DocumentId INTEGER, PageNum INTEGER, ImageLength INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
             db.execSQL("CREATE TABLE Notes(Id INTEGER PRIMARY KEY, Info TEXT, Created TEXT)");
             IncrementVersion();
         }

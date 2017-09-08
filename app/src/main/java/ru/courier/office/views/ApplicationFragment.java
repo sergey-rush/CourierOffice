@@ -4,6 +4,8 @@ package ru.courier.office.views;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
@@ -17,10 +19,16 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
+import ru.courier.office.core.Document;
+import ru.courier.office.core.Scan;
+import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
+import ru.courier.office.web.ScanManager;
+import ru.courier.office.web.UploadManager;
 import ru.courier.office.web.WebContext;
 
 /**
@@ -91,8 +99,8 @@ public class ApplicationFragment extends Fragment {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
             switch (menuItem.getItemId()) {
-                case R.id.app_menu_update:
-                    UpdateApplication();
+                case R.id.app_menu_submit:
+                    submitApplication();
                     return true;
                 case R.id.app_menu_delete:
                     AlertDialog dialog = onDeleteDialog();
@@ -103,12 +111,29 @@ public class ApplicationFragment extends Fragment {
             return false;
         }
     }
+    private DataAccess dataAccess;
 
-    private void UpdateApplication() {
-        Toast.makeText(getContext(), "Update", Toast.LENGTH_SHORT).show();
-        DataAccess dataAccess = DataAccess.getInstance(getContext());
-        dataAccess.refreshApplication(application);
+    private void submitApplication() {
+
+        dataAccess = DataAccess.getInstance(getContext());
+
+        application.DocumentList = dataAccess.getDocumentsByApplicationGuid(application.ApplicationGuid);
+
+        for (Document document : application.DocumentList) {
+            List<Scan> scans = dataAccess.getScansByDocumentId(document.Id);
+            for (Scan scan : scans) {
+                ScanStatus scanStatus = scan.ScanStatus;
+                ScanManager scanManager = new ScanManager(this, document, scan);
+                scanManager.execute();
+                break;
+            }
+        }
     }
+
+     public void onScanRetrieved(Scan scan)
+     {
+         dataAccess.updateScan(scan);
+     }
 
     private AlertDialog onDeleteDialog() {
         AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom)
@@ -117,10 +142,16 @@ public class ApplicationFragment extends Fragment {
                 .setIcon(R.drawable.ic_question)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-
                         DataAccess dataAccess = DataAccess.getInstance(getContext());
                         dataAccess.removeApplication(application.Id);
                         Toast.makeText(getContext(), "Удалено", Toast.LENGTH_SHORT).show();
+
+                        FragmentManager fm = getFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        HomeFragment homeFragment = new HomeFragment();
+                        ft.replace(R.id.container, homeFragment);
+                        ft.commit();
+
                         dialog.dismiss();
                     }
 

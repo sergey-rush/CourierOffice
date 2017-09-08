@@ -10,13 +10,14 @@
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/tvCount"
-        android:textColor="@color/grey2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/black"
         android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

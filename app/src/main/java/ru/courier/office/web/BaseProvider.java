@@ -3,6 +3,8 @@ package ru.courier.office.web;
 import ru.courier.office.core.Application;
 import ru.courier.office.core.Document;
 import ru.courier.office.core.Note;
+import ru.courier.office.core.Scan;
+import ru.courier.office.core.ScanStatus;
 import ru.courier.office.core.Status;
 import ru.courier.office.core.User;
 
@@ -149,16 +151,25 @@ public class BaseProvider {
         return application;
     }
 
+    protected Scan parseToScan(String input, Scan scan) throws JSONException, ParseException {
+
+        JSONObject resultData = new JSONObject(input);
+        scan.PhotoGuid = resultData.getString("Id");
+        //scan.ApplicationGuid = resultData.getString("ApplicationId");
+        //scan.DocumentGuid = resultData.getString("DocumentId");
+        //scan.PageNum = resultData.getInt("PageNum");
+        scan.ByteNum = resultData.getInt("ByteNum");
+        if(scan.ScanStatus == ScanStatus.None)
+        {
+            scan.ScanStatus = ScanStatus.Created;
+        }
+
+        return scan;
+    }
+
     protected List<Note> parseToNoteList(String input) throws JSONException, ParseException {
-
-        //JSONObject resultData = new JSONObject(input);
-
         JSONArray items = new JSONArray(input);
-        
         ArrayList<Note> noteList = new ArrayList<Note>();
-        
-        //JSONArray items = resultData.getJSONArray("NoteList");
-
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         for (int i = 0; i < items.length(); i++) {
             JSONObject item = items.getJSONObject(i);

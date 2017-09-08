@@ -74,6 +74,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
     private TextView tvDocuments;
     private TextView tvScans;
     private TextView tvStatuses;
+    private TextView tvNotes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,6 +96,7 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
         tvDocuments = (TextView) view.findViewById(R.id.tvDocuments);
         tvScans = (TextView) view.findViewById(R.id.tvScans);
         tvStatuses = (TextView) view.findViewById(R.id.tvStatuses);
+        tvNotes = (TextView) view.findViewById(R.id.tvNotes);
 
         dataAccess = DataAccess.getInstance(getContext());
         getStatus ();
@@ -113,6 +115,8 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
         tvScans.setText(String.format("Scans count: %s", countScans));
         long countStatuses = dataAccess.countStatuses();
         tvStatuses.setText(String.format("Statuses count: %s", countStatuses));
+        long countNotes = dataAccess.countNotes();
+        tvNotes.setText(String.format("Notes count: %s", countNotes));
     }
 
     @Override

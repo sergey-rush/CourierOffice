@@ -9,14 +9,18 @@ import ru.courier.office.core.Note;
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.User;
 import ru.courier.office.core.UrlType;
+import ru.courier.office.core.Scan;
 
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class WebContext {
 
@@ -27,12 +31,18 @@ public class WebContext {
 
     public AppMode Mode = AppMode.Develop;
     public User User = new User();
+    public Scan Scan = new Scan();
+
     public Application Application = new Application();
     public List<Note> Notes = new ArrayList<Note>();
 
     private CookieManager CookieManager = new CookieManager();
 
-    private WebContext(){
+    private WebContext() {
+
+        if (Mode != AppMode.Product) {
+            User = new User(1, "Раш Сергей Николаевич", "79267026528", "sr@7seconds.ru", true);
+        }
 
         initUrls();
     }
@@ -64,6 +74,8 @@ public class WebContext {
     {
         Map<UrlType, UrlObject> developMap = new HashMap<UrlType, UrlObject>();
         developMap.put(UrlType.Note, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/note"));
+        developMap.put(UrlType.Position, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/courier/api/position"));
+        developMap.put(UrlType.Scan, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/courier/api/document"));
         developMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/account/sign"));
         developMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/account"));
         developMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/application"));
@@ -73,6 +85,10 @@ public class WebContext {
 
     public UrlObject getUrl(UrlType urlType) {
         return urlMap.get(Mode).get(urlType);
+    }
+
+    public static String getCurrentDateFormatted() {
+        return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(new Date());
     }
 }
 

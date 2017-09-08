@@ -371,7 +371,7 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         scan.DocumentId = documentId;
         int count = dataAccess.countScansByDocumentId(documentId);
         scan.PageNum = ++count;
-        scan.ScanStatus = ScanStatus.Created;
+        scan.ScanStatus = ScanStatus.None;
         scan.ImageLength = imageBytes.length;
         scan.SmallPhoto = resizeBitmap(imageBytes);
         scan.LargePhoto = imageBytes;

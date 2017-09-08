@@ -5,34 +5,28 @@ import android.os.AsyncTask;
 import android.view.View;
 
 import ru.courier.office.data.DataAccess;
+import ru.courier.office.views.HomeFragment;
 
 public class NoteManager extends AsyncTask<Void, Void, Void> {
 
-    private View _view;
+    private HomeFragment _view;
+    private int responseCode;
+    private int _maxId;
 
-    int id;
-
-    public NoteManager(View view, int id) {
+    public NoteManager(HomeFragment view, int maxId) {
         _view = view;
-        id = id;
+        _maxId = maxId;
     }
-
-    private ProgressDialog pDialog;
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        // Showing progress dialog
-        pDialog = new ProgressDialog(_view.getContext());
-        pDialog.setMessage("Пожалуйста, подождите...");
-        pDialog.setCancelable(false);
-        pDialog.show();
     }
 
     @Override
     protected Void doInBackground(Void... arg0) {
         NoteProvider noteProvider = new NoteProvider();
-        int status = noteProvider.getNotes(id);
+        responseCode = noteProvider.getNotes(_maxId);
         return null;
     }
 
@@ -40,14 +34,16 @@ public class NoteManager extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void result) {
         super.onPostExecute(result);
 
-        WebContext webContext = WebContext.getInstance();
-        DataAccess dataAccess = DataAccess.getInstance(_view.getContext());
-        dataAccess.addNotes(webContext.Notes);
+        boolean toBeUpdated = false;
 
-        if (pDialog.isShowing())
-            pDialog.dismiss();
+        if (responseCode == 200) {
 
+            WebContext webContext = WebContext.getInstance();
+            DataAccess dataAccess = DataAccess.getInstance(_view.getContext());
+            dataAccess.addNotes(webContext.Notes);
+            toBeUpdated = true;
+        }
 
+        _view.onRefreshedNotes(toBeUpdated);
     }
-
 }

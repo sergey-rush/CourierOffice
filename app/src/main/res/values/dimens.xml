@@ -15,11 +15,10 @@
     <dimen name="button_padding">16dp</dimen>
     <dimen name="button_side_padding">44dp</dimen>
 
-    <dimen name="dots_width">20dp</dimen>
-    <dimen name="dots_height">30dp</dimen>
     <!-- Common dimensions -->
     <dimen name="dimen0">0dp</dimen>
     <dimen name="dimen5">5dp</dimen>
+    <dimen name="dimen8">8dp</dimen>
     <dimen name="dimen10">10dp</dimen>
     <dimen name="dimen12">12dp</dimen>
     <dimen name="dimen16">16dp</dimen>
@@ -27,5 +26,7 @@
     <dimen name="dimen30">30dp</dimen>
     <dimen name="dimen32">32dp</dimen>
     <dimen name="dimen48">48dp</dimen>
+    <dimen name="dimen100">100dp</dimen>
+    <dimen name="dimen110">110dp</dimen>
     <dimen name="dimen160">160dp</dimen>
 </resources>

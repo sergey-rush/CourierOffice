@@ -116,10 +116,9 @@ public class DataProvider extends DataAccess {
         List<Application> applications = new ArrayList<Application>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications ORDER BY DATETIME(Created) DESC Limit ?", new String[]{String.valueOf(String.valueOf(limit))});           cursor.moveToFirst();
+            cursor = db.rawQuery("SELECT Id, ApplicationGuid, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications ORDER BY Created DESC Limit ?", new String[]{String.valueOf(String.valueOf(limit))});           cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 Application application = new Application();
-                application.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 application.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 application.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 application.MerchantGuid = cursor.getString(cursor.getColumnIndex("MerchantGuid"));
@@ -233,10 +232,36 @@ public class DataProvider extends DataAccess {
         deleteScansByApplicationGuid(application.ApplicationGuid);
         deleteDocumentsByApplicationGuid(application.ApplicationGuid);
         deleteStatusesByApplicationId(application.Id);
+        deleteScansByApplicationGuid(application.ApplicationGuid);
         deleteApplicationById(id);
         return true;
     }
 
+    @Override
+    public Document getDocumentById(int id) {
+        Document document = null;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationGuid, Title, Count FROM Documents FROM Documents WHERE Id = ?", new String[]{String.valueOf(id)});
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                document = new Document();
+                document.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                document.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
+                document.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
+                document.Title = cursor.getString(cursor.getColumnIndex("Title"));
+                document.Count = cursor.getInt(cursor.getColumnIndex("Count"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return document;
+    }
+    
     @Override
     public List<Document> getDocumentsByApplicationGuid(String applicationGuid) {
         List<Document> documents = null;
@@ -342,11 +367,12 @@ public class DataProvider extends DataAccess {
         Scan scan = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE Id = ?", new String[]{String.valueOf(scanId)});
+            cursor = db.rawQuery("SELECT Id, PhotoGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE Id = ?", new String[]{String.valueOf(scanId)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 scan = new Scan();
                 scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                scan.PhotoGuid = cursor.getString(cursor.getColumnIndex("PhotoGuid"));
                 scan.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 scan.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
                 scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
@@ -370,12 +396,13 @@ public class DataProvider extends DataAccess {
         List<Scan> scans = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY PageNum", new String[]{String.valueOf(documentId)});
+            cursor = db.rawQuery("SELECT Id, PhotoGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY PageNum", new String[]{String.valueOf(documentId)});
             cursor.moveToFirst();
             scans = new ArrayList<Scan>();
             while (!cursor.isAfterLast()) {
                 Scan scan = new Scan();
                 scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                scan.PhotoGuid = cursor.getString(cursor.getColumnIndex("PhotoGuid"));
                 scan.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 scan.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
                 scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
@@ -454,6 +481,15 @@ public class DataProvider extends DataAccess {
         }
 
         return ret;
+    }
+
+    @Override
+    public boolean updateScan(Scan scan) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("PhotoGuid", scan.PhotoGuid);
+        contentValues.put("ScanStatus", scan.ScanStatus.ordinal());
+        int ret = (int) db.update("Scans", contentValues, "Id = ?", new String[]{String.valueOf(scan.Id)});
+        return ret == 1;
     }
 
     @Override
@@ -599,6 +635,26 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
+    public int countNotes() {
+        int count = 0;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Notes", null);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(cursor.getColumnIndex("Total"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    @Override
     public int insertNote(Note note) {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         ContentValues contentValues = new ContentValues();
@@ -611,7 +667,7 @@ public class DataProvider extends DataAccess {
 
     @Override
     public boolean deleteNotesById(int id) {
-        int ret = db.delete("Notees", "Id < ?", new String[]{String.valueOf(id)});
+        int ret = db.delete("Notes", "Id < ?", new String[]{String.valueOf(id)});
         return ret == 1;
     }
 
@@ -619,6 +675,12 @@ public class DataProvider extends DataAccess {
     public void addNotes(List<Note> notes) {
         for (ru.courier.office.core.Note note : notes) {
             insertNote(note);
+        }
+    int countNotes = countNotes();
+        if(countNotes>10)
+        {
+            int maxId = getNoteMaxId();
+            deleteNotesById(maxId - 10);
         }
     }
 }

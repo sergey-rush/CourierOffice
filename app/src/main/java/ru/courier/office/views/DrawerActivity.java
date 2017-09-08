@@ -1,8 +1,8 @@
 package ru.courier.office.views;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -14,20 +14,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.services.PositionService;
 
-public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
         AppViewFragment.OnFragmentInteractionListener, TakePhotoFragment.OnFragmentInteractionListener, ScanViewFragment.OnFragmentInteractionListener,
-        QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener {
+        QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener, LocationFragment.OnFragmentInteractionListener {
 
-
+    private Switch swtOnline;
+    private TextView tvSwitchOnline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +49,26 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        View headerLayout = navigationView.getHeaderView(0);
+        tvSwitchOnline = (TextView) headerLayout.findViewById(R.id.tvSwitchOnline);
+        swtOnline = (Switch) headerLayout.findViewById(R.id.swtOnline);
+        swtOnline.setOnCheckedChangeListener(this);
+
+        //startService(new Intent(this, PositionService.class));
+
         showFragment(new HomeFragment());
+    }
+
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            tvSwitchOnline.setText("Онлайн");
+            startService(new Intent(this, PositionService.class));
+            Toast.makeText(this, "Приложение онлайн", Toast.LENGTH_SHORT).show();
+        } else {
+            tvSwitchOnline.setText("Оффлайн");
+            stopService(new Intent(this, PositionService.class));
+            Toast.makeText(this, "Приложение оффлайн", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -148,6 +172,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new DatabaseFragment();
         } else if (id == R.id.nav_send) {
             fragment = new UploadFragment();
+        } else if (id == R.id.nav_location) {
+            fragment = new LocationFragment();
         }
 
         showFragment(fragment);

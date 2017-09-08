@@ -21,14 +21,14 @@ public enum ScanStatus {
     }
 
     public static ScanStatus fromInt(int value) {
-        for (ScanStatus e : ScanStatus.values()) {
-            if (e.getValue() == value)
-                return e;
+        for (ScanStatus status : ScanStatus.values()) {
+            int statusValue = status.getValue();
+            if (statusValue == value)
+            {
+                return status;
+            }
         }
         return ScanStatus.None;//For values out of enum scope
     }
-
-
-
 }
 

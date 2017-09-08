@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -75,43 +81,61 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private WebContext webContext;
+    private DataAccess dataAccess;
+    private View view;
+    private ListView listView;
+    private NoteAdapter adapter;
+    public SwipeRefreshLayout srlMain;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        WebContext webContext = WebContext.getInstance();
-        DataAccess dataAccess = DataAccess.getInstance(view.getContext());
+        webContext = WebContext.getInstance();
+        dataAccess = DataAccess.getInstance(view.getContext());
         webContext.Notes = dataAccess.getNotesByLimit(10);
 
-        if(webContext.Notes.size()==0) {
-            int maxId = dataAccess.getNoteMaxId();
-            NoteManager noteManager = new NoteManager(view, maxId);
-            noteManager.execute();
-        }
+        if (webContext.Notes != null) {
 
-        if(webContext.Notes.size()>0) {
-
-            List<Note> noteList = webContext.Notes;
-            NoteAdapter adapter = new NoteAdapter(getContext(), noteList);
-
-            ListView listView = (ListView) view.findViewById(R.id.lvNotes);
+            listView = (ListView) view.findViewById(R.id.lvNotes);
+            adapter = new NoteAdapter(getContext(), webContext.Notes);
             listView.setAdapter(adapter);
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            srlMain = (SwipeRefreshLayout) view.findViewById(R.id.srlMain);
+            srlMain.setColorSchemeResources(R.color.colorPrimaryDark);
 
-                    RelativeLayout layout = (RelativeLayout) view;
-                    TextView tvInfo = (TextView) layout.findViewById(R.id.tvInfo);
-                    Toast.makeText(view.getContext(), tvInfo.getText(), Toast.LENGTH_SHORT).show();
+            srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    onRefreshingNotes();
                 }
             });
         }
 
-
         return view;
     }
+
+
+private void onRefreshingNotes() {
+    int maxId = dataAccess.getNoteMaxId();
+    NoteManager noteManager = new NoteManager(this, maxId);
+    noteManager.execute();
+}
+
+public void onRefreshedNotes(boolean toBeUpdated)
+{
+    if(toBeUpdated)
+    {
+        webContext.Notes = dataAccess.getNotesByLimit(10);
+        adapter = new NoteAdapter(getContext(), webContext.Notes);
+        listView.setAdapter(adapter);
+    }
+
+    srlMain.setRefreshing(false);
+}
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
