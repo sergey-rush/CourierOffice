@@ -71,11 +71,11 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
-    public Application getApplicationByApplicationId(String applicationId) {
+    public Application getApplicationByApplicationGuid(String applicationGuid) {
         Application application = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationId = ? COLLATE NOCASE", new String[]{String.valueOf(String.valueOf(applicationId))});
+            cursor = db.rawQuery("SELECT Id, ApplicationGuid, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationGuid = ? COLLATE NOCASE", new String[]{applicationGuid});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 application = new Application();
@@ -367,12 +367,13 @@ public class DataProvider extends DataAccess {
         Scan scan = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, PhotoGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE Id = ?", new String[]{String.valueOf(scanId)});
+            cursor = db.rawQuery("SELECT Id, PhotoGuid, StreamGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE Id = ?", new String[]{String.valueOf(scanId)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 scan = new Scan();
                 scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 scan.PhotoGuid = cursor.getString(cursor.getColumnIndex("PhotoGuid"));
+                scan.StreamGuid = cursor.getString(cursor.getColumnIndex("StreamGuid"));
                 scan.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 scan.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
                 scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
@@ -396,13 +397,14 @@ public class DataProvider extends DataAccess {
         List<Scan> scans = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, PhotoGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY PageNum", new String[]{String.valueOf(documentId)});
+            cursor = db.rawQuery("SELECT Id, PhotoGuid, StreamGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY PageNum", new String[]{String.valueOf(documentId)});
             cursor.moveToFirst();
             scans = new ArrayList<Scan>();
             while (!cursor.isAfterLast()) {
                 Scan scan = new Scan();
                 scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 scan.PhotoGuid = cursor.getString(cursor.getColumnIndex("PhotoGuid"));
+                scan.StreamGuid = cursor.getString(cursor.getColumnIndex("StreamGuid"));
                 scan.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 scan.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
                 scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
@@ -487,6 +489,7 @@ public class DataProvider extends DataAccess {
     public boolean updateScan(Scan scan) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("PhotoGuid", scan.PhotoGuid);
+        contentValues.put("StreamGuid", scan.StreamGuid);
         contentValues.put("ScanStatus", scan.ScanStatus.ordinal());
         int ret = (int) db.update("Scans", contentValues, "Id = ?", new String[]{String.valueOf(scan.Id)});
         return ret == 1;
@@ -506,7 +509,11 @@ public class DataProvider extends DataAccess {
 
     @Override
     public boolean deleteScanById(int id) {
+        Scan scan = getScanById(id);
         int ret = db.delete("Scans", "Id = ?", new String[]{String.valueOf(id)});
+        if (ret > 0) {
+            updateDocumentCountByScan(scan.DocumentId, OperationType.Decrement);
+        }
         return ret == 1;
     }
 

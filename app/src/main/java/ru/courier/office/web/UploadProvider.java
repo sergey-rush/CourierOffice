@@ -18,7 +18,7 @@ import ru.courier.office.core.UrlType;
 
 public class UploadProvider extends BaseProvider {
 
-    private int responseCode = 0;
+
     private String boundary = "===" + System.currentTimeMillis() + "===";
     private String lineEnd = "\r\n";
     private String twoHyphens = "--";

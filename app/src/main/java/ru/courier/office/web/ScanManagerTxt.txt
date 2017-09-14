@@ -1,9 +1,13 @@
 package ru.courier.office.web;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
+import android.view.View;
 
 import java.util.List;
 
@@ -14,6 +18,9 @@ import ru.courier.office.core.LocalSettings;
 import ru.courier.office.core.Scan;
 import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
+import ru.courier.office.views.ApplicationFragment;
+import ru.courier.office.views.DrawerActivity;
+import ru.courier.office.views.LoginActivity;
 
 public class ScanManager extends AsyncTask<Void, Void, Void> {
 
@@ -21,14 +28,14 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
     private Context _context;
     private Application _application;
     private WebContext _webContext;
-    private String _deviceId;
+    private String deviceId;
     private DataAccess _dataAccess;
 
     public ScanManager(Context context, Application application) {
         _context = context;
         _application = application;
         _webContext = WebContext.getInstance();
-        _deviceId = LocalSettings.getDeviceID(_context);
+        deviceId = LocalSettings.getDeviceID(_context);
         _dataAccess = DataAccess.getInstance(_context);
     }
 
@@ -44,7 +51,6 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
 
         for (Document document : documents) {
             List<Scan> scans = _dataAccess.getScansByDocumentId(document.Id);
-
             for (Scan scan : scans) {
                 _webContext.Scan = scan;
 
@@ -52,29 +58,12 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
                     String postData = FormatPayload(document, scan);
                     ScanProvider scanProvider = new ScanProvider();
                     responseCode = scanProvider.getInfo(postData);
-                    if (responseCode == 200) {
-                        _webContext.Scan.ScanStatus = ScanStatus.Progress;
-                        _dataAccess.updateScan(_webContext.Scan);
-                    }
-                    else{
-                        break; // inner loop
-                    }
+                    _dataAccess.updateScan(_webContext.Scan);
                 }
 
-                if (scan.ScanStatus == ScanStatus.Progress) {
-                    uploadScan(_webContext.Scan);
-                    if (responseCode == 200) {
-                        _webContext.Scan.ScanStatus = ScanStatus.Completed;
-                        _dataAccess.updateScan(_webContext.Scan);
-                    }
-                    else{
-                        break; // inner loop
-                    }
-                }
-            }
+                uploadScan(_webContext.Scan);
 
-            if (responseCode != 200) {
-                break; // outer loop
+                //break;
             }
         }
         return null;
@@ -95,10 +84,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
             byte[] imageBytes = _dataAccess.getScanImage(scan.Id, sendBytes, bufferLength);
             int imageBytesLength = imageBytes.length;
             ScanProvider scanProvider = new ScanProvider();
-            responseCode = scanProvider.doUpload(scan, imageBytes);
-            if (responseCode != 200) {
-                return;
-            }
+            scanProvider.doUpload(scan, imageBytes);
             sendBytes = sendBytes + imageBytesLength;
         }
     }
@@ -111,7 +97,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
         String appType = "CourierAppV2";
         String docId = document.DocumentGuid;
         String pageNum = Integer.toString(scan.PageNum);
-        String postData = String.format("{\"PhotoId\":\"%s\", \"ApplicationId\":\"%s\", \"FileName\":\"%s\", \"AppType\":\"%s\", \"DocumentId\":\"%s\", \"PageNum\":\"%s\", \"Imei\":\"%s\"}", photoId, appId, fileName, appType, docId, pageNum, _deviceId);
+        String postData = String.format("{\"PhotoId\":\"%s\", \"ApplicationId\":\"%s\", \"FileName\":\"%s\", \"AppType\":\"%s\", \"DocumentId\":\"%s\", \"PageNum\":\"%s\", \"Imei\":\"%s\"}", photoId, appId, fileName, appType, docId, pageNum, deviceId);
         return postData;
     }
 
@@ -119,22 +105,9 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void output) {
         super.onPostExecute(output);
 
-        if (responseCode != 200) {
-            loadFailedDialog().show();
+        if (responseCode == 200) {
+
+            return;
         }
-    }
-
-    private AlertDialog loadFailedDialog() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
-                .setTitle("Ошибка загрузки")
-                .setMessage("Сервер недоступен. Документы будут отправлены позже.")
-                .setIcon(R.drawable.ic_error)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-
-                }).create();
-        return alertDialog;
     }
 }

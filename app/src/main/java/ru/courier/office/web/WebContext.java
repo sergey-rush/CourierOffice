@@ -32,7 +32,6 @@ public class WebContext {
     public AppMode Mode = AppMode.Develop;
     public User User = new User();
     public Scan Scan = new Scan();
-
     public Application Application = new Application();
     public List<Note> Notes = new ArrayList<Note>();
 
@@ -43,7 +42,6 @@ public class WebContext {
         if (Mode != AppMode.Product) {
             User = new User(1, "Раш Сергей Николаевич", "79267026528", "sr@7seconds.ru", true);
         }
-
         initUrls();
     }
 

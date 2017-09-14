@@ -19,16 +19,11 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
-import ru.courier.office.core.Document;
-import ru.courier.office.core.Scan;
-import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.ScanManager;
-import ru.courier.office.web.UploadManager;
 import ru.courier.office.web.WebContext;
 
 /**
@@ -36,7 +31,7 @@ import ru.courier.office.web.WebContext;
  */
 public class ApplicationFragment extends Fragment {
 
-    private Application application;
+    private Application _application;
     private ImageView ivMenu;
     private TextView tvId;
     private TextView tvMerchantName;
@@ -55,21 +50,21 @@ public class ApplicationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_application, container, false);
 
         WebContext webContext = WebContext.getInstance();
-        application = webContext.Application;
+        _application = webContext.Application;
 
         tvId = (TextView) view.findViewById(R.id.tvId);
-        tvId.setText(application.ApplicationGuid);
+        tvId.setText(_application.ApplicationGuid);
         tvMerchantName = (TextView) view.findViewById(R.id.tvMerchantName);
-        tvMerchantName.setText(application.MerchantName);
+        tvMerchantName.setText(_application.MerchantName);
         tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
-        tvPersonName.setText(application.PersonName);
+        tvPersonName.setText(_application.PersonName);
         tvAmount = (TextView) view.findViewById(R.id.tvAmount);
-        tvAmount.setText(application.Amount);
+        tvAmount.setText(_application.Amount);
         tvDeliveryAddress = (TextView) view.findViewById(R.id.tvDeliveryAddress);
-        tvDeliveryAddress.setText(application.DeliveryAddress);
+        tvDeliveryAddress.setText(_application.DeliveryAddress);
         tvCreated = (TextView) view.findViewById(R.id.tvCreated);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        tvCreated.setText(dateFormat.format(application.Created));
+        tvCreated.setText(dateFormat.format(_application.Created));
 
         ivMenu = (ImageView) view.findViewById(R.id.ivMenu);
         ivMenu.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +78,6 @@ public class ApplicationFragment extends Fragment {
     }
 
     private void showPopupMenu(View view) {
-        // inflate menu
         PopupMenu popup = new PopupMenu(getContext(), view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.app_menu, popup.getMenu());
@@ -111,29 +105,13 @@ public class ApplicationFragment extends Fragment {
             return false;
         }
     }
-    private DataAccess dataAccess;
+
 
     private void submitApplication() {
-
-        dataAccess = DataAccess.getInstance(getContext());
-
-        application.DocumentList = dataAccess.getDocumentsByApplicationGuid(application.ApplicationGuid);
-
-        for (Document document : application.DocumentList) {
-            List<Scan> scans = dataAccess.getScansByDocumentId(document.Id);
-            for (Scan scan : scans) {
-                ScanStatus scanStatus = scan.ScanStatus;
-                ScanManager scanManager = new ScanManager(this, document, scan);
-                scanManager.execute();
-                break;
-            }
-        }
+        ScanManager scanManager = new ScanManager(getContext(), _application);
+        scanManager.execute();
     }
 
-     public void onScanRetrieved(Scan scan)
-     {
-         dataAccess.updateScan(scan);
-     }
 
     private AlertDialog onDeleteDialog() {
         AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom)
@@ -143,7 +121,7 @@ public class ApplicationFragment extends Fragment {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         DataAccess dataAccess = DataAccess.getInstance(getContext());
-                        dataAccess.removeApplication(application.Id);
+                        dataAccess.removeApplication(_application.Id);
                         Toast.makeText(getContext(), "Удалено", Toast.LENGTH_SHORT).show();
 
                         FragmentManager fm = getFragmentManager();

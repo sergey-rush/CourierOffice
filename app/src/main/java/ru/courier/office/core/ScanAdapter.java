@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.data.DataAccess;
 
 /**
  * Created by rash on 31.08.2017.
@@ -54,6 +55,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
     @Override
     public void onBindViewHolder(final ScanViewHolder holder, int position) {
         Scan scan = _scanList.get(position);
+        final int scanId = scan.Id;
         holder.tvTitle.setText(String.format("Страница: %s", scan.PageNum));
         holder.tvTitle.setTag(scan.Id);
         holder.tvStatus.setText(toString(scan.ScanStatus));
@@ -67,7 +69,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         holder.ivMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showPopupMenu(holder.ivMenu);
+                showPopupMenu(holder.ivMenu, scanId);
             }
         });
     }
@@ -77,16 +79,13 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         String output = "Неопределено";
         switch (status) {
             case None:
-                output = "Неопределеный";
-                break;
-            case Created:
-                output = "Создан";
+                output = "Неопределенный";
                 break;
             case Progress:
-                output = "Загружается";
+                output = "Обрабатывается";
                 break;
-            case Downloaded:
-                output = "Загружен";
+            case Completed:
+                output = "Завершен";
         }
         return output;
     }
@@ -94,12 +93,12 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
     /**
      * Showing popup menu when tapping on 3 dots
      */
-    private void showPopupMenu(View view) {
+    private void showPopupMenu(View view, int scanId) {
         // inflate menu
         PopupMenu popup = new PopupMenu(_context, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.scan_menu, popup.getMenu());
-        popup.setOnMenuItemClickListener(new ScanMenuItemClickListener());
+        popup.setOnMenuItemClickListener(new ScanMenuItemClickListener(scanId));
         popup.show();
     }
 
@@ -107,8 +106,9 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
      * Click listener for popup menu items
      */
     class ScanMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
-
-        public ScanMenuItemClickListener() {
+        int _scanId;
+        public ScanMenuItemClickListener(int scanId) {
+            _scanId = scanId;
         }
 
         @Override
@@ -118,7 +118,9 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
                     Toast.makeText(_context, "Показать", Toast.LENGTH_SHORT).show();
                     return true;
                 case R.id.scan_menu_delete:
-                    Toast.makeText(_context, "Удалить", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(_context, "Удалить: " + _scanId, Toast.LENGTH_SHORT).show();
+                    DataAccess dataAccess = DataAccess.getInstance(_context);
+                    dataAccess.deleteScanById(_scanId);
                     return true;
                 default:
             }

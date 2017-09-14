@@ -7,6 +7,7 @@ package ru.courier.office.core;
 public class Scan {
     public int Id;
     public String PhotoGuid;
+    public String StreamGuid;
     public String ApplicationGuid;
     public String DocumentGuid;
     public int DocumentId;

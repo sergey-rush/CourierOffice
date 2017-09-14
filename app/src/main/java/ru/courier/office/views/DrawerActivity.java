@@ -23,8 +23,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import ru.courier.office.ApplicationService;
 import ru.courier.office.R;
-import ru.courier.office.services.PositionService;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
@@ -54,19 +54,17 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         swtOnline = (Switch) headerLayout.findViewById(R.id.swtOnline);
         swtOnline.setOnCheckedChangeListener(this);
 
-        //startService(new Intent(this, PositionService.class));
-
         showFragment(new HomeFragment());
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             tvSwitchOnline.setText("Онлайн");
-            startService(new Intent(this, PositionService.class));
+            startService(new Intent(this, ApplicationService.class));
             Toast.makeText(this, "Приложение онлайн", Toast.LENGTH_SHORT).show();
         } else {
             tvSwitchOnline.setText("Оффлайн");
-            stopService(new Intent(this, PositionService.class));
+            stopService(new Intent(this, ApplicationService.class));
             Toast.makeText(this, "Приложение оффлайн", Toast.LENGTH_SHORT).show();
         }
     }

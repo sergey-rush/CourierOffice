@@ -155,15 +155,12 @@ public class BaseProvider {
 
         JSONObject resultData = new JSONObject(input);
         scan.PhotoGuid = resultData.getString("Id");
-        //scan.ApplicationGuid = resultData.getString("ApplicationId");
+        scan.StreamGuid = resultData.getString("StreamId");
+        //scan.ApplicationGuid = resultData.getString("StreamId");
         //scan.DocumentGuid = resultData.getString("DocumentId");
         //scan.PageNum = resultData.getInt("PageNum");
         scan.ByteNum = resultData.getInt("ByteNum");
-        if(scan.ScanStatus == ScanStatus.None)
-        {
-            scan.ScanStatus = ScanStatus.Created;
-        }
-
+        scan.ScanStatus = ScanStatus.fromInt(resultData.getInt("ScanStatus"));
         return scan;
     }
 

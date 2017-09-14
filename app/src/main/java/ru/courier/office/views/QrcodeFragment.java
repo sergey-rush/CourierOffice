@@ -4,16 +4,13 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,9 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import net.sourceforge.zbar.Config;
@@ -38,12 +33,8 @@ import net.sourceforge.zbar.SymbolSet;
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
 import ru.courier.office.core.CameraPreview;
-import ru.courier.office.core.LocalSettings;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.ApplicationManager;
-
-import java.io.File;
-import java.io.IOException;
 
 import static me.dm7.barcodescanner.core.CameraUtils.getCameraInstance;
 
@@ -67,7 +58,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
     private boolean previewing = true;
     private boolean checkScanResult = true;
     private ProgressDialog progressDialog;
-    private String applicationId;
+    private String _applicationGuid;
     private FrameLayout cameraPreview;
 
     static {
@@ -207,22 +198,22 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         }
     };
 
-    private void checkBarCode(String applicationId) {
+    private void checkBarCode(String applicationGuid) {
 
-        this.applicationId = applicationId;
+        _applicationGuid = applicationGuid;
 
         DataAccess dataAccess = DataAccess.getInstance(getContext());
-        Application application = dataAccess.getApplicationByApplicationId(applicationId);
+        Application application = dataAccess.getApplicationByApplicationGuid(_applicationGuid);
         if(application!=null)
         {
-            String message = String.format("Заявка %s уже зарегистрирована в базе данных приложения", applicationId);
+            String message = String.format("Заявка %s уже зарегистрирована в базе данных приложения", _applicationGuid);
             ApplicationExistsDialog(message).show();
             setFragment(new HomeFragment());
 
         }
         else {
-            ApplicationManager applicationManager = new ApplicationManager(getContext(), this, applicationId);
-            final AsyncTask<Void, Void, Void> execute = applicationManager.execute();
+            ApplicationManager applicationManager = new ApplicationManager(getContext(), this, _applicationGuid);
+            applicationManager.execute();
         }
     }
 

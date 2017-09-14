@@ -6,9 +6,8 @@ package ru.courier.office.core;
 
 public enum ScanStatus {
     None(0),
-    Created(1),
-    Progress(2),
-    Downloaded(3);
+    Progress(1),
+    Completed(2);
 
     private final int value;
 
