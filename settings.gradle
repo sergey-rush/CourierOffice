@@ -1,1 +1,1 @@
-include ':app', ':pinlock', ':openCVLibrary320', ':cameraview'
+include ':app', ':pinlock', ':openCVLibrary320', ':cameraview', ':scanlibrary'

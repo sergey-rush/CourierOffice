@@ -76,10 +76,13 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
 
     public String toString(ScanStatus status) {
 
-        String output = "Неопределено";
+        String output = "Неопределенный";
         switch (status) {
             case None:
                 output = "Неопределенный";
+                break;
+            case Ready:
+                output = "Готовый к отправке";
                 break;
             case Progress:
                 output = "Обрабатывается";

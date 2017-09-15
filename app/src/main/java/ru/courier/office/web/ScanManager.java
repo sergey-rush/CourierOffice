@@ -48,7 +48,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
             for (Scan scan : scans) {
                 _webContext.Scan = scan;
 
-                if (scan.ScanStatus == ScanStatus.None) {
+                if (scan.ScanStatus == ScanStatus.Ready) {
                     String postData = FormatPayload(document, scan);
                     ScanProvider scanProvider = new ScanProvider();
                     responseCode = scanProvider.getInfo(postData);

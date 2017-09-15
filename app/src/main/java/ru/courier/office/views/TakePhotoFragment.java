@@ -1,8 +1,8 @@
 package ru.courier.office.views;
 
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.SensorManager;
@@ -10,20 +10,20 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
 
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.core.Application;
 import ru.courier.office.core.Document;
 import ru.courier.office.core.LocalSettings;
 import ru.courier.office.core.OrientationManager;
@@ -42,12 +42,11 @@ import ru.courier.office.web.WebContext;
  */
 public class TakePhotoFragment extends Fragment {
 
-    private static final String TAG = "rlf_app";
     private View view;
     CameraView mCameraView;
     RelativeLayout rlTakePhoto;
-    ImageView rlTakePhotoMask;
-    //ImageView grid;
+    //ImageView rlTakePhotoMask;
+
     RelativeLayout menuScreen;
     RelativeLayout rlFlash;
     ImageView flashIcon;
@@ -56,11 +55,17 @@ public class TakePhotoFragment extends Fragment {
     OrientationManager orientationManager;
     int currentOrientation = OrientationManager.ScreenOrientation.PORTRAIT.ordinal();
 
-    private static final String ARG_DOCUMENT_ID = "documentId";
     private static final String ARG_APPLICATION_ID = "applicationId";
+    private static final String ARG_DOCUMENT_ID = "documentId";
+    private static final String ARG_SCAN_ID = "scanId";
 
-    private String applicationGuid;
+    private int applicationId;
     private int documentId;
+    private int scanId;
+
+    private DataAccess _dataAccess;
+    private Application _application;
+    private Document _currentDocument;
 
     public TakePhotoFragment() {
         // Required empty public constructor
@@ -74,11 +79,12 @@ public class TakePhotoFragment extends Fragment {
      * @param applicationId ApplicationId
      * @return A new instance of fragment TakePhotoFragment.
      */
-    public static TakePhotoFragment newInstance(int documentId, String applicationId) {
+    public static TakePhotoFragment newInstance(int applicationId, int documentId, int scanId) {
         TakePhotoFragment fragment = new TakePhotoFragment();
         Bundle args = new Bundle();
+        args.putInt(ARG_APPLICATION_ID, applicationId);
         args.putInt(ARG_DOCUMENT_ID, documentId);
-        args.putString(ARG_APPLICATION_ID, applicationId);
+        args.putInt(ARG_SCAN_ID, scanId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,175 +93,206 @@ public class TakePhotoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            applicationId = getArguments().getInt(ARG_APPLICATION_ID);
             documentId = getArguments().getInt(ARG_DOCUMENT_ID);
-            applicationGuid = getArguments().getString(ARG_APPLICATION_ID);
+            scanId = getArguments().getInt(ARG_SCAN_ID);
         }
     }
+
+    private Toolbar _toolbar;
+    private int _totalDocs;
+    private int _currentDoc = 0;
+    private int _currentScan = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_take_photo, container, false);
-
+        _toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         orientationManager = new OrientationManager(getContext(), SensorManager.SENSOR_DELAY_NORMAL, new OrientationManager.OrientationListener() {
             @Override
             public void onOrientationChange(OrientationManager.ScreenOrientation screenOrientation) {
                 currentOrientation = screenOrientation.ordinal();
             }
         });
-
         orientationManager.enable();
 
+        WebContext webContext = WebContext.getInstance();
+        _dataAccess = DataAccess.getInstance(getContext());
+
+        if (applicationId > 0) {
+            _application = _dataAccess.getApplicationById(applicationId);
+            webContext.Application = _application;
+            _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
+            _totalDocs = _application.DocumentList.size();
+        }
+
+        setCurrentDocument();
+        setCurrentScan();
         initViews();
 
         return view;
     }
 
+    private void setCurrentDocument() {
+        _currentDocument = _application.DocumentList.get(_currentDoc);
+        if (_totalDocs > _currentDoc) {
+            _currentDoc++;
+        }
+    }
 
- private void initViews() {
+    private void setCurrentScan() {
 
-     mCameraView = (CameraView) view.findViewById(R.id.camera);
-     if (mCameraView != null) {
-         //mCameraView.setFlash(CameraView.FLASH_AUTO);
-         //mCameraView.setAspectRatio(AspectRatio.of(4,3));
-         mCameraView.addCallback(mCallback);
-         mCameraView.start();
-     }
+        if (_currentScan == 0) {
+            _currentScan = _dataAccess.countScansByDocumentId(_currentDocument.Id);
+        }
+        ++_currentScan;
+        String title = String.format("%d. %s", _currentScan, _currentDocument.Title);
+        _toolbar.setTitle(title);
+    }
 
-     //RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(300, 150);
-     //mCameraView.setLayoutParams(layoutParams);
-
-     rlTakePhoto = (RelativeLayout) view.findViewById(R.id.rlTakePhoto);
-     rlTakePhoto.setOnClickListener(clickListener);
-
-     rlTakePhotoMask = (ImageView) view.findViewById(R.id.rlTakePhotoMask);
-
-     flashIcon = (ImageView) view.findViewById(R.id.flashIcon);
-
-     rlFlash = (RelativeLayout) view.findViewById(R.id.rlFlash);
-
-     rlFlash.setOnClickListener(new View.OnClickListener() {
-         @Override
-         public void onClick(View view) {
-             switch (mCameraView.getFlash()) {
-                 case CameraView.FLASH_AUTO:
-                     mCameraView.setFlash(CameraView.FLASH_ON);
-                     flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_on));
-                     break;
-                 case CameraView.FLASH_ON:
-                     mCameraView.setFlash(CameraView.FLASH_OFF);
-                     flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
-                     break;
-                 case CameraView.FLASH_OFF:
-                     mCameraView.setFlash(CameraView.FLASH_AUTO);
-                     flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_auto));
-                     break;
-             }
-         }
-     });
-
-
-     setInfo();
-
-
-     //TODO move menuscreen to separate activity or fragment
-//     menuScreen = (RelativeLayout) view.findViewById(R.id.menuScreen);
-//     menuScreen.setVisibility(View.INVISIBLE);
-//
-//     ImageView infoIcon = (ImageView) view.findViewById(R.id.infoIcon);
-//     infoIcon.setOnClickListener(new View.OnClickListener() {
-//         @Override
-//         public void onClick(View view) {
-//             showMenuScreen();
-//         }
-//     });
-//
-//     ImageView infoIconClose = (ImageView) view.findViewById(R.id.infoIconClose);
-//     infoIconClose.setOnClickListener(new View.OnClickListener() {
-//         @Override
-//         public void onClick(View view) {
-//             hideMenuScreen();
-//         }
-//     });
-//
-//     RelativeLayout rlSkip = (RelativeLayout) view.findViewById(R.id.rlSkip);
-//     rlSkip.setOnClickListener(new View.OnClickListener() {
-//         @Override
-//         public void onClick(View view) {
-//             //hideMenuScreen();
-//             cancelOrder();
-//         }
-//     });
-//
-//
-//     RelativeLayout rlCall = (RelativeLayout) view.findViewById(R.id.rlCall);
-//     rlCall.setOnClickListener(new View.OnClickListener() {
-//         @Override
-//         public void onClick(View view) {
-//             hideMenuScreen();
-//             callOperator();
-//         }
-//     });
-
-     //grid = (ImageView) view.findViewById(R.id.grid);
- }
-
-//        private void callOperator() {
-//            SUtils.callOperator(this);
-//        }
-
-        private void showMenuScreen() {
-            menuScreen.setVisibility(View.VISIBLE);
+    private void initViews() {
+        dispose();
+        mCameraView = (CameraView) view.findViewById(R.id.cvCamera);
+        if (mCameraView != null) {
+            //mCameraView.setFlash(CameraView.FLASH_AUTO);
+            //mCameraView.setAspectRatio(AspectRatio.of(4,3));
+            mCameraView.addCallback(mCallback);
+            mCameraView.start();
         }
 
-        private void hideMenuScreen() {
+        rlTakePhoto = (RelativeLayout) view.findViewById(R.id.rlTakePhoto);
+        rlTakePhoto.setOnClickListener(clickListener);
+
+        //rlTakePhotoMask = (ImageView) view.findViewById(R.id.rlTakePhotoMask);
+
+        flashIcon = (ImageView) view.findViewById(R.id.flashIcon);
+
+        rlFlash = (RelativeLayout) view.findViewById(R.id.rlFlash);
+
+        rlFlash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (mCameraView.getFlash()) {
+                    case CameraView.FLASH_AUTO:
+                        mCameraView.setFlash(CameraView.FLASH_ON);
+                        flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_on));
+                        break;
+                    case CameraView.FLASH_ON:
+                        mCameraView.setFlash(CameraView.FLASH_OFF);
+                        flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
+                        break;
+                    case CameraView.FLASH_OFF:
+                        mCameraView.setFlash(CameraView.FLASH_AUTO);
+                        flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_auto));
+                        break;
+                }
+            }
+        });
+
+
+        setInfo();
+
+
+        //TODO move menuscreen to separate activity or fragment
+        //menuScreen = (RelativeLayout) view.findViewById(R.id.menuScreen);
+        //menuScreen.setVisibility(View.INVISIBLE);
+
+//        ImageView infoIcon = (ImageView) view.findViewById(R.id.infoIcon);
+//        infoIcon.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showMenuScreen();
+//            }
+//        });
+
+//        ImageView infoIconClose = (ImageView) view.findViewById(R.id.infoIconClose);
+//        infoIconClose.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                hideMenuScreen();
+//            }
+//        });
+
+//        RelativeLayout rlSkip = (RelativeLayout) view.findViewById(R.id.rlSkip);
+//        rlSkip.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                //hideMenuScreen();
+//                cancelOrder();
+//            }
+//        });
+
+
+//        RelativeLayout rlCall = (RelativeLayout) view.findViewById(R.id.rlCall);
+//        rlCall.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                hideMenuScreen();
+//                callOperator();
+//            }
+//        });
+    }
+
+    private void callOperator() {
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", LocalSettings.OPERATOR_PHONE_NUMBER, null));
+        getActivity().startActivityForResult(intent, 99);
+    }
+
+    private void showMenuScreen() {
+            menuScreen.setVisibility(View.VISIBLE);
+    }
+
+    private void hideMenuScreen() {
             menuScreen.setVisibility(View.INVISIBLE);
         }
 
-        private void setInfo() {
+    private void setInfo() {
             pictureTaken = false;
             setTakePhotoButton(true);
 
-            TextView currentPhotoNum = (TextView) view.findViewById(R.id.currentPhotoNum);
-            TextView totalNum = (TextView) view.findViewById(R.id.totalNum);
-            TextView pageTitle = (TextView) view.findViewById(R.id.pageTitle);
 
-            int currentDoc = LocalSettings.getCurrentDocNumber(getContext());
-            long totalDoc = 8; //DatabaseHelper.getTotalDocuments();
-            int currentPage = LocalSettings.getCurrentPage(getContext());
 
-            currentPhotoNum.setText(Integer.toString(currentDoc));
-            totalNum.setText("/ " + Long.toString(totalDoc));
+            //TextView currentPhotoNum = (TextView) view.findViewById(R.id.currentPhotoNum);
+            //TextView totalNum = (TextView) view.findViewById(R.id.totalNum);
+            //TextView pageTitle = (TextView) view.findViewById(R.id.pageTitle);
+
+            //int currentDoc = LocalSettings.getCurrentDocNumber(getContext());
+            //long totalDoc = 8; //DatabaseHelper.getTotalDocuments();
+            //int currentPage = LocalSettings.getCurrentPage(getContext());
+
+            //currentPhotoNum.setText(Integer.toString(currentDoc));
+            //totalNum.setText("/ " + Long.toString(totalDoc));
 
             //String[] pageTitles = getResources().getStringArray(R.array.photo_page_titles);
             //String titleText = pageTitles[currentDoc-1];
 
-            String titleText = "ImageTitle"; //SUtils.getPictureTitle(currentDoc, currentPage);
-            pageTitle.setText(titleText);
+            //String titleText = "ImageTitle"; //SUtils.getPictureTitle(currentDoc, currentPage);
+            //pageTitle.setText(titleText);
 
-            saveEnterTime(currentDoc);
+            //saveEnterTime(currentDoc);
         }
 
-        private void setTakePhotoButton(boolean enabled) {
+    private void setTakePhotoButton(boolean enabled) {
 
             rlTakePhoto.setClickable(enabled);
             rlTakePhoto.setFocusable(enabled);
             rlTakePhoto.setEnabled(enabled);
 
-            if(enabled){
-                rlTakePhotoMask.setVisibility(View.INVISIBLE);
-            }else{
-                rlTakePhotoMask.setVisibility(View.VISIBLE);
-            }
+//            if(enabled){
+//                rlTakePhotoMask.setVisibility(View.INVISIBLE);
+//            }else{
+//                rlTakePhotoMask.setVisibility(View.VISIBLE);
+//            }
         }
 
 
-        private void saveEnterTime(int photoNum) {
+    private void saveEnterTime(int photoNum) {
             //String dateStr = RequestUtils.getCurrentDateFormatted();
             //LocalSettings.setEnterTime(getContext(), photoNum, dateStr);
-        }
+    }
 
-        private void cancelOrder() {
+    private void cancelOrder() {
             android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(getContext());
             dialog.setMessage(this.getString(R.string.camera_not_available));
             dialog.setPositiveButton(this.getString(R.string.camera_not_available), new DialogInterface.OnClickListener() {
@@ -283,7 +320,7 @@ public class TakePhotoFragment extends Fragment {
             dialog.show();
         }
 
-        private CameraView.Callback mCallback = new CameraView.Callback() {
+    private CameraView.Callback mCallback = new CameraView.Callback() {
 
             @Override
             public void onCameraOpened(CameraView cameraView) {
@@ -303,24 +340,20 @@ public class TakePhotoFragment extends Fragment {
                 SavePhotoAsyncTask savePhotoAsyncTask = new SavePhotoAsyncTask(data);
                 savePhotoAsyncTask.execute();
             }
-
         };
 
-        private void showProgressBar() {
+    private void showProgressBar() {
             progressDialog = new ProgressDialog(getContext());
             progressDialog.setMessage(this.getString(R.string.please_wait));
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
 
-        private void hideProgressBar() {
+    private void hideProgressBar() {
             if(progressDialog!=null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
         }
-
-
-
 
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override
@@ -343,10 +376,10 @@ public class TakePhotoFragment extends Fragment {
 
 private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
-    byte[] imageBytes;
+    private byte[] _imageBytes;
 
     public SavePhotoAsyncTask(byte[] imageBytes) {
-        this.imageBytes = imageBytes;
+        _imageBytes = imageBytes;
     }
 
     @Override
@@ -357,37 +390,31 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-
-        DataAccess dataAccess = DataAccess.getInstance(getContext());
-        WebContext current = WebContext.getInstance();
-        applicationGuid = current.Application.ApplicationGuid;
-        List<Document> documents = dataAccess.getDocumentsByApplicationGuid(applicationGuid);
-        Document document = documents.get(0);
-        documentId = document.Id;
-
         Scan scan = new Scan();
-        scan.ApplicationGuid = applicationGuid;
-        scan.DocumentGuid = document.DocumentGuid;
-        scan.DocumentId = documentId;
-        int count = dataAccess.countScansByDocumentId(documentId);
-        scan.PageNum = ++count;
+        scan.ApplicationGuid = _application.ApplicationGuid;
+        scan.DocumentGuid = _currentDocument.DocumentGuid;
+        scan.DocumentId = _currentDocument.Id;
+        scan.PageNum = _currentScan;
         scan.ScanStatus = ScanStatus.None;
-        scan.ImageLength = imageBytes.length;
-        scan.SmallPhoto = resizeBitmap(imageBytes);
-        scan.LargePhoto = imageBytes;
-
-        int result = dataAccess.insertScan(scan);
+        scan.ImageLength = _imageBytes.length;
+        scan.SmallPhoto = resizeBitmap(_imageBytes);
+        scan.LargePhoto = _imageBytes;
+        int result = _dataAccess.insertScan(scan);
         return result > 0;
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
         super.onPostExecute(result);
+
         hideProgressBar();
+
+        setCurrentScan();
+
         if (result) {
-            launchScanActivity();
+            dispose();
         } else {
-            Toast.makeText(getContext(), R.string.camera_not_available, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
             setInfo();
         }
     }
@@ -428,26 +455,13 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         return outputBytes;
     }
 
-
-    private void launchScanActivity() {
-
-        mCameraView.removeCallback(mCallback);
-        mCameraView.stop();
-        mCameraView = null;
-        initViews();
-
-        //Intent intent = new Intent(TakePhotoActivity.this, EditPhotoActivity.class);
-
-        //intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
-        //intent.putExtra(PICTURE_URI, uri.toString());
-        //startActivityForResult(intent, REQUEST_CODE);
-
-        //startActivity(intent);
-
-        //finish();
+    private void dispose() {
+        if (mCameraView != null) {
+            mCameraView.removeCallback(mCallback);
+            mCameraView.stop();
+            mCameraView = null;
+        }
     }
-
-
 
     /**
      * This interface must be implemented by activities that contain this

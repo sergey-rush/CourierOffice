@@ -13,17 +13,9 @@
         <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/dimen16"
+            android:gravity="center"
             android:orientation="vertical"
-            android:gravity="center">
-
-        <ImageView
-            android:id="@+id/ivMenu"
-            android:layout_width="@dimen/dimen20"
-            android:layout_height="@dimen/dimen30"
-            android:layout_alignParentRight="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_dots" />
+            android:padding="@dimen/dimen16">
 
         <TextView
             android:id="@+id/tvIdTitle"
@@ -34,92 +26,100 @@
 
         <TextView
             android:id="@+id/tvId"
-            android:layout_below="@id/tvIdTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvIdTitle"
+            android:text="tvId"
             android:textColor="@color/black"
-            android:textSize="@dimen/dimen16"
-            android:text="tvId" />
+            android:textSize="@dimen/dimen16" />
 
         <TextView
             android:id="@+id/tvMerchantNameTitle"
-            android:layout_below="@id/tvId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvId"
             android:text="Магазин" />
 
         <TextView
             android:id="@+id/tvMerchantName"
-            android:layout_below="@id/tvMerchantNameTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvMerchantNameTitle"
+            android:text="tvMerchantName"
             android:textColor="@color/black"
-            android:textSize="@dimen/dimen16"
-            android:text="tvMerchantName" />
+            android:textSize="@dimen/dimen16" />
 
         <TextView
             android:id="@+id/tvPersonNameTitle"
-            android:layout_below="@id/tvMerchantName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvMerchantName"
             android:text="Заемщик" />
 
         <TextView
             android:id="@+id/tvPersonName"
-            android:layout_below="@id/tvPersonNameTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvPersonNameTitle"
+            android:text="tvPersonName"
             android:textColor="@color/black"
-            android:textSize="@dimen/dimen16"
-            android:text="tvPersonName" />
+            android:textSize="@dimen/dimen16" />
 
         <TextView
             android:id="@+id/tvAmountTitle"
-            android:layout_below="@id/tvPersonName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvPersonName"
             android:text="Сумма" />
 
         <TextView
             android:id="@+id/tvAmount"
-            android:layout_below="@id/tvAmountTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvAmountTitle"
+            android:text="tvAmount"
             android:textColor="@color/black"
-            android:textSize="@dimen/dimen16"
-            android:text="tvAmount" />
+            android:textSize="@dimen/dimen16" />
 
         <TextView
             android:id="@+id/tvDeliveryAddressTitle"
-            android:layout_below="@id/tvAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvAmount"
             android:text="Адрес:" />
 
         <TextView
             android:id="@+id/tvDeliveryAddress"
-            android:layout_below="@id/tvDeliveryAddressTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvDeliveryAddressTitle"
+            android:text="tvDeliveryAddress"
             android:textColor="@color/black"
-            android:textSize="@dimen/dimen16"
-            android:text="tvDeliveryAddress" />
+            android:textSize="@dimen/dimen16" />
 
         <TextView
             android:id="@+id/tvCreatedTitle"
-            android:layout_below="@id/tvDeliveryAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvDeliveryAddress"
             android:text="Дата заявки:" />
 
         <TextView
             android:id="@+id/tvCreated"
-            android:layout_below="@id/tvCreatedTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/tvCreatedTitle"
+            android:text="tvCreated"
             android:textColor="@color/black"
-            android:textSize="@dimen/dimen16"
-            android:text="tvCreated" />
+            android:textSize="@dimen/dimen16" />
+
+        <ImageView
+            android:id="@+id/ivMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_menu" />
 
     </RelativeLayout>
 

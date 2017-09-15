@@ -19,6 +19,7 @@ import ru.courier.office.core.Document;
 import ru.courier.office.core.Note;
 import ru.courier.office.core.OperationType;
 import ru.courier.office.core.Scan;
+import ru.courier.office.core.ScanStatus;
 import ru.courier.office.core.Status;
 
 /**
@@ -70,6 +71,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract int countScansByDocumentId(int documentId);
     public abstract int insertScan(Scan scan);
     public abstract boolean updateScan(Scan scan);
+    public abstract boolean updateScansByApplicationGuid(String applicationGuid, ScanStatus scanStatus);
     public abstract byte[] getScanImage(int scanId, int offset, int length);
     public abstract Scan getScanById(int scanId);
 

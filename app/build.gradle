@@ -28,6 +28,7 @@ dependencies {
     compile project(':openCVLibrary320')
     compile project(':cameraview')
     compile project(':pinlock')
+    compile project(':scanlibrary')
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'

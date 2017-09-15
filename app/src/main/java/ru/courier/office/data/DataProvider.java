@@ -496,6 +496,14 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
+    public boolean updateScansByApplicationGuid(String applicationGuid, ScanStatus scanStatus) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("ScanStatus", scanStatus.ordinal());
+        int ret = (int) db.update("Scans", contentValues, "ApplicationGuid = ?", new String[]{applicationGuid});
+        return ret > 1;
+    }
+
+    @Override
     public boolean deleteScansByApplicationGuid(String applicationGuid) {
         int ret = db.delete("Scans", "ApplicationGuid = ?", new String[]{String.valueOf(applicationGuid)});
         return ret == 1;

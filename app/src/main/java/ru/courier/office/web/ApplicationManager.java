@@ -5,17 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.view.View;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import ru.courier.office.R;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.views.DrawerActivity;
-import ru.courier.office.views.MainActivity;
 import ru.courier.office.views.QrcodeFragment;
 import ru.courier.office.views.TakePhotoFragment;
 
@@ -26,14 +24,15 @@ import ru.courier.office.views.TakePhotoFragment;
 public class ApplicationManager extends AsyncTask<Void, Void, Void> {
 
     QrcodeFragment _fragment;
-    private Context _view;
+    private Context _context;
     private String _qrCodeValue;
+    private int applicationId;
     private int responseCode;
 
     private WebContext webContext = WebContext.getInstance();
 
     public ApplicationManager(Context context, QrcodeFragment fragment, String qrCodeValue) {
-        _view = context;
+        _context = context;
         _fragment = fragment;
         _qrCodeValue = qrCodeValue;
     }
@@ -45,7 +44,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         super.onPreExecute();
 
         _fragment.releaseCamera();
-        pDialog = new ProgressDialog(_view);
+        pDialog = new ProgressDialog(_context);
         pDialog.setMessage("Пожалуйста, подождите...");
         pDialog.setCancelable(false);
         pDialog.show();
@@ -58,7 +57,17 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         String postData = String.format("{\"ApplicationId\":\"%s\"}", _qrCodeValue);
         ApplicationProvider applicationProvider = new ApplicationProvider();
         responseCode = applicationProvider.postApplication(postData);
+        if (responseCode == 200) {
+            SaveData();
+        }
         return null;
+    }
+
+    private void SaveData()
+    {
+        DataAccess dataAccess = DataAccess.getInstance(_context);
+        WebContext current = WebContext.getInstance();
+        applicationId = dataAccess.addApplication(current.Application);
     }
 
     @Override
@@ -67,7 +76,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         if (pDialog.isShowing())
             pDialog.dismiss();
 
-        Toast.makeText(_view, "ApplicationManager.onPostExecute", Toast.LENGTH_SHORT).show();
+        Toast.makeText(_context, "ApplicationManager.onPostExecute", Toast.LENGTH_SHORT).show();
 
         if (responseCode == 200) {
             SaveData();
@@ -82,30 +91,27 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    private void SaveData()
-    {
-        DataAccess dataAccess = DataAccess.getInstance(_view);
-        WebContext current = WebContext.getInstance();
-        dataAccess.addApplication(current.Application);
-    }
-
     private AlertDialog onBeginScanDialog() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle("Сканирование заявки")
                 .setMessage("Вы желаете продолжить сканирование заявки сейчас?")
                 .setIcon(R.drawable.ic_question)
                 .setPositiveButton("Продолжить", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        _fragment.setFragment(new TakePhotoFragment());
+                        TakePhotoFragment fragment = TakePhotoFragment.newInstance(applicationId, 0, 0);
+                        FragmentManager fm = ((AppCompatActivity)_context).getSupportFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        ft.replace(R.id.container, fragment);
+                        ft.commit();
                         dialog.dismiss();
                     }
                 }).setNegativeButton("Отложить", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                        Toast.makeText(_view, "Вы выбрали отложить сканирование заявки", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(_context, "Вы выбрали отложить сканирование заявки", Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(_view, DrawerActivity.class);
-                        _view.startActivity(intent);
+                        Intent intent = new Intent(_context, DrawerActivity.class);
+                        _context.startActivity(intent);
 
                         dialog.dismiss();
                     }
@@ -114,7 +120,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     }
 
     private AlertDialog AuthorizationFailed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle("Ошибка входа")
                 .setMessage("Неверный телефон или пароль")
                 .setIcon(R.drawable.ic_error)
@@ -128,7 +134,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     }
 
     private AlertDialog ApplicationFailed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle("Заявка недействительна")
                 .setMessage("Кредитная заявка недействительна")
                 .setIcon(R.drawable.ic_error)
@@ -142,7 +148,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     }
 
     private AlertDialog ConnectionFailed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(_view, R.style.AlertDialogCustom)
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle(R.string.connection_failed)
                 .setMessage(R.string.connection_not_available)
                 .setIcon(R.drawable.ic_error)

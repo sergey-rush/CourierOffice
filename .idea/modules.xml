@@ -7,6 +7,8 @@
       <module fileurl="file://$PROJECT_DIR$/cameraview/cameraview.iml" filepath="$PROJECT_DIR$/cameraview/cameraview.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" filepath="$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" />
       <module fileurl="file://$PROJECT_DIR$/pinlock/pinlock.iml" filepath="$PROJECT_DIR$/pinlock/pinlock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scanbitmap/scanbitmap.iml" filepath="$PROJECT_DIR$/scanbitmap/scanbitmap.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scanlibrary/scanlibrary.iml" filepath="$PROJECT_DIR$/scanlibrary/scanlibrary.iml" />
     </modules>
   </component>
 </project>

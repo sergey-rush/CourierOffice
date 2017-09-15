@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="blue">#ff59a9ff</color>
+    <color name="orange">#ffff900d</color>
+    <color name="bottom_background_color">#ffc4c2bc</color>
+
+    <color name="polygonViewCircleStrokeColor">#ff59a9ff</color>
+    <color name="polygonViewCircleBackground">#90e5f8ff</color>
+
+    <color name="mainBlue">#4665de</color>
+    <color name="transparentBlue">#e54665de</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="green">#0dab0d</color>
+    <color name="greyDark">#4a4a4a</color>
+    <color name="greyLight">#eeeeee</color>
+    <color name="greyLight2">#d9d9d9</color>
+    <color name="greyLight3">#cccccc</color>
+    <color name="dividerBlue">#7789da</color>
+
+</resources>

@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/cameraview" />
             <option value="$PROJECT_DIR$/openCVLibrary320" />
             <option value="$PROJECT_DIR$/pinlock" />
+            <option value="$PROJECT_DIR$/scanlibrary" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

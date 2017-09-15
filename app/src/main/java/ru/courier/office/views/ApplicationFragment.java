@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -22,6 +23,7 @@ import java.text.SimpleDateFormat;
 
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
+import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.ScanManager;
 import ru.courier.office.web.WebContext;
@@ -39,6 +41,7 @@ public class ApplicationFragment extends Fragment {
     private TextView tvAmount;
     private TextView tvDeliveryAddress;
     private TextView tvCreated;
+    private DataAccess _dataAccess;
 
     public ApplicationFragment() {
 
@@ -48,7 +51,7 @@ public class ApplicationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_application, container, false);
-
+        _dataAccess = DataAccess.getInstance(getContext());
         WebContext webContext = WebContext.getInstance();
         _application = webContext.Application;
 
@@ -93,6 +96,9 @@ public class ApplicationFragment extends Fragment {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
             switch (menuItem.getItemId()) {
+                case R.id.app_menu_scan:
+                    scanDocuments();
+                    return true;
                 case R.id.app_menu_submit:
                     submitApplication();
                     return true;
@@ -106,8 +112,17 @@ public class ApplicationFragment extends Fragment {
         }
     }
 
+    private void scanDocuments() {
+
+        TakePhotoFragment fragment = TakePhotoFragment.newInstance(_application.Id, 0, 0);
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.container, fragment);
+        ft.commit();
+    }
 
     private void submitApplication() {
+        _dataAccess.updateScansByApplicationGuid(_application.ApplicationGuid, ScanStatus.Ready);
         ScanManager scanManager = new ScanManager(getContext(), _application);
         scanManager.execute();
     }
@@ -120,8 +135,8 @@ public class ApplicationFragment extends Fragment {
                 .setIcon(R.drawable.ic_question)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        DataAccess dataAccess = DataAccess.getInstance(getContext());
-                        dataAccess.removeApplication(_application.Id);
+
+                        _dataAccess.removeApplication(_application.Id);
                         Toast.makeText(getContext(), "Удалено", Toast.LENGTH_SHORT).show();
 
                         FragmentManager fm = getFragmentManager();

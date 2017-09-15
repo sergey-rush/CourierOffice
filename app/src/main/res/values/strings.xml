@@ -30,20 +30,18 @@
 
     <!-- Strings related to hardware and network-->
     <string name="camera_not_available">Камера недоступна</string>
+    <string name="something_went_wrong">Что-то пошло не так...</string>
     <string name="connection_failed">Ошибка подключения</string>
     <string name="connection_not_available">Не удалось подключиться к серверу. Проверьте подключение к интернету.</string>
-
-    <!-- Strings related to wizard -->
-    <string name="scan_app_qrcode">Отсканируйте QR-код заявки</string>
 
     <!-- Strings related to fragments -->
     <string name="welcome">Это главная страница. Здесь предполагается отображать новости и другие служебные сообщения</string>
 
     <!-- titles -->
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home_fragment">Сообщения</string>
+    <string name="title_qrcode_fragment">Сканировать QR-код</string>
     <string name="title_activity_login">7 seconds</string>
     <string name="title_activity_register">RegisterActivity</string>
-    <string name="title_activity_drawer">DrawerActivity</string>
     <string name="title_activity_pinlock">PinlockActivity</string>
 
     <!-- Intro -->
@@ -57,10 +55,11 @@
     <string name="desc_slide3">Банк примет решение в течение 10 минут</string>
 
     <!-- Strings related to app menu -->
+    <string name="menu_scan">Сканировать</string>
     <string name="menu_submit">Отправить</string>
-    <string name="scan_menu_show">Посмотреть</string>
     <string name="menu_delete">Удалить</string>
-
-
+    <string name="call_operator">Позвонить оператору</string>
+    <string name="reject_button_text">Отказ получателя</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="scan_menu_show">Посмотреть</string>
 </resources>
