@@ -1,8 +1,8 @@
 package com.scanlibrary;
 
-import android.app.Activity;
-import android.app.FragmentTransaction;
-import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,18 +12,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * Created by jhansi on 28/03/15.
  */
-public class ScanActivity extends Activity implements IScanner {
+public class ScanActivity extends AppCompatActivity implements IScanner {
 
     //debug
     private static final int IMAGE_MAX_SIZE = Integer.MAX_VALUE;
@@ -45,11 +42,12 @@ public class ScanActivity extends Activity implements IScanner {
     }
 
     private void showScanFragment() {
-        ScanFragment fragment = new ScanFragment();
-        android.app.FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.content, fragment, FRAGMENT_TAG);
-        fragmentTransaction.commit();
+//        ScanFragment fragment = new ScanFragment();
+//        FragmentManager fm = getFragmentManager();
+//        FragmentManager fragmentManager = getFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.add(R.id.content, fragment, FRAGMENT_TAG);
+//        fragmentTransaction.commit();
     }
 
     public void prepareBitmap() {
@@ -148,16 +146,17 @@ public class ScanActivity extends Activity implements IScanner {
         return 0;
     }
 
-    @Override
-    public void onBitmapSelect(Uri uri) {
-    }
-
     public void onBitmapPrepared(Bitmap bitmap) {
-        ScanFragment fragment = ((ScanFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG));
-        if(fragment != null) fragment.onBitmapReady(bitmap);
+        //ScanFragment fragment = ((ScanFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG));
+        //if(fragment != null) fragment.onBitmapReady(bitmap);
     }
 
     //methods to override
+
+    @Override
+    public void onBitmapSelect(Uri uri) {
+
+    }
 
     @Override
     public void onScanFinish(Uri uri) {
@@ -167,9 +166,7 @@ public class ScanActivity extends Activity implements IScanner {
         return "";
     }
 
-    protected float getRatio() {
-        return 0;
-    }
+
 
     public void cancelOrder() {}
 
@@ -184,8 +181,8 @@ public class ScanActivity extends Activity implements IScanner {
     @Override
     public void onBackPressed() {
         if(menuScreenShown){
-            ScanFragment fragment = ((ScanFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG));
-            fragment.hideMenuScreen();
+            //ScanFragment fragment = ((ScanFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG));
+            //fragment.hideMenuScreen();
         }else {
             super.onBackPressed();
         }
@@ -199,6 +196,9 @@ public class ScanActivity extends Activity implements IScanner {
         return 0;
     }
 
+    protected float getRatio() {
+        return 0;
+    }
 
     private class PreparePhotoAsyncTask extends AsyncTask<Void, Void, Bitmap> {
 

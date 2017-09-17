@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
+import com.scanlibrary.ScanFragment;
 
 import java.io.ByteArrayOutputStream;
 
@@ -42,30 +45,30 @@ import ru.courier.office.web.WebContext;
  */
 public class TakePhotoFragment extends Fragment {
 
-    private View view;
-    CameraView mCameraView;
-    RelativeLayout rlTakePhoto;
-    //ImageView rlTakePhotoMask;
-
-    RelativeLayout menuScreen;
-    RelativeLayout rlFlash;
-    ImageView flashIcon;
-    boolean pictureTaken = false;
-    private ProgressDialog progressDialog;
-    OrientationManager orientationManager;
-    int currentOrientation = OrientationManager.ScreenOrientation.PORTRAIT.ordinal();
-
     private static final String ARG_APPLICATION_ID = "applicationId";
     private static final String ARG_DOCUMENT_ID = "documentId";
     private static final String ARG_SCAN_ID = "scanId";
-
-    private int applicationId;
+    private int _applicationId;
     private int documentId;
-    private int scanId;
-
+    private int _scanId;
+    private View view;
+    private CameraView mCameraView;
+    private RelativeLayout rlTakePhoto;
+    private RelativeLayout menuScreen;
+    private RelativeLayout rlFlash;
+    private ImageView flashIcon;
+    boolean pictureTaken = false;
+    private ProgressDialog progressDialog;
+    private OrientationManager orientationManager;
+    private int currentOrientation = OrientationManager.ScreenOrientation.PORTRAIT.ordinal();
     private DataAccess _dataAccess;
     private Application _application;
     private Document _currentDocument;
+    private Toolbar _toolbar;
+    private int _totalDocs;
+    private int _currentDoc = 0;
+    private int _currentScan = 0;
+    
 
     public TakePhotoFragment() {
         // Required empty public constructor
@@ -93,16 +96,11 @@ public class TakePhotoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            applicationId = getArguments().getInt(ARG_APPLICATION_ID);
+            _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
             documentId = getArguments().getInt(ARG_DOCUMENT_ID);
-            scanId = getArguments().getInt(ARG_SCAN_ID);
+            _scanId = getArguments().getInt(ARG_SCAN_ID);
         }
     }
-
-    private Toolbar _toolbar;
-    private int _totalDocs;
-    private int _currentDoc = 0;
-    private int _currentScan = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -120,8 +118,8 @@ public class TakePhotoFragment extends Fragment {
         WebContext webContext = WebContext.getInstance();
         _dataAccess = DataAccess.getInstance(getContext());
 
-        if (applicationId > 0) {
-            _application = _dataAccess.getApplicationById(applicationId);
+        if (_applicationId > 0) {
+            _application = _dataAccess.getApplicationById(_applicationId);
             webContext.Application = _application;
             _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
             _totalDocs = _application.DocumentList.size();
@@ -286,7 +284,6 @@ public class TakePhotoFragment extends Fragment {
 //            }
         }
 
-
     private void saveEnterTime(int photoNum) {
             //String dateStr = RequestUtils.getCurrentDateFormatted();
             //LocalSettings.setEnterTime(getContext(), photoNum, dateStr);
@@ -399,8 +396,8 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         scan.ImageLength = _imageBytes.length;
         scan.SmallPhoto = resizeBitmap(_imageBytes);
         scan.LargePhoto = _imageBytes;
-        int result = _dataAccess.insertScan(scan);
-        return result > 0;
+        _scanId = _dataAccess.insertScan(scan);
+        return _scanId > 0;
     }
 
     @Override
@@ -412,6 +409,13 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         setCurrentScan();
 
         if (result) {
+
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            EditPhotoFragment editPhotoFragment = EditPhotoFragment.newInstance(_scanId);
+            ft.replace(R.id.container, editPhotoFragment);
+            ft.commit();
+
             dispose();
         } else {
             Toast.makeText(getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
@@ -477,5 +481,4 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
 }

@@ -1,8 +1,8 @@
 package com.scanlibrary;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Created by jhansi on 29/03/15.
  */
-public class ScanFragment extends Fragment {
+public class ScanFragment extends Fragment implements IScanner{
 
     public static final String OUTPUT_IMAGE_NAME = "tmp_scanned_picture.jpg";
 
@@ -52,17 +52,17 @@ public class ScanFragment extends Fragment {
 
     RelativeLayout menuScreen;
 
-    @Override
-    public void onAttach(Activity activity) {
-
-        //Log.d("rlf_app", "ScanFragment onAttach");
-
-        super.onAttach(activity);
-        if (!(activity instanceof IScanner)) {
-            throw new ClassCastException("Activity must implement IScanner");
-        }
-        this.scanner = (IScanner) activity;
-    }
+//    @Override
+//    public void onAttach(Activity activity) {
+//
+//        //Log.d("rlf_app", "ScanFragment onAttach");
+//
+//        super.onAttach(activity);
+//        if (!(activity instanceof IScanner)) {
+//            throw new ClassCastException("Activity must implement IScanner");
+//        }
+//        this.scanner = (IScanner) activity;
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -170,6 +170,10 @@ public class ScanFragment extends Fragment {
         });
     }
     */
+
+    protected float getRatio() {
+        return 0;
+    }
 
     public void onBitmapReady(Bitmap bitmap){
         original = bitmap;
@@ -301,6 +305,16 @@ public class ScanFragment extends Fragment {
         return orderedPoints;
     }
 
+    @Override
+    public void onBitmapSelect(Uri uri) {
+
+    }
+
+    @Override
+    public void onScanFinish(Uri uri) {
+
+    }
+
     private class ScanButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -317,9 +331,9 @@ public class ScanFragment extends Fragment {
     }
 
     private void showErrorDialog() {
-        SingleButtonDialogFragment fragment = new SingleButtonDialogFragment(R.string.ok, getString(R.string.cantCrop), "Error", true);
-        FragmentManager fm = getActivity().getFragmentManager();
-        fragment.show(fm, SingleButtonDialogFragment.class.toString());
+        //SingleButtonDialogFragment fragment = new SingleButtonDialogFragment(R.string.ok, getString(R.string.cantCrop), "Error", true);
+        //FragmentManager fm = getActivity().getFragmentManager();
+        //fragment.show(fm, SingleButtonDialogFragment.class.toString());
     }
 
     private boolean isScanPointsValid(Map<Integer, PointF> points) {
@@ -462,9 +476,9 @@ public class ScanFragment extends Fragment {
     }
 
     protected void showProgressDialog(String message) {
-        progressDialogFragment = new ProgressDialogFragment(message);
-        FragmentManager fm = getFragmentManager();
-        progressDialogFragment.show(fm, ProgressDialogFragment.class.toString());
+        //progressDialogFragment = new ProgressDialogFragment(message);
+        //FragmentManager fm = getFragmentManager();
+        //progressDialogFragment.show(fm, ProgressDialogFragment.class.toString());
     }
 
     protected void dismissDialog() {
