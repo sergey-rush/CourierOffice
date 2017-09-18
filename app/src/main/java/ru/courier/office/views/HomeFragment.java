@@ -97,34 +97,31 @@ public class HomeFragment extends Fragment {
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.title_home_fragment));
 
+        refreshNotes();
         webContext = WebContext.getInstance();
         dataAccess = DataAccess.getInstance(view.getContext());
         webContext.Notes = dataAccess.getNotesByLimit(10);
 
-        if (webContext.Notes != null) {
+        listView = (ListView) view.findViewById(R.id.lvNotes);
+        adapter = new NoteAdapter(getContext(), webContext.Notes);
+        listView.setAdapter(adapter);
 
-            listView = (ListView) view.findViewById(R.id.lvNotes);
-            adapter = new NoteAdapter(getContext(), webContext.Notes);
-            listView.setAdapter(adapter);
+        srlMain = (SwipeRefreshLayout) view.findViewById(R.id.srlMain);
+        srlMain.setColorSchemeResources(R.color.colorPrimaryDark);
 
-            srlMain = (SwipeRefreshLayout) view.findViewById(R.id.srlMain);
-            srlMain.setColorSchemeResources(R.color.colorPrimaryDark);
-
-            srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    onRefreshingNotes();
-                }
-            });
-        }
+        srlMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshNotes();
+            }
+        });
 
         return view;
     }
 
 
-private void onRefreshingNotes() {
-    int maxId = dataAccess.getNoteMaxId();
-    NoteManager noteManager = new NoteManager(this, maxId);
+private void refreshNotes() {
+    NoteManager noteManager = new NoteManager(this);
     noteManager.execute();
 }
 

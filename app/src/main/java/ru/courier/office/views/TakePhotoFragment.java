@@ -5,6 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -13,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +26,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
-import com.scanlibrary.ScanFragment;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
@@ -68,11 +75,11 @@ public class TakePhotoFragment extends Fragment {
     private int _totalDocs;
     private int _currentDoc = 0;
     private int _currentScan = 0;
-    
-
-    public TakePhotoFragment() {
-        // Required empty public constructor
-    }
+    private static final int IMAGE_NORMAL = 0;
+    private static final int IMAGE_DARK = 1;
+    private static final int IMAGE_BLUR = 2;
+    private static final float BRIGHTNESS_THRESHOLD_PERCENT = .25f;
+    public static final int BRIGHTNESS_THRESHOLD = 20;
 
     /**
      * Use this factory method to create a new instance of
@@ -107,6 +114,7 @@ public class TakePhotoFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_take_photo, container, false);
         _toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+
         orientationManager = new OrientationManager(getContext(), SensorManager.SENSOR_DELAY_NORMAL, new OrientationManager.OrientationListener() {
             @Override
             public void onOrientationChange(OrientationManager.ScreenOrientation screenOrientation) {
@@ -387,6 +395,9 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
+
+        //progressDialog.setMessage(getString(R.string.please_wait_while_prepare_image));
+
         Scan scan = new Scan();
         scan.ApplicationGuid = _application.ApplicationGuid;
         scan.DocumentGuid = _currentDocument.DocumentGuid;
@@ -395,9 +406,128 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         scan.ScanStatus = ScanStatus.None;
         scan.ImageLength = _imageBytes.length;
         scan.SmallPhoto = resizeBitmap(_imageBytes);
-        scan.LargePhoto = _imageBytes;
-        _scanId = _dataAccess.insertScan(scan);
+        scan.LargePhoto = drawDate(_imageBytes);
+
+        //progressDialog.setMessage(getString(R.string.please_wait_while_process_brightness));
+        Bitmap inputBitmap = BitmapFactory.decodeByteArray(scan.SmallPhoto, 0, scan.SmallPhoto.length);
+
+        int brightness = defineBrightness(inputBitmap);
+        if(brightness == IMAGE_NORMAL) {
+            //progressDialog.setMessage(getString(R.string.please_wait_while_process_blur));
+
+                _scanId = _dataAccess.insertScan(scan);
+
+        }
+
         return _scanId > 0;
+    }
+
+    public byte[] resizeBitmap(byte[] inputBytes) {
+        int inputBytesLength = inputBytes.length;
+        int targetW = 200;
+        int targetH = 200;
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+        int scaleFactor = 1;
+        if ((targetW > 0) || (targetH > 0)) {
+            scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+        }
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true; //Deprecated API 21
+        Bitmap outputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] outputBytes = stream.toByteArray();
+        int outputBytesLength = outputBytes.length;
+        return outputBytes;
+    }
+
+    private byte[] drawDate(byte[] inputBytes) {
+        Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length);
+        String dateStr = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(new Date());
+        String timeStr = new SimpleDateFormat("HH:mm", Locale.US).format(new Date());
+        int lineHeight = (int) Math.round(inputBitmap.getWidth() * .14);
+        long textSize = Math.round(0.5 * lineHeight);
+        long textMargin = Math.round(inputBitmap.getWidth() * .08);
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        Bitmap tempBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), lineHeight, conf);
+        Canvas canvas = new Canvas(tempBitmap);
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE); // back Color
+        canvas.drawRect(0, 0, inputBitmap.getWidth(), lineHeight, paint);
+        paint.setColor(Color.BLACK); // Text Color
+        paint.setTextSize(textSize); // Text Size
+        paint.setFakeBoldText(true);
+        long dateTextWidth = Math.round(paint.measureText(dateStr));
+        long timeTextWidth = Math.round(paint.measureText(timeStr));
+        long timeStrX = inputBitmap.getWidth() - timeTextWidth - textMargin;
+        if (timeStrX < (textMargin * 2 + dateTextWidth))
+            timeStrX = (textMargin * 2 + dateTextWidth);
+        canvas.drawText(dateStr, textMargin, textSize + (lineHeight - textSize) / 2, paint);
+        canvas.drawText(timeStr, timeStrX, textSize + (lineHeight - textSize) / 2, paint);
+        Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight, inputBitmap.getConfig());
+        Canvas canvas1 = new Canvas(outputBitmap);
+        canvas1.drawBitmap(inputBitmap, null, new RectF(0, 0, inputBitmap.getWidth(), inputBitmap.getHeight()), null);
+        canvas1.drawBitmap(tempBitmap, null, new RectF(0, inputBitmap.getHeight(), inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight), null);
+        inputBitmap.recycle();
+        tempBitmap.recycle();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] outputBytes = stream.toByteArray();
+        return outputBytes;
+    }
+
+    private Integer defineBrightness(Bitmap inputBitmap) {
+        int result;
+        Date d1 = new Date();
+
+
+        int histogram[] = new int[256];
+
+        for (int i = 0; i < 256; i++) {
+            histogram[i] = 0;
+        }
+
+        int bitmapWidth = inputBitmap.getWidth();
+        int bitmapHeight = inputBitmap.getHeight();
+        int totalPixels = bitmapWidth * bitmapHeight;
+
+        int counter = 0;
+
+        for (int x = 0; x < bitmapWidth; x++) {
+            for (int y = 0; y < bitmapHeight; y++) {
+                int pixel = inputBitmap.getPixel(x, y);
+
+                int r = Color.red(pixel);
+                int g = Color.green(pixel);
+                int b = Color.blue(pixel);
+
+                int brightness = (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
+                histogram[brightness]++;
+                counter++;
+            }
+        }
+
+        // Count pixels with brightness less then 20 //default 10
+        int darkPixelCount = 0;
+        for (int i = 0; i < BRIGHTNESS_THRESHOLD; i++) {
+            darkPixelCount += histogram[i];
+        }
+
+        if (darkPixelCount > totalPixels * BRIGHTNESS_THRESHOLD_PERCENT) {
+            result = IMAGE_DARK;
+        } else {
+            result = IMAGE_NORMAL;
+        }
+
+        Date d2 = new Date();
+        long diff = d2.getTime() - d1.getTime();
+
+        return result;
     }
 
     @Override
@@ -410,11 +540,11 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
         if (result) {
 
-            FragmentManager fm = getFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            EditPhotoFragment editPhotoFragment = EditPhotoFragment.newInstance(_scanId);
-            ft.replace(R.id.container, editPhotoFragment);
-            ft.commit();
+            //FragmentManager fm = getFragmentManager();
+            //FragmentTransaction ft = fm.beginTransaction();
+            //EditPhotoFragment editPhotoFragment = EditPhotoFragment.newInstance(_scanId);
+            //ft.replace(R.id.container, editPhotoFragment);
+            //ft.commit();
 
             dispose();
         } else {
@@ -423,42 +553,6 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         }
     }
 }
-
-    public byte[] resizeBitmap(byte[] inputBytes) {
-
-        int inputBytesLength = inputBytes.length;
-
-        int targetW = 600;
-        int targetH = 600;
-
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-
-        Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
-
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        int scaleFactor = 1;
-        if ((targetW > 0) || (targetH > 0)) {
-            scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-        }
-
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true; //Deprecated API 21
-
-        Bitmap outputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
-
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] outputBytes = stream.toByteArray();
-
-        int outputBytesLength = outputBytes.length;
-
-        return outputBytes;
-    }
-
     private void dispose() {
         if (mCameraView != null) {
             mCameraView.removeCallback(mCallback);

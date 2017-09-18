@@ -58,16 +58,11 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         ApplicationProvider applicationProvider = new ApplicationProvider();
         responseCode = applicationProvider.postApplication(postData);
         if (responseCode == 200) {
-            SaveData();
+            DataAccess dataAccess = DataAccess.getInstance(_context);
+            WebContext current = WebContext.getInstance();
+            applicationId = dataAccess.addApplication(current.Application);
         }
         return null;
-    }
-
-    private void SaveData()
-    {
-        DataAccess dataAccess = DataAccess.getInstance(_context);
-        WebContext current = WebContext.getInstance();
-        applicationId = dataAccess.addApplication(current.Application);
     }
 
     @Override
@@ -79,7 +74,6 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         Toast.makeText(_context, "ApplicationManager.onPostExecute", Toast.LENGTH_SHORT).show();
 
         if (responseCode == 200) {
-            SaveData();
             onBeginScanDialog().show();
             return;
         } else if (responseCode == 403) {

@@ -105,8 +105,8 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
     }
 
     private void getStatus () {
-        Status status = dataAccess.getVersion();
-        tvInfo.setText(String.format("%s \nVersion: %s \nCreated: %s", status.Info, status.Id, status.Created));
+        //Status status = dataAccess.getVersion();
+        //tvInfo.setText(String.format("%s \nVersion: %s \nCreated: %s", status.Info, status.Id, status.Created));
         long countApplications = dataAccess.countApplications();
         tvApps.setText(String.format("Applications count: %s", countApplications));
         long countDocuments = dataAccess.countDocuments();
@@ -135,12 +135,12 @@ public class DatabaseFragment extends Fragment implements View.OnClickListener{
     }
 
     public void onButtonCreateDatabaseClick(View view) {
-        dataAccess.onInit();
+        //dataAccess.onInit();
         getStatus ();
     }
 
     public void onButtonSetupDatabaseClick(View view) {
-        dataAccess.onSetup();
+        //dataAccess.onSetup();
         getStatus ();
     }
 

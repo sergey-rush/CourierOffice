@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import ru.courier.office.services.PositionService;
+import ru.courier.office.web.NoteManager;
 
 /**
  * Created by rash on 14.09.2017.

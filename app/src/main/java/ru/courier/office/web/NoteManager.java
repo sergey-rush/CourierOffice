@@ -1,21 +1,18 @@
 package ru.courier.office.web;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.view.View;
 
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.views.HomeFragment;
 
 public class NoteManager extends AsyncTask<Void, Void, Void> {
 
-    private HomeFragment _view;
+    private HomeFragment _fragment;
     private int responseCode;
-    private int _maxId;
 
-    public NoteManager(HomeFragment view, int maxId) {
-        _view = view;
-        _maxId = maxId;
+    public NoteManager(HomeFragment fragment) {
+        _fragment = fragment;
     }
 
     @Override
@@ -25,8 +22,10 @@ public class NoteManager extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... arg0) {
+        DataAccess dataAccess = DataAccess.getInstance(_fragment.getContext());
+        int maxId = dataAccess.getNoteMaxId();
         NoteProvider noteProvider = new NoteProvider();
-        responseCode = noteProvider.getNotes(_maxId);
+        responseCode = noteProvider.getNotes(maxId);
         return null;
     }
 
@@ -39,11 +38,11 @@ public class NoteManager extends AsyncTask<Void, Void, Void> {
         if (responseCode == 200) {
 
             WebContext webContext = WebContext.getInstance();
-            DataAccess dataAccess = DataAccess.getInstance(_view.getContext());
+            DataAccess dataAccess = DataAccess.getInstance(_fragment.getContext());
             dataAccess.addNotes(webContext.Notes);
             toBeUpdated = true;
         }
 
-        _view.onRefreshedNotes(toBeUpdated);
+        _fragment.onRefreshedNotes(toBeUpdated);
     }
 }

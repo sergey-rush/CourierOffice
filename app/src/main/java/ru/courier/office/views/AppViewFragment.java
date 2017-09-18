@@ -23,23 +23,24 @@ import java.util.List;
 
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
+import ru.courier.office.data.AppViewManager;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.WebContext;
 
 public class AppViewFragment extends Fragment {
 
-    private static final String ARG_PARAM1 = "appId";
-    private int id;
+    private static final String ARG_APPLICATION_ID = "applicationId";
+    private int applicationId;
 
     private OnFragmentInteractionListener mListener;
 
     public AppViewFragment() {
     }
 
-    public static AppViewFragment newInstance(int id) {
+    public static AppViewFragment newInstance(int applicationId) {
         AppViewFragment fragment = new AppViewFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM1, id);
+        args.putInt(ARG_APPLICATION_ID, applicationId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,7 +49,7 @@ public class AppViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            id = getArguments().getInt(ARG_PARAM1);
+            applicationId = getArguments().getInt(ARG_APPLICATION_ID);
         }
     }
 
@@ -59,9 +60,8 @@ public class AppViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_appview, container, false);
 
-        DataAccess dataAccess = DataAccess.getInstance(view.getContext());
-        WebContext webContext = WebContext.getInstance();
-        webContext.Application = dataAccess.getApplicationById(id);
+        AppViewManager appViewManager = new AppViewManager(view.getContext(), applicationId);
+        appViewManager.execute();
 
         viewPager = (ViewPager) view.findViewById(R.id.viewpager);
         setupViewPager(view, viewPager);

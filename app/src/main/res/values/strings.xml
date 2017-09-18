@@ -6,6 +6,10 @@
     <string name="ok">ОК</string>
     <string name="error">Ошибка</string>
     <string name="please_wait">Пожалуйста, подождите...</string>
+    <string name="please_wait_while_prepare_image">Пожалуйста, подождите, подготавливаю изображение</string>
+    <string name="please_wait_while_process_brightness">Пожалуйста, подождите, проверяю яркость изображения</string>
+    <string name="please_wait_while_process_blur">Пожалуйста, подождите, проверяю качество изображения</string>
+
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

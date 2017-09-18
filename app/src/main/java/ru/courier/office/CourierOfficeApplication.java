@@ -5,6 +5,8 @@ import android.content.Context;
 import android.telephony.TelephonyManager;
 
 import ru.courier.office.core.LocalSettings;
+import ru.courier.office.data.DataAccess;
+import ru.courier.office.web.NoteManager;
 import ru.courier.office.web.WebContext;
 
 /**
@@ -17,7 +19,8 @@ public class CourierOfficeApplication extends Application {
         super.onCreate();
         setDeviceInfo();
         WebContext.getInstance();
-
+        DataAccess dataAccess = DataAccess.getInstance(getApplicationContext());
+        //dataAccess.createDatabase();
     }
 
     private boolean setDeviceInfo() {
