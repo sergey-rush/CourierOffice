@@ -40,8 +40,6 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... arg0) {
 
-        _dataAccess.updateScansByApplicationGuid(_webContext.Application.ApplicationGuid, ScanStatus.Ready);
-
         List<Document> documents = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
 
         for (Document document : documents) {

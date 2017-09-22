@@ -75,7 +75,7 @@ public class HomeFragment extends Fragment {
 
 
     private void loadDataCallback() {
-        _noteList = _dataAccess.getNotesByLimit(10);
+        _noteList = _dataAccess.getNotesByLimit(100);
         adapter = new NoteAdapter(_context, _noteList);
         _listView.setAdapter(adapter);
     }
@@ -95,20 +95,21 @@ public class HomeFragment extends Fragment {
         protected Void doInBackground(Void... arg0) {
 
             int maxId = _dataAccess.getNoteMaxId();
+            String postData = String.format("{\"Id\":\"%d\", \"Imei\":\"%s\"}", maxId, _webContext.Imei);
             NoteProvider noteProvider = new NoteProvider();
-            responseCode = noteProvider.getNotes(maxId);
+            responseCode = noteProvider.getNotes(postData);
+            if (responseCode == 200) {
+                _dataAccess.addNotes(_webContext.NoteList);
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-
             _srlMain.setRefreshing(false);
 
             if (responseCode == 200) {
-                DataAccess dataAccess = DataAccess.getInstance(_context);
-                dataAccess.addNotes(_noteList);
                 loadDataCallback();
             }
         }
