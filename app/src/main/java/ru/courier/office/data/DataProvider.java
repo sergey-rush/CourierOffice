@@ -215,6 +215,7 @@ public class DataProvider extends DataAccess {
     public int addApplication(Application application) {
         int applicationId = insertApplication(application);
         for (ru.courier.office.core.Document document : application.DocumentList) {
+            document.ApplicationId = applicationId;
             insertDocument(document);
         }
 
@@ -242,12 +243,13 @@ public class DataProvider extends DataAccess {
         Document document = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationGuid, Title, Count FROM Documents FROM Documents WHERE Id = ?", new String[]{String.valueOf(id)});
+            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationId, ApplicationGuid, Title, Count FROM Documents FROM Documents WHERE Id = ?", new String[]{String.valueOf(id)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 document = new Document();
                 document.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 document.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
+                document.ApplicationId = cursor.getInt(cursor.getColumnIndex("ApplicationId"));
                 document.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 document.Title = cursor.getString(cursor.getColumnIndex("Title"));
                 document.Count = cursor.getInt(cursor.getColumnIndex("Count"));
@@ -261,19 +263,49 @@ public class DataProvider extends DataAccess {
         }
         return document;
     }
-    
+
     @Override
-    public List<Document> getDocumentsByApplicationGuid(String applicationGuid) {
+    public List<Document> getDocumentsByApplicationId(int applicationId) {
         List<Document> documents = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationGuid, Title, Count FROM Documents WHERE ApplicationGuid = ? COLLATE NOCASE ORDER BY Id", new String[]{String.valueOf(applicationGuid)});
+            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationId, ApplicationGuid, Title, Count FROM Documents WHERE ApplicationId = ? ORDER BY Id", new String[]{String.valueOf(applicationId)});
             cursor.moveToFirst();
             documents = new ArrayList<Document>();
             while (!cursor.isAfterLast()) {
                 Document document = new Document();
                 document.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 document.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
+                document.ApplicationId = cursor.getInt(cursor.getColumnIndex("ApplicationId"));
+                document.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
+                document.Title = cursor.getString(cursor.getColumnIndex("Title"));
+                document.Count = cursor.getInt(cursor.getColumnIndex("Count"));
+                documents.add(document);
+                cursor.moveToNext();
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return documents;
+    }
+    
+    @Override
+    public List<Document> getDocumentsByApplicationGuid(String applicationGuid) {
+        List<Document> documents = null;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationId, ApplicationGuid, Title, Count FROM Documents WHERE ApplicationGuid = ? COLLATE NOCASE ORDER BY Id", new String[]{applicationGuid});
+            cursor.moveToFirst();
+            documents = new ArrayList<Document>();
+            while (!cursor.isAfterLast()) {
+                Document document = new Document();
+                document.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                document.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
+                document.ApplicationId = cursor.getInt(cursor.getColumnIndex("ApplicationId"));
                 document.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 document.Title = cursor.getString(cursor.getColumnIndex("Title"));
                 document.Count = cursor.getInt(cursor.getColumnIndex("Count"));
@@ -314,6 +346,7 @@ public class DataProvider extends DataAccess {
     public int insertDocument(Document document) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("DocumentGuid", document.DocumentGuid);
+        contentValues.put("ApplicationId", document.ApplicationId);
         contentValues.put("ApplicationGuid", document.ApplicationGuid);
         contentValues.put("Title", document.Title);
         contentValues.put("Count", document.Count);
@@ -496,10 +529,18 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
+    public boolean updateScansByScanStatus(ScanStatus scanStatus) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("ScanStatus", scanStatus.ordinal());
+        int ret = (int) db.update("Scans", contentValues, "Id > ? AND ScanStatus != ?", new String[]{String.valueOf(0), String.valueOf(scanStatus.ordinal())});
+        return ret > 0;
+    }
+
+    @Override
     public boolean updateScansByApplicationGuid(String applicationGuid, ScanStatus scanStatus) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("ScanStatus", scanStatus.ordinal());
-        int ret = (int) db.update("Scans", contentValues, "ApplicationGuid = ?", new String[]{applicationGuid});
+        int ret = (int) db.update("Scans", contentValues, "ApplicationGuid = ? AND ScanStatus != ?", new String[]{applicationGuid, String.valueOf(scanStatus.ordinal())});
         return ret > 1;
     }
 
@@ -530,7 +571,7 @@ public class DataProvider extends DataAccess {
         List<Status> statuses = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationId, ApplicationGuid, Code, Category, Info, Created FROM Statuses WHERE ApplicationId = ? COLLATE NOCASE ORDER BY Created DESC", new String[]{String.valueOf(applicationId)});
+            cursor = db.rawQuery("SELECT Id, ApplicationId, ApplicationGuid, Code, Category, Info, Created FROM Statuses WHERE ApplicationId = ? ORDER BY Created DESC", new String[]{String.valueOf(applicationId)});
             cursor.moveToFirst();
             statuses = new ArrayList<Status>();
             while (!cursor.isAfterLast()) {

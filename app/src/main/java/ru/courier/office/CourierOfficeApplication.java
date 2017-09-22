@@ -6,12 +6,7 @@ import android.telephony.TelephonyManager;
 
 import ru.courier.office.core.LocalSettings;
 import ru.courier.office.data.DataAccess;
-import ru.courier.office.web.NoteManager;
 import ru.courier.office.web.WebContext;
-
-/**
- * Created by rash on 21.08.2017.
- */
 
 public class CourierOfficeApplication extends Application {
     @Override

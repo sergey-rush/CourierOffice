@@ -9,17 +9,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import ru.courier.office.R;
 import ru.courier.office.data.DataAccess;
-import ru.courier.office.views.DrawerActivity;
+import ru.courier.office.views.AppListFragment;
+import ru.courier.office.views.HomeFragment;
 import ru.courier.office.views.QrcodeFragment;
 import ru.courier.office.views.TakePhotoFragment;
-
-/**
- * Created by rash on 22.08.2017.
- */
 
 public class ApplicationManager extends AsyncTask<Void, Void, Void> {
 
@@ -70,9 +66,6 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(output);
         if (pDialog.isShowing())
             pDialog.dismiss();
-
-        Toast.makeText(_context, "ApplicationManager.onPostExecute", Toast.LENGTH_SHORT).show();
-
         if (responseCode == 200) {
             onBeginScanDialog().show();
             return;
@@ -93,7 +86,7 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
                 .setPositiveButton("Продолжить", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         TakePhotoFragment fragment = TakePhotoFragment.newInstance(applicationId, 0, 0);
-                        FragmentManager fm = ((AppCompatActivity)_context).getSupportFragmentManager();
+                        FragmentManager fm = ((AppCompatActivity) _context).getSupportFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
                         ft.replace(R.id.container, fragment);
                         ft.commit();
@@ -101,12 +94,11 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
                     }
                 }).setNegativeButton("Отложить", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-
-                        Toast.makeText(_context, "Вы выбрали отложить сканирование заявки", Toast.LENGTH_SHORT).show();
-
-                        Intent intent = new Intent(_context, DrawerActivity.class);
-                        _context.startActivity(intent);
-
+                        AppListFragment fragment = new AppListFragment();
+                        FragmentManager fm = ((AppCompatActivity) _context).getSupportFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        ft.replace(R.id.container, fragment);
+                        ft.commit();
                         dialog.dismiss();
                     }
                 }).create();

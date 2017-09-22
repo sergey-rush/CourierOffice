@@ -6,8 +6,8 @@
 
 
     <Button
-        android:id="@+id/btnUpload"
+        android:id="@+id/btnUpdate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Upload Image" />
+        android:text="Update Scans" />
 </FrameLayout>

@@ -1,7 +1,9 @@
 package ru.courier.office.views;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.core.Application;
 import ru.courier.office.core.Document;
 import ru.courier.office.core.DocumentAdapter;
 import ru.courier.office.data.DataAccess;
@@ -24,46 +27,99 @@ import ru.courier.office.web.WebContext;
 
 public class DocumentFragment extends Fragment {
 
+    private static final String ARG_APPLICATION_ID = "applicationId";
+    private int _applicationId;
+
+    private WebContext _webContext;
+    private ListView _listView;
+    private Context _context;
+    private View _view;
+
     public DocumentFragment() {
-        // Required empty public constructor
     }
-    ListView listView;
+
+    public static DocumentFragment newInstance(int applicationId) {
+        DocumentFragment fragment = new DocumentFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_APPLICATION_ID, applicationId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_document, container, false);
+        _view = inflater.inflate(R.layout.fragment_document, container, false);
+        _context = getContext();
 
-        WebContext webContext = WebContext.getInstance();
-        List<Document> documentList = webContext.Application.DocumentList;
+        _webContext = WebContext.getInstance();
+        DocumentAsyncTask documentAsyncTask = new DocumentAsyncTask();
+        documentAsyncTask.execute();
+        return _view;
+    }
 
-        if (documentList == null) {
-            documentList = DataAccess.getInstance(getContext()).getDocumentsByApplicationGuid(webContext.Application.ApplicationGuid);
-        }
+    private void loadDataCallback() {
+        if (_webContext.Application.DocumentList.size() > 0) {
 
-        if (documentList != null) {
+            DocumentAdapter adapter = new DocumentAdapter(_context, _webContext.Application.DocumentList);
 
-            DocumentAdapter adapter = new DocumentAdapter(getContext(), documentList);
+            _listView = (ListView) _view.findViewById(R.id.lvDocuments);
+            _listView.setItemsCanFocus(false);
+            _listView.setAdapter(adapter);
 
-            listView = (ListView) view.findViewById(R.id.lvDocuments);
-            listView.setItemsCanFocus(false);
-            listView.setAdapter(adapter);
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                     TextView tvTitle = (TextView) view.findViewById(R.id.tvTitle);
-                    String title = tvTitle.getText().toString();
                     int documentId = Integer.parseInt(tvTitle.getTag().toString());
-
-
-                    ScanListFragment scanListFragment = ScanListFragment.newInstance(documentId, title);
+                    _webContext.SelectedDocumentId = documentId;
+                    ScanListFragment scanListFragment = ScanListFragment.newInstance(documentId);
                     FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
 
                 }
             });
         }
-
-        return view;
     }
 
+    private class DocumentAsyncTask extends AsyncTask<Void, Void, Void> {
+        private DocumentAsyncTask() {
+        }
+
+        private ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(_context);
+            pDialog.setMessage("Пожалуйста, подождите...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            DataAccess dataAccess = DataAccess.getInstance(_context);
+            _webContext.Application.DocumentList = dataAccess.getDocumentsByApplicationId(_applicationId);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (_webContext.Application.DocumentList != null) {
+                loadDataCallback();
+            }
+        }
+    }
 }

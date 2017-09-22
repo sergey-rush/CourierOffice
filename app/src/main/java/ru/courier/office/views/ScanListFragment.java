@@ -1,25 +1,24 @@
 package ru.courier.office.views;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Resources;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.courier.office.R;
@@ -32,27 +31,22 @@ import ru.courier.office.data.DataAccess;
 public class ScanListFragment extends Fragment {
     
     private static final String ARG_DOCUMENT_ID = "documentId";
-    private static final String ARG_TITLE = "title";
    
-    private int documentId;
+    private int _documentId;
     private String title;
 
-    public ScanListFragment() {        
-    }
+    private RecyclerView _listView;
+    private ScanAdapter adapter;
+    private List<Scan> _scanList;
+    private Context _context;
+    private View _view;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param documentId DocumentId
-     * @param title Title
-     * @return A new instance of fragment ScanListFragment.
-     */    
-    public static ScanListFragment newInstance(int documentId, String title) {
+    public ScanListFragment() {}
+   
+    public static ScanListFragment newInstance(int documentId) {
         ScanListFragment fragment = new ScanListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_DOCUMENT_ID, documentId);
-        args.putString(ARG_TITLE, title);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,51 +55,23 @@ public class ScanListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            documentId = getArguments().getInt(ARG_DOCUMENT_ID);
-            title = getArguments().getString(ARG_TITLE);
+            _documentId = getArguments().getInt(ARG_DOCUMENT_ID);
         }
     }
-
-    private RecyclerView listView;
-    private ScanAdapter adapter;
-    private List<Scan> scanList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_scan_list, container, false);
+        _view = inflater.inflate(R.layout.fragment_scan_list, container, false);
 
-        listView = (RecyclerView) view.findViewById(R.id.rvScans);
+        _context = getContext();
+        ScanAsyncTask scanAsyncTask = new ScanAsyncTask();
+        scanAsyncTask.execute();
 
-        scanList = DataAccess.getInstance(getContext()).getScansByDocumentId(documentId);
-        adapter = new ScanAdapter(getContext(), scanList);
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
+        MenuItem btnCorner = (MenuItem) toolbar.findViewById(R.id.btnCorner);
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), 2);
-        listView.setLayoutManager(mLayoutManager);
-        listView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        listView.setItemAnimator(new DefaultItemAnimator());
-        listView.setAdapter(adapter);
-
-        listView.setOnTouchListener(new AdapterView.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                TextView tvTitle = (TextView) view.findViewById(R.id.tvTitle);
-                String title = tvTitle.getText().toString();
-                int scanId = Integer.parseInt(tvTitle.getTag().toString());
-
-                ScanViewFragment scanListFragment = ScanViewFragment.newInstance(documentId, scanId);
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
-
-                Toast.makeText(getContext(), String.format("Title: %s ScanId: %s", title, scanId), Toast.LENGTH_SHORT).show();
-
-                return false;
-
-            }
-        });
-
-        return view;
+        return _view;
     }
 
     /**
@@ -114,5 +80,63 @@ public class ScanListFragment extends Fragment {
     private int dpToPx(int dp) {
         Resources r = getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    }
+    private void loadDataCallback() {
+
+        if (_scanList.size() > 0) {
+            _listView = (RecyclerView) _view.findViewById(R.id.rvScans);
+            adapter = new ScanAdapter(_context, _documentId,_scanList);
+            RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(_context, 2);
+            _listView.setLayoutManager(mLayoutManager);
+            _listView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+            _listView.setItemAnimator(new DefaultItemAnimator());
+            _listView.setAdapter(adapter);
+
+//            _listView.setOnClickListener(new AdapterView.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//
+//                    TextView tvTitle = (TextView) view.findViewById(R.id.tvTitle);
+//                    int scanId = Integer.parseInt(tvTitle.getTag().toString());
+//
+//                    ScanViewFragment scanListFragment = ScanViewFragment.newInstance(_documentId, scanId);
+//                    FragmentManager fragmentManager = getFragmentManager();
+//                    fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
+//                }
+//            });
+        }
+    }
+    
+
+    private class ScanAsyncTask extends AsyncTask<Void, Void, Void> {
+        private ScanAsyncTask() {}
+        private ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(_context);
+            pDialog.setMessage("Пожалуйста, подождите...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            DataAccess dataAccess = DataAccess.getInstance(_context);
+            _scanList = dataAccess.getScansByDocumentId(_documentId);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (_scanList != null) {
+                loadDataCallback();
+            }
+        }
     }
 }

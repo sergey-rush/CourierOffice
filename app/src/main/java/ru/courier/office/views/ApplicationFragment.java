@@ -1,7 +1,10 @@
 package ru.courier.office.views;
 
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,7 +35,9 @@ import ru.courier.office.web.WebContext;
  */
 public class ApplicationFragment extends Fragment {
 
-    private Application _application;
+    private static final String ARG_APPLICATION_ID = "applicationId";
+    private int _applicationId;
+
     private ImageView ivMenu;
     private TextView tvId;
     private TextView tvMerchantName;
@@ -40,47 +45,45 @@ public class ApplicationFragment extends Fragment {
     private TextView tvAmount;
     private TextView tvDeliveryAddress;
     private TextView tvCreated;
+    private View _view;
+    private Context _context;
+    private WebContext _webContext;
     private DataAccess _dataAccess;
 
-    public ApplicationFragment() {
+    public ApplicationFragment() {}
 
+    public static ApplicationFragment newInstance(int applicationId) {
+        ApplicationFragment fragment = new ApplicationFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_APPLICATION_ID, applicationId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_application, container, false);
-        _dataAccess = DataAccess.getInstance(getContext());
-        WebContext webContext = WebContext.getInstance();
-        _application = webContext.Application;
+        _view = inflater.inflate(R.layout.fragment_application, container, false);
+        _context = getContext();
+        _webContext = WebContext.getInstance();
+        _dataAccess = DataAccess.getInstance(_context);
 
-        tvId = (TextView) view.findViewById(R.id.tvId);
-        tvId.setText(_application.ApplicationGuid);
-        tvMerchantName = (TextView) view.findViewById(R.id.tvMerchantName);
-        tvMerchantName.setText(_application.MerchantName);
-        tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
-        tvPersonName.setText(_application.PersonName);
-        tvAmount = (TextView) view.findViewById(R.id.tvAmount);
-        tvAmount.setText(_application.Amount);
-        tvDeliveryAddress = (TextView) view.findViewById(R.id.tvDeliveryAddress);
-        tvDeliveryAddress.setText(_application.DeliveryAddress);
-        tvCreated = (TextView) view.findViewById(R.id.tvCreated);
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        tvCreated.setText(dateFormat.format(_application.Created));
+        ApplicationAsyncTask applicationAsyncTask = new ApplicationAsyncTask();
+        applicationAsyncTask.execute();
 
-        ivMenu = (ImageView) view.findViewById(R.id.ivMenu);
-        ivMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPopupMenu(view);
-            }
-        });
-
-        return view;
+        return _view;
     }
 
     private void showPopupMenu(View view) {
-        PopupMenu popup = new PopupMenu(getContext(), view);
+        PopupMenu popup = new PopupMenu(_context, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.app_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(new AppMenuItemClickListener());
@@ -98,8 +101,8 @@ public class ApplicationFragment extends Fragment {
                 case R.id.app_menu_scan:
                     scanDocuments();
                     return true;
-                case R.id.app_menu_submit:
-                    submitApplication();
+                case R.id.app_menu_send:
+                    sendApplication();
                     return true;
                 case R.id.app_menu_delete:
                     AlertDialog dialog = onDeleteDialog();
@@ -113,35 +116,34 @@ public class ApplicationFragment extends Fragment {
 
     private void scanDocuments() {
 
-        TakePhotoFragment fragment = TakePhotoFragment.newInstance(_application.Id, 0, 0);
+        TakePhotoFragment fragment = TakePhotoFragment.newInstance(_applicationId, 0, 0);
         FragmentManager fm = getFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.container, fragment);
         ft.commit();
     }
 
-    private void submitApplication() {
-        _dataAccess.updateScansByApplicationGuid(_application.ApplicationGuid, ScanStatus.Ready);
-        ScanManager scanManager = new ScanManager(getContext(), _application);
+    private void sendApplication() {
+
+        ScanManager scanManager = new ScanManager(_context, _webContext.Application);
         scanManager.execute();
     }
 
-
     private AlertDialog onDeleteDialog() {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom)
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
                 .setTitle("Удаление заявки")
                 .setMessage("Вы действительно желаете удалить эту заявку?")
                 .setIcon(R.drawable.ic_question)
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                        _dataAccess.removeApplication(_application.Id);
-                        Toast.makeText(getContext(), "Удалено", Toast.LENGTH_SHORT).show();
+                        _dataAccess.removeApplication(_applicationId);
+                        Toast.makeText(_context, "Удалено", Toast.LENGTH_SHORT).show();
 
                         FragmentManager fm = getFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();
-                        HomeFragment homeFragment = new HomeFragment();
-                        ft.replace(R.id.container, homeFragment);
+                        AppListFragment appListFragment = new AppListFragment();
+                        ft.replace(R.id.container, appListFragment);
                         ft.commit();
 
                         dialog.dismiss();
@@ -153,5 +155,65 @@ public class ApplicationFragment extends Fragment {
                     }
                 }).create();
         return alertDialog;
+    }
+
+    private void loadDataCallback()
+    {
+        Application application = _webContext.Application;
+
+        tvId = (TextView) _view.findViewById(R.id.tvId);
+        tvId.setText(application.ApplicationGuid);
+        tvMerchantName = (TextView) _view.findViewById(R.id.tvMerchantName);
+        tvMerchantName.setText(application.MerchantName);
+        tvPersonName = (TextView) _view.findViewById(R.id.tvPersonName);
+        tvPersonName.setText(application.PersonName);
+        tvAmount = (TextView) _view.findViewById(R.id.tvAmount);
+        tvAmount.setText(application.Amount);
+        tvDeliveryAddress = (TextView) _view.findViewById(R.id.tvDeliveryAddress);
+        tvDeliveryAddress.setText(application.DeliveryAddress);
+        tvCreated = (TextView) _view.findViewById(R.id.tvCreated);
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        tvCreated.setText(dateFormat.format(application.Created));
+
+        ivMenu = (ImageView) _view.findViewById(R.id.ivMenu);
+        ivMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopupMenu(view);
+            }
+        });
+    }
+
+    private class ApplicationAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private ApplicationAsyncTask() {}
+
+        private ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(_context);
+            pDialog.setMessage("Пожалуйста, подождите...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            _webContext.Application = _dataAccess.getApplicationById(_applicationId);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (_webContext.Application != null) {
+                loadDataCallback();
+            }
+        }
     }
 }

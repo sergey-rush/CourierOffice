@@ -7,9 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import ru.courier.office.core.Note;
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.UrlType;
 
@@ -23,13 +25,18 @@ public class NoteProvider extends BaseProvider {
             UrlObject urlObject = webContext.getUrl(UrlType.Note);
             URL url = new URL(String.format("%s?id=%d", urlObject.Url, id));
             connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            connection.setReadTimeout(15000);
+            connection.setConnectTimeout(15000);
+            connection.setRequestMethod(urlObject.HttpMethod.toString());
+            connection.setDoOutput(true);
             webContext.attachCookieTo(connection);
-            connection.connect();
+
             responseCode = connection.getResponseCode();
 
             if (responseCode == HttpsURLConnection.HTTP_OK) {
                 String output = deserializeToString(connection);
-                webContext.Notes = parseToNoteList(output);
+                List<Note> noteList = parseToNoteList(output);
             } else {
                 return responseCode;
             }

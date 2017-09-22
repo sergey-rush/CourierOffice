@@ -29,11 +29,11 @@ public class WebContext {
         return current;
     }
 
-    public AppMode Mode = AppMode.Develop;
+
     public User User = new User();
     public Scan Scan = new Scan();
+    public int SelectedDocumentId;
     public Application Application = new Application();
-    public List<Note> Notes = new ArrayList<Note>();
 
     private CookieManager CookieManager = new CookieManager();
 
@@ -66,19 +66,40 @@ public class WebContext {
         }
     }
 
+    public AppMode Mode = AppMode.Develop;
     Map<AppMode, Map<UrlType, UrlObject>> urlMap = new HashMap<AppMode, Map<UrlType, UrlObject>>();
 
     private void initUrls()
     {
         Map<UrlType, UrlObject> developMap = new HashMap<UrlType, UrlObject>();
-        developMap.put(UrlType.Note, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/note"));
-        developMap.put(UrlType.Position, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/courier/api/position"));
-        developMap.put(UrlType.Scan, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/courier/api/document"));
-        developMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/account/sign"));
-        developMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/courier/api/account"));
-        developMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/application"));
-        developMap.put(UrlType.Image, new UrlObject(HttpMethod.POST, "http://192.168.100.100/courier/api/document"));
+        developMap.put(UrlType.Note, new UrlObject(HttpMethod.GET, "https://dev-api.7seconds.ru/api/CourierAppV3/GetNotes"));
+        developMap.put(UrlType.Position, new UrlObject(HttpMethod.PUT, "https://dev-api.7seconds.ru/api/CourierAppV3/PutPosition"));
+        developMap.put(UrlType.Scan, new UrlObject(HttpMethod.PUT, "https://dev-api.7seconds.ru/api/CourierAppV3/PutPhoto"));
+        developMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "https://dev-api.7seconds.ru/api/CourierAppV3/Sign"));
+        developMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "https://dev-api.7seconds.ru/api/CourierAppV3/GetUser"));
+        developMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "https://dev-api.7seconds.ru/api/CourierAppV3/PostApplication"));
+        developMap.put(UrlType.Image, new UrlObject(HttpMethod.POST, "https://dev-api.7seconds.ru/api/CourierAppV3/PostPhoto"));
         urlMap.put(AppMode.Develop, developMap);
+
+        Map<UrlType, UrlObject> testMap = new HashMap<UrlType, UrlObject>();
+        testMap.put(UrlType.Note, new UrlObject(HttpMethod.GET, "http://192.168.100.100/Courier/api/CourierAppV3/GetNotes"));
+        testMap.put(UrlType.Position, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/Courier/api/CourierAppV3/PutPosition"));
+        testMap.put(UrlType.Scan, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/Courier/api/CourierAppV3/PutPhoto"));
+        testMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/Courier/api/CourierAppV3/Sign"));
+        testMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/Courier/api/CourierAppV3/GetUser"));
+        testMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "http://192.168.100.100/Courier/api/CourierAppV3/PostApplication"));
+        testMap.put(UrlType.Image, new UrlObject(HttpMethod.POST, "http://192.168.100.100/Courier/api/CourierAppV3/PostPhoto"));
+        urlMap.put(AppMode.Test, testMap);
+
+        Map<UrlType, UrlObject> prodMap = new HashMap<UrlType, UrlObject>();
+        prodMap.put(UrlType.Note, new UrlObject(HttpMethod.GET, "http://192.168.100.100/PublicAPI/api/CourierAppV3/GetNotes"));
+        prodMap.put(UrlType.Position, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/PublicAPI/api/CourierAppV3/PutPosition"));
+        prodMap.put(UrlType.Scan, new UrlObject(HttpMethod.PUT, "http://192.168.100.100/PublicAPI/api/CourierAppV3/PutPhoto"));
+        prodMap.put(UrlType.Sign, new UrlObject(HttpMethod.POST, "http://192.168.100.100/PublicAPI/api/CourierAppV3/Sign"));
+        prodMap.put(UrlType.User, new UrlObject(HttpMethod.GET, "http://192.168.100.100/PublicAPI/api/CourierAppV3/GetUser"));
+        prodMap.put(UrlType.Application, new UrlObject(HttpMethod.POST, "http://192.168.100.100/PublicAPI/api/CourierAppV3/PostApplication"));
+        prodMap.put(UrlType.Image, new UrlObject(HttpMethod.POST, "http://192.168.100.100/PublicAPI/api/CourierAppV3/PostPhoto"));
+        urlMap.put(AppMode.Product, prodMap);
     }
 
     public UrlObject getUrl(UrlType urlType) {

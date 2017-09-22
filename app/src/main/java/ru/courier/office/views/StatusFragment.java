@@ -1,6 +1,9 @@
 package ru.courier.office.views;
 
 
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -26,35 +29,97 @@ import ru.courier.office.web.WebContext;
  */
 public class StatusFragment extends Fragment {
 
-    public StatusFragment() {
-        // Required empty public constructor
+    private static final String ARG_APPLICATION_ID = "applicationId";
+    private int _applicationId;
+
+    private WebContext _webContext;
+    private ListView _listView;
+    private Context _context;
+    private View _view;
+
+    public StatusFragment() {}
+
+    public static StatusFragment newInstance(int applicationId) {
+        StatusFragment fragment = new StatusFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_APPLICATION_ID, applicationId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_status, container, false);
+        _view = inflater.inflate(R.layout.fragment_status, container, false);
+        _context = getContext();
+        _webContext = WebContext.getInstance();
 
-        WebContext webContext = WebContext.getInstance();
-        DataAccess dataAccess = DataAccess.getInstance(view.getContext());
-        webContext.Application.StatusList = dataAccess.getStatusesByApplicationId(webContext.Application.Id);
+        StatusAsyncTask statusAsyncTask = new StatusAsyncTask();
+        statusAsyncTask.execute();
 
-        List<Status> statusList = webContext.Application.StatusList;
-        StatusAdapter adapter = new StatusAdapter(this.getContext(), statusList);
-
-        ListView listView = (ListView) view.findViewById(R.id.lvStatuses);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                RelativeLayout layout = (RelativeLayout)view;
-                TextView tvInfo = (TextView)layout.findViewById(R.id.tvInfo);
-                Toast.makeText(view.getContext(), tvInfo.getText(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        return view;
+        return _view;
     }
 
+    private void loadDataCallback() {
+
+        if (_webContext.Application.StatusList.size() > 0) {
+
+            List<Status> statusList = _webContext.Application.StatusList;
+            StatusAdapter adapter = new StatusAdapter(_context, statusList);
+
+            _listView = (ListView) _view.findViewById(R.id.lvStatuses);
+            _listView.setAdapter(adapter);
+
+            _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                    RelativeLayout layout = (RelativeLayout) view;
+                    TextView tvInfo = (TextView) layout.findViewById(R.id.tvInfo);
+                    Toast.makeText(_context, tvInfo.getText(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private class StatusAsyncTask extends AsyncTask<Void, Void, Void> {
+        private StatusAsyncTask() {
+        }
+
+        private ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(_context);
+            pDialog.setMessage("Пожалуйста, подождите...");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            DataAccess dataAccess = DataAccess.getInstance(_context);
+            _webContext.Application.StatusList = dataAccess.getStatusesByApplicationId(_applicationId);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (pDialog.isShowing())
+                pDialog.dismiss();
+
+            if (_webContext.Application.StatusList != null) {
+                loadDataCallback();
+            }
+        }
+    }
 }
