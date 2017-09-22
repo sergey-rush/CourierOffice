@@ -1,6 +1,7 @@
 package ru.courier.office.web;
 
 import ru.courier.office.core.Application;
+import ru.courier.office.core.ApplicationStatus;
 import ru.courier.office.core.Document;
 import ru.courier.office.core.Note;
 import ru.courier.office.core.Scan;
@@ -60,6 +61,7 @@ public class BaseProvider {
         Application application = new Application();
         JSONObject resultData = new JSONObject(input);
         application.ApplicationGuid = applicationGuid = resultData.getString("Id");
+        application.ApplicationStatus = ApplicationStatus.None;
         application.Amount = resultData.getString("Amount");
         application.DeliveryAddress = resultData.getString("DeliveryAddress");
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");

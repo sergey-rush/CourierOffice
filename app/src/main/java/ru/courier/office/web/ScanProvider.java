@@ -116,7 +116,7 @@ public class ScanProvider extends BaseProvider {
             serialisePost(connection, postData);
             responseCode = connection.getResponseCode();
 
-            if (responseCode == HttpsURLConnection.HTTP_OK) {
+            if (responseCode == HttpsURLConnection.HTTP_OK || responseCode == HttpsURLConnection.HTTP_CREATED) {
                 webContext.setCookie(connection.getHeaderFields());
                 String output = deserializeToString(connection);
                 webContext.Scan = parseToScan(output, webContext.Scan);

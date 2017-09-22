@@ -60,7 +60,7 @@
 
     <!-- Strings related to app menu -->
     <string name="menu_scan">Сканировать</string>
-    <string name="menu_submit">Отправить</string>
+    <string name="menu_send">Отправить</string>
     <string name="menu_delete">Удалить</string>
     <string name="call_operator">Позвонить оператору</string>
     <string name="reject_button_text">Отказ получателя</string>

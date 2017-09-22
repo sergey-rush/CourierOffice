@@ -85,7 +85,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
         toolbar.setTitle(getString(R.string.title_qrcode_fragment));
 
         releaseCamera();
@@ -163,8 +163,6 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         scanner.setConfig(0, Config.Y_DENSITY, 3);
 
         mPreview = new CameraPreview(getContext(), mCamera, previewCb, autoFocusCB);
-
-
         cameraPreview.addView(mPreview);
 
         startScan();
@@ -187,11 +185,8 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
-                    Log.i("rlf_app", "<<<<Bar Code>>> " + sym.getData());
                     String scanResult = sym.getData().trim();
-
                     barcodeScanned = true;
-                    //Log.i("rlf_app", "checkScanResult " + checkScanResult);
                     if(checkScanResult) {
                         checkScanResult = false;
                         checkBarCode(scanResult);

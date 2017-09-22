@@ -52,7 +52,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
                     String postData = FormatPayload(document, scan);
                     ScanProvider scanProvider = new ScanProvider();
                     responseCode = scanProvider.getInfo(postData);
-                    if (responseCode == 200) {
+                    if (responseCode == 200 || responseCode == 201) {
                         _webContext.Scan.ScanStatus = ScanStatus.Progress;
                         _dataAccess.updateScan(_webContext.Scan);
                     }
@@ -81,6 +81,37 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
     }
 
     public void uploadScan(Scan scan) {
+
+        int scanImageLength = scan.ImageLength;
+        byte[] imageBytes = new byte[scanImageLength];
+
+        // The bytes have already been read
+        int totalBytes = 0;
+        int bufferSize = 1 * 1024 * 1024;
+
+        if (scanImageLength < bufferSize) {
+            bufferSize = scanImageLength;
+        }
+
+        while (totalBytes < scanImageLength) {
+
+            if (totalBytes + bufferSize > scanImageLength) {
+                bufferSize = scanImageLength - totalBytes;
+            }
+
+            byte[] buffer = new byte[bufferSize];
+            buffer = _dataAccess.getScanImage(scan.Id, totalBytes, bufferSize);
+
+            System.arraycopy(buffer, 0, imageBytes, totalBytes, buffer.length);
+            totalBytes = (totalBytes + bufferSize);
+        }
+
+        ScanProvider scanProvider = new ScanProvider();
+        responseCode = scanProvider.doUpload(scan, imageBytes);
+    }
+
+
+    public void uploadScan1(Scan scan) {
 
         int imageLength = scan.ImageLength;
         int sendBytes = 0;

@@ -6,6 +6,7 @@ import java.util.List;
 public class Application {
     public int Id;
     public String ApplicationGuid;
+    public ApplicationStatus ApplicationStatus;
     public String MerchantGuid;
     public String MerchantName;
     public String Inn;

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,8 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,25 +24,26 @@ import java.util.List;
 
 import ru.courier.office.ApplicationService;
 import ru.courier.office.R;
+import ru.courier.office.web.WebContext;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
-        AppViewFragment.OnFragmentInteractionListener, TakePhotoFragment.OnFragmentInteractionListener, ScanViewFragment.OnFragmentInteractionListener,
-        QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener, LocationFragment.OnFragmentInteractionListener {
+        TakePhotoFragment.OnFragmentInteractionListener, QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener,
+        LocationFragment.OnFragmentInteractionListener, UpdateScansFragment.OnFragmentInteractionListener {
 
     private Switch swtOnline;
     private TextView tvSwitchOnline;
+    private Toolbar _toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_drawer);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+        _toolbar = (Toolbar) findViewById(R.id.tlbMain);
+        setSupportActionBar(_toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, _toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -81,8 +81,25 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         Fragment fragment = getVisibleFragment();
 
         if (fragment instanceof AppViewFragment) {
-            //Toast.makeText(this, "AppViewFragment", Toast.LENGTH_LONG).show();
             showFragment(new AppListFragment());
+            handled = true;
+        }
+
+        if (fragment instanceof ScanListFragment) {
+            WebContext webContext = WebContext.getInstance();
+            showFragment(AppViewFragment.newInstance(webContext.Application.Id));
+            handled = true;
+        }
+
+        if (fragment instanceof ScanViewFragment) {
+            WebContext webContext = WebContext.getInstance();
+            showFragment(ScanListFragment.newInstance(webContext.SelectedDocumentId));
+            handled = true;
+        }
+
+        if (fragment instanceof TakePhotoFragment) {
+            _toolbar.setVisibility(View.VISIBLE);
+            showFragment(new HomeFragment());
             handled = true;
         }
 
@@ -99,7 +116,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     }
 
     public Fragment getVisibleFragment(){
-        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();
         if(fragments != null){
             for(Fragment fragment : fragments){
@@ -110,27 +127,17 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         return null;
     }
 
-    public void onbuttonSaveClick(View view) {
-        EditText editTextFirstName = (EditText) findViewById(R.id.editTextFirstName);
-        EditText editTextMiddleName = (EditText) findViewById(R.id.editTextMiddleName);
-        EditText editTextLastName = (EditText) findViewById(R.id.editTextLastName);
+    private void removeFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        List<Fragment> fragmentList = fragmentManager.getFragments();
 
-        Spinner spinnerGender = (Spinner) findViewById(R.id.spinnerGender);
-
-        EditText editTextBirthDate = (EditText) findViewById(R.id.editTextBirthDate);
-        EditText editTextBirthPlace = (EditText) findViewById(R.id.editTextBirthPlace);
-        EditText editTextPasportNum = (EditText) findViewById(R.id.editTextPasportNum);
-        EditText editTextPasportSerial = (EditText) findViewById(R.id.editTextPasportSerial);
-
-        EditText editTextAuthority = (EditText) findViewById(R.id.editTextAuthority);
-        EditText editTextSnils = (EditText) findViewById(R.id.editTextSnils);
-        EditText editTextInn = (EditText) findViewById(R.id.editTextInn);
-
-        Spinner spinnerMarital = (Spinner) findViewById(R.id.spinnerMarital);
-
-        Spinner spinnerChildren = (Spinner) findViewById(R.id.spinnerChildren);
-
-        EditText editTextAddress = (EditText) findViewById(R.id.editTextAddress);
+        for (Fragment fragment : fragmentList) {
+            if (fragment instanceof HomeFragment) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.remove(fragment);
+                fragmentTransaction.commit();
+            }
+        }
     }
 
     @Override
@@ -148,7 +155,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.btnCorner) {
             return true;
         }
 
@@ -173,6 +180,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new UploadFragment();
         } else if (id == R.id.nav_location) {
             fragment = new LocationFragment();
+        } else if (id == R.id.nav_updatescans) {
+            fragment = new UpdateScansFragment();
         }
 
         showFragment(fragment);

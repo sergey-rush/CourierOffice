@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import ru.courier.office.core.Application;
+import ru.courier.office.core.ApplicationStatus;
 import ru.courier.office.core.Document;
 import ru.courier.office.core.Note;
 import ru.courier.office.core.OperationType;
@@ -29,7 +30,7 @@ import ru.courier.office.core.Status;
 public abstract class DataAccess extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "COURIEROFFICEDB.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 1;
     private Context _context;
     protected SQLiteDatabase db;
 
@@ -58,7 +59,7 @@ public abstract class DataAccess extends SQLiteOpenHelper {
 
     public abstract int insertApplication(Application application);
 
-    public abstract boolean refreshApplication(Application application);
+    public abstract boolean updateApplicationByApplicationStatus(int id, ApplicationStatus applicationStatus);
 
     public abstract boolean deleteApplicationById(int id);
 
@@ -67,6 +68,8 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract boolean removeApplication(int id);
 
     public abstract Document getDocumentById(int id);
+
+    public abstract List<Document> getDocumentsByApplicationId(int applicationId);
 
     public abstract List<Document> getDocumentsByApplicationGuid(String applicationGuid);
 
@@ -87,6 +90,8 @@ public abstract class DataAccess extends SQLiteOpenHelper {
     public abstract int insertScan(Scan scan);
 
     public abstract boolean updateScan(Scan scan);
+
+    public abstract boolean updateScansByScanStatus(ScanStatus scanStatus);
 
     public abstract boolean updateScansByApplicationGuid(String applicationGuid, ScanStatus scanStatus);
 
@@ -125,9 +130,9 @@ public abstract class DataAccess extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationGuid TEXT, MerchantGuid TEXT, MerchantName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, PersonGuid TEXT, PersonName TEXT, BirthDate TEXT, Gender INTEGER, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
+        db.execSQL("CREATE TABLE Applications(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationGuid TEXT, ApplicationStatus INTEGER, MerchantGuid TEXT, MerchantName TEXT, Inn TEXT, Email TEXT, Site TEXT, ManagerName TEXT, ManagerPhone TEXT, PersonGuid TEXT, PersonName TEXT, BirthDate TEXT, Gender INTEGER, Amount TEXT, DeliveryAddress TEXT, Created TEXT)");
         db.execSQL("CREATE TABLE Statuses(Id INTEGER PRIMARY KEY AUTOINCREMENT, ApplicationId INTEGER, ApplicationGuid TEXT, Code TEXT, Category TEXT, Info TEXT, Created TEXT)");
-        db.execSQL("CREATE TABLE Documents(Id INTEGER PRIMARY KEY AUTOINCREMENT, DocumentGuid TEXT, ApplicationGuid TEXT, Title TEXT, Count INTEGER)");
+        db.execSQL("CREATE TABLE Documents(Id INTEGER PRIMARY KEY AUTOINCREMENT, DocumentGuid TEXT, ApplicationId INTEGER, ApplicationGuid TEXT, Title TEXT, Count INTEGER)");
         db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, PhotoGuid TEXT, StreamGuid TEXT, ApplicationGuid TEXT, DocumentGuid TEXT, DocumentId INTEGER, PageNum INTEGER, ImageLength INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
         db.execSQL("CREATE TABLE Notes(Id INTEGER PRIMARY KEY, Info TEXT, Created TEXT)");
     }

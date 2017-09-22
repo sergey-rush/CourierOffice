@@ -3,6 +3,9 @@ package ru.courier.office.core;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +21,8 @@ import java.util.List;
 
 import ru.courier.office.R;
 import ru.courier.office.data.DataAccess;
+import ru.courier.office.views.ScanListFragment;
+import ru.courier.office.views.ScanViewFragment;
 
 /**
  * Created by rash on 31.08.2017.
@@ -27,10 +32,14 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
 
     private Context _context;
     private List<Scan> _scanList;
+    private int _documentId;
 
     public class ScanViewHolder extends RecyclerView.ViewHolder {
-        public TextView tvTitle, tvStatus;
-        public ImageView ivScan, ivMenu;
+
+        public TextView tvTitle;
+        public TextView tvStatus;
+        public ImageView ivScan;
+        public ImageView ivMenu;
 
         public ScanViewHolder(View view) {
             super(view);
@@ -41,8 +50,9 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         }
     }
 
-    public ScanAdapter(Context context, List<Scan> scanList) {
+    public ScanAdapter(Context context, int documentId, List<Scan> scanList) {
         _context = context;
+        _documentId = documentId;
         _scanList = scanList;
     }
 
@@ -59,12 +69,17 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         holder.tvTitle.setText(String.format("Страница: %s", scan.PageNum));
         holder.tvTitle.setTag(scan.Id);
         holder.tvStatus.setText(toString(scan.ScanStatus));
+
         byte[] imageBytes = scan.SmallPhoto;
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
         holder.ivScan.setImageBitmap(bitmap);
 
-        // loading scan cover using Glide library
-        //Glide.with(_context).load(scan.getThumbnail()).into(holder.ivScan);
+        holder.ivScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showScanView(holder.ivMenu, scanId);
+            }
+        });
 
         holder.ivMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,30 +89,18 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         });
     }
 
-    public String toString(ScanStatus status) {
-
-        String output = "Неопределенный";
-        switch (status) {
-            case None:
-                output = "Неопределенный";
-                break;
-            case Ready:
-                output = "Готовый к отправке";
-                break;
-            case Progress:
-                output = "Обрабатывается";
-                break;
-            case Completed:
-                output = "Завершен";
-        }
-        return output;
+    private void showScanView(View view, int scanId)
+    {
+        ScanViewFragment scanListFragment = ScanViewFragment.newInstance(_documentId, scanId);
+        FragmentManager fragmentManager = ((AppCompatActivity)_context).getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
     }
 
     /**
      * Showing popup menu when tapping on 3 dots
      */
     private void showPopupMenu(View view, int scanId) {
-        // inflate menu
+
         PopupMenu popup = new PopupMenu(_context, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.scan_menu, popup.getMenu());
@@ -118,10 +121,11 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
         public boolean onMenuItemClick(MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 case R.id.scan_menu_show:
-                    Toast.makeText(_context, "Показать", Toast.LENGTH_SHORT).show();
+                    ScanViewFragment scanListFragment = ScanViewFragment.newInstance(_documentId, _scanId);
+                    FragmentManager fragmentManager = ((AppCompatActivity)_context).getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
                     return true;
                 case R.id.scan_menu_delete:
-                    Toast.makeText(_context, "Удалить: " + _scanId, Toast.LENGTH_SHORT).show();
                     DataAccess dataAccess = DataAccess.getInstance(_context);
                     dataAccess.deleteScanById(_scanId);
                     return true;
@@ -134,5 +138,24 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
     @Override
     public int getItemCount() {
         return _scanList.size();
+    }
+
+    public String toString(ScanStatus status) {
+
+        String output = "Неопределенный";
+        switch (status) {
+            case None:
+                output = "Неопределенный";
+                break;
+            case Ready:
+                output = "Готовый к отправке";
+                break;
+            case Progress:
+                output = "Обрабатывается";
+                break;
+            case Completed:
+                output = "Отправлен";
+        }
+        return output;
     }
 }

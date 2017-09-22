@@ -1,6 +1,7 @@
 package ru.courier.office.views;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,12 +18,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
@@ -42,32 +43,31 @@ import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.WebContext;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link TakePhotoFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TakePhotoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TakePhotoFragment extends Fragment {
 
+    public static final int BRIGHTNESS_THRESHOLD = 20;
     private static final String ARG_APPLICATION_ID = "applicationId";
     private static final String ARG_DOCUMENT_ID = "documentId";
     private static final String ARG_SCAN_ID = "scanId";
+    private static final int IMAGE_NORMAL = 0;
+    private static final int IMAGE_DARK = 1;
+    private static final int IMAGE_BLUR = 2;
+    private static final float BRIGHTNESS_THRESHOLD_PERCENT = .25f;
+    boolean pictureTaken = false;
     private int _applicationId;
     private int documentId;
     private int _scanId;
-    private View view;
+    private View _view;
+    private Context _context;
     private CameraView mCameraView;
     private RelativeLayout rlTakePhoto;
     private RelativeLayout menuScreen;
     private RelativeLayout rlFlash;
     private ImageView flashIcon;
-    boolean pictureTaken = false;
     private ProgressDialog progressDialog;
     private OrientationManager orientationManager;
     private int currentOrientation = OrientationManager.ScreenOrientation.PORTRAIT.ordinal();
+
     private DataAccess _dataAccess;
     private Application _application;
     private Document _currentDocument;
@@ -75,20 +75,8 @@ public class TakePhotoFragment extends Fragment {
     private int _totalDocs;
     private int _currentDoc = 0;
     private int _currentScan = 0;
-    private static final int IMAGE_NORMAL = 0;
-    private static final int IMAGE_DARK = 1;
-    private static final int IMAGE_BLUR = 2;
-    private static final float BRIGHTNESS_THRESHOLD_PERCENT = .25f;
-    public static final int BRIGHTNESS_THRESHOLD = 20;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param documentId DocumentId
-     * @param applicationId ApplicationId
-     * @return A new instance of fragment TakePhotoFragment.
-     */
+    private TextView _tvTitle;
+            
     public static TakePhotoFragment newInstance(int applicationId, int documentId, int scanId) {
         TakePhotoFragment fragment = new TakePhotoFragment();
         Bundle args = new Bundle();
@@ -112,10 +100,31 @@ public class TakePhotoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_take_photo, container, false);
-        _toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        _view = inflater.inflate(R.layout.fragment_take_photo, container, false);
+        _toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
+        _toolbar.setVisibility(View.GONE);
 
-        orientationManager = new OrientationManager(getContext(), SensorManager.SENSOR_DELAY_NORMAL, new OrientationManager.OrientationListener() {
+        _context = getContext();
+
+        ImageView ivPrev = (ImageView) _view.findViewById(R.id.ivPrev);
+        ivPrev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setPrevDocument();
+            }
+        });
+
+        ImageView ivNext = (ImageView) _view.findViewById(R.id.ivNext);
+        ivNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setNextDocument();
+            }
+        });
+
+        _tvTitle = (TextView) _view.findViewById(R.id.tvTitle);
+
+        orientationManager = new OrientationManager(_context, SensorManager.SENSOR_DELAY_NORMAL, new OrientationManager.OrientationListener() {
             @Override
             public void onOrientationChange(OrientationManager.ScreenOrientation screenOrientation) {
                 currentOrientation = screenOrientation.ordinal();
@@ -130,36 +139,44 @@ public class TakePhotoFragment extends Fragment {
             _application = _dataAccess.getApplicationById(_applicationId);
             webContext.Application = _application;
             _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
-            _totalDocs = _application.DocumentList.size();
+            _totalDocs = _application.DocumentList.size() - 1;
         }
 
         setCurrentDocument();
-        setCurrentScan();
-        initViews();
+        initCamera();
 
-        return view;
+        return _view;
+    }
+
+    private void setPrevDocument() {
+        if (_currentDoc > 0) {
+            _currentDoc = _currentDoc - 1;
+        }
+        setCurrentDocument();
+    }
+
+    private void setNextDocument() {
+        if (_currentDoc < _totalDocs) {
+            _currentDoc = _currentDoc + 1;
+        }
+        setCurrentDocument();
+    }
+
+    private void setTitle() {
+        String title = String.format("%d. %s", _currentScan, _currentDocument.Title);
+        _tvTitle.setText(title);
     }
 
     private void setCurrentDocument() {
         _currentDocument = _application.DocumentList.get(_currentDoc);
-        if (_totalDocs > _currentDoc) {
-            _currentDoc++;
-        }
+        _currentScan = _dataAccess.countScansByDocumentId(_currentDocument.Id);
+        _currentScan = _currentScan + 1;
+        setTitle();
     }
 
-    private void setCurrentScan() {
+    private void initCamera() {
 
-        if (_currentScan == 0) {
-            _currentScan = _dataAccess.countScansByDocumentId(_currentDocument.Id);
-        }
-        ++_currentScan;
-        String title = String.format("%d. %s", _currentScan, _currentDocument.Title);
-        _toolbar.setTitle(title);
-    }
-
-    private void initViews() {
-        dispose();
-        mCameraView = (CameraView) view.findViewById(R.id.cvCamera);
+        mCameraView = (CameraView) _view.findViewById(R.id.cvCamera);
         if (mCameraView != null) {
             //mCameraView.setFlash(CameraView.FLASH_AUTO);
             //mCameraView.setAspectRatio(AspectRatio.of(4,3));
@@ -167,18 +184,16 @@ public class TakePhotoFragment extends Fragment {
             mCameraView.start();
         }
 
-        rlTakePhoto = (RelativeLayout) view.findViewById(R.id.rlTakePhoto);
+        rlTakePhoto = (RelativeLayout) _view.findViewById(R.id.rlTakePhoto);
         rlTakePhoto.setOnClickListener(clickListener);
 
-        //rlTakePhotoMask = (ImageView) view.findViewById(R.id.rlTakePhotoMask);
+        flashIcon = (ImageView) _view.findViewById(R.id.flashIcon);
 
-        flashIcon = (ImageView) view.findViewById(R.id.flashIcon);
-
-        rlFlash = (RelativeLayout) view.findViewById(R.id.rlFlash);
+        rlFlash = (RelativeLayout) _view.findViewById(R.id.rlFlash);
 
         rlFlash.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View _view) {
                 switch (mCameraView.getFlash()) {
                     case CameraView.FLASH_AUTO:
                         mCameraView.setFlash(CameraView.FLASH_ON);
@@ -196,156 +211,40 @@ public class TakePhotoFragment extends Fragment {
             }
         });
 
-
-        setInfo();
-
-
-        //TODO move menuscreen to separate activity or fragment
-        //menuScreen = (RelativeLayout) view.findViewById(R.id.menuScreen);
-        //menuScreen.setVisibility(View.INVISIBLE);
-
-//        ImageView infoIcon = (ImageView) view.findViewById(R.id.infoIcon);
-//        infoIcon.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                showMenuScreen();
-//            }
-//        });
-
-//        ImageView infoIconClose = (ImageView) view.findViewById(R.id.infoIconClose);
-//        infoIconClose.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                hideMenuScreen();
-//            }
-//        });
-
-//        RelativeLayout rlSkip = (RelativeLayout) view.findViewById(R.id.rlSkip);
-//        rlSkip.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //hideMenuScreen();
-//                cancelOrder();
-//            }
-//        });
-
-
-//        RelativeLayout rlCall = (RelativeLayout) view.findViewById(R.id.rlCall);
-//        rlCall.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                hideMenuScreen();
-//                callOperator();
-//            }
-//        });
+        pictureTaken = false;
+        setTakePhotoButton(true);
     }
 
-    private void callOperator() {
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", LocalSettings.OPERATOR_PHONE_NUMBER, null));
-        getActivity().startActivityForResult(intent, 99);
-    }
+    View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
 
-    private void showMenuScreen() {
-            menuScreen.setVisibility(View.VISIBLE);
-    }
+            if (mCameraView != null && !pictureTaken) {
 
-    private void hideMenuScreen() {
-            menuScreen.setVisibility(View.INVISIBLE);
-        }
+                LocalSettings.setDeviceOrientationDuringTakePhoto(_context, currentOrientation);
 
-    private void setInfo() {
-            pictureTaken = false;
-            setTakePhotoButton(true);
+                float frameRatio = (float) mCameraView.getHeight() / (float) mCameraView.getWidth();
+                LocalSettings.setFrameRatio(_context, frameRatio);
 
+                pictureTaken = true;
+                setTakePhotoButton(false);
 
-
-            //TextView currentPhotoNum = (TextView) view.findViewById(R.id.currentPhotoNum);
-            //TextView totalNum = (TextView) view.findViewById(R.id.totalNum);
-            //TextView pageTitle = (TextView) view.findViewById(R.id.pageTitle);
-
-            //int currentDoc = LocalSettings.getCurrentDocNumber(getContext());
-            //long totalDoc = 8; //DatabaseHelper.getTotalDocuments();
-            //int currentPage = LocalSettings.getCurrentPage(getContext());
-
-            //currentPhotoNum.setText(Integer.toString(currentDoc));
-            //totalNum.setText("/ " + Long.toString(totalDoc));
-
-            //String[] pageTitles = getResources().getStringArray(R.array.photo_page_titles);
-            //String titleText = pageTitles[currentDoc-1];
-
-            //String titleText = "ImageTitle"; //SUtils.getPictureTitle(currentDoc, currentPage);
-            //pageTitle.setText(titleText);
-
-            //saveEnterTime(currentDoc);
-        }
-
-    private void setTakePhotoButton(boolean enabled) {
-
-            rlTakePhoto.setClickable(enabled);
-            rlTakePhoto.setFocusable(enabled);
-            rlTakePhoto.setEnabled(enabled);
-
-//            if(enabled){
-//                rlTakePhotoMask.setVisibility(View.INVISIBLE);
-//            }else{
-//                rlTakePhotoMask.setVisibility(View.VISIBLE);
-//            }
-        }
-
-    private void saveEnterTime(int photoNum) {
-            //String dateStr = RequestUtils.getCurrentDateFormatted();
-            //LocalSettings.setEnterTime(getContext(), photoNum, dateStr);
-    }
-
-    private void cancelOrder() {
-            android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(getContext());
-            dialog.setMessage(this.getString(R.string.camera_not_available));
-            dialog.setPositiveButton(this.getString(R.string.camera_not_available), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg1) {
-                    //SUtils.clearSettings(TakePhotoActivity.this);
-                    //SUtils.removeAllTemporaryFiles(TakePhotoActivity.this);
-                    //SUtils.removeOrderEncodedFiles(TakePhotoActivity.this, LocalSettings.getOrderId(TakePhotoActivity.this));
-                    //ImageLoader.getInstance().clearMemoryCache();
-
-                    //RequestUtils.sendCancelOrderStatus(TakePhotoActivity.this);
-                    //RequestUtils.sendFinalStatus(TakePhotoActivity.this.getApplicationContext(), LocalSettings.getOrderId(TakePhotoActivity.this), LocalSettings.getToken(TakePhotoActivity.this), SUtils.DEFAULT_CANCEL_ORDER_STATUS);
-
-                    //Intent intent = new Intent(TakePhotoActivity.this, QRActivity.class);
-                    //startActivity(intent);
-
-                    //finish();
-                }
-            });
-            dialog.setNegativeButton(this.getString(R.string.camera_not_available), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int arg1) {
-                    hideMenuScreen();
-                }
-            });
-            dialog.setCancelable(false);
-            dialog.show();
-        }
-
-    private CameraView.Callback mCallback = new CameraView.Callback() {
-
-            @Override
-            public void onCameraOpened(CameraView cameraView) {
-                //Log.d(TAG, "onCameraOpened");
+                mCameraView.takePicture();
             }
+        }
+    };
 
-            @Override
-            public void onCameraClosed(CameraView cameraView) {
-                //Log.d(TAG, "onCameraClosed");
-            }
+    private void setTakePhotoButton(boolean state) {
+        rlTakePhoto.setClickable(state);
+        rlTakePhoto.setFocusable(state);
+        rlTakePhoto.setEnabled(state);
+    }
 
-            @Override
-            public void onPictureTaken(final CameraView cameraView, byte[] data) {
-                //Log.d(TAG, "onPictureTaken " + data.length);
-                //Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT).show();
-
-                SavePhotoAsyncTask savePhotoAsyncTask = new SavePhotoAsyncTask(data);
-                savePhotoAsyncTask.execute();
-            }
-        };
+    private void resetCamera() {
+        disposeCamera();
+        setTakePhotoButton(true);
+        initCamera();
+    }
 
     private void showProgressBar() {
             progressDialog = new ProgressDialog(getContext());
@@ -360,200 +259,7 @@ public class TakePhotoFragment extends Fragment {
             }
         }
 
-    View.OnClickListener clickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-
-            if (mCameraView != null && !pictureTaken) {
-
-                LocalSettings.setDeviceOrientationDuringTakePhoto(getContext(), currentOrientation);
-
-                float frameRatio = (float) mCameraView.getHeight() / (float) mCameraView.getWidth();
-                LocalSettings.setFrameRatio(getContext(), frameRatio);
-
-                pictureTaken = true;
-                setTakePhotoButton(false);
-
-                mCameraView.takePicture();
-            }
-        }
-    };
-
-private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
-
-    private byte[] _imageBytes;
-
-    public SavePhotoAsyncTask(byte[] imageBytes) {
-        _imageBytes = imageBytes;
-    }
-
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        showProgressBar();
-    }
-
-    @Override
-    protected Boolean doInBackground(Void... params) {
-
-        //progressDialog.setMessage(getString(R.string.please_wait_while_prepare_image));
-
-        Scan scan = new Scan();
-        scan.ApplicationGuid = _application.ApplicationGuid;
-        scan.DocumentGuid = _currentDocument.DocumentGuid;
-        scan.DocumentId = _currentDocument.Id;
-        scan.PageNum = _currentScan;
-        scan.ScanStatus = ScanStatus.None;
-        scan.ImageLength = _imageBytes.length;
-        scan.SmallPhoto = resizeBitmap(_imageBytes);
-        scan.LargePhoto = drawDate(_imageBytes);
-
-        //progressDialog.setMessage(getString(R.string.please_wait_while_process_brightness));
-        Bitmap inputBitmap = BitmapFactory.decodeByteArray(scan.SmallPhoto, 0, scan.SmallPhoto.length);
-
-        int brightness = defineBrightness(inputBitmap);
-        if(brightness == IMAGE_NORMAL) {
-            //progressDialog.setMessage(getString(R.string.please_wait_while_process_blur));
-
-                _scanId = _dataAccess.insertScan(scan);
-
-        }
-
-        return _scanId > 0;
-    }
-
-    public byte[] resizeBitmap(byte[] inputBytes) {
-        int inputBytesLength = inputBytes.length;
-        int targetW = 200;
-        int targetH = 200;
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-        int scaleFactor = 1;
-        if ((targetW > 0) || (targetH > 0)) {
-            scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-        }
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true; //Deprecated API 21
-        Bitmap outputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] outputBytes = stream.toByteArray();
-        int outputBytesLength = outputBytes.length;
-        return outputBytes;
-    }
-
-    private byte[] drawDate(byte[] inputBytes) {
-        Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length);
-        String dateStr = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(new Date());
-        String timeStr = new SimpleDateFormat("HH:mm", Locale.US).format(new Date());
-        int lineHeight = (int) Math.round(inputBitmap.getWidth() * .14);
-        long textSize = Math.round(0.5 * lineHeight);
-        long textMargin = Math.round(inputBitmap.getWidth() * .08);
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap tempBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), lineHeight, conf);
-        Canvas canvas = new Canvas(tempBitmap);
-        Paint paint = new Paint();
-        paint.setColor(Color.WHITE); // back Color
-        canvas.drawRect(0, 0, inputBitmap.getWidth(), lineHeight, paint);
-        paint.setColor(Color.BLACK); // Text Color
-        paint.setTextSize(textSize); // Text Size
-        paint.setFakeBoldText(true);
-        long dateTextWidth = Math.round(paint.measureText(dateStr));
-        long timeTextWidth = Math.round(paint.measureText(timeStr));
-        long timeStrX = inputBitmap.getWidth() - timeTextWidth - textMargin;
-        if (timeStrX < (textMargin * 2 + dateTextWidth))
-            timeStrX = (textMargin * 2 + dateTextWidth);
-        canvas.drawText(dateStr, textMargin, textSize + (lineHeight - textSize) / 2, paint);
-        canvas.drawText(timeStr, timeStrX, textSize + (lineHeight - textSize) / 2, paint);
-        Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight, inputBitmap.getConfig());
-        Canvas canvas1 = new Canvas(outputBitmap);
-        canvas1.drawBitmap(inputBitmap, null, new RectF(0, 0, inputBitmap.getWidth(), inputBitmap.getHeight()), null);
-        canvas1.drawBitmap(tempBitmap, null, new RectF(0, inputBitmap.getHeight(), inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight), null);
-        inputBitmap.recycle();
-        tempBitmap.recycle();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] outputBytes = stream.toByteArray();
-        return outputBytes;
-    }
-
-    private Integer defineBrightness(Bitmap inputBitmap) {
-        int result;
-        Date d1 = new Date();
-
-
-        int histogram[] = new int[256];
-
-        for (int i = 0; i < 256; i++) {
-            histogram[i] = 0;
-        }
-
-        int bitmapWidth = inputBitmap.getWidth();
-        int bitmapHeight = inputBitmap.getHeight();
-        int totalPixels = bitmapWidth * bitmapHeight;
-
-        int counter = 0;
-
-        for (int x = 0; x < bitmapWidth; x++) {
-            for (int y = 0; y < bitmapHeight; y++) {
-                int pixel = inputBitmap.getPixel(x, y);
-
-                int r = Color.red(pixel);
-                int g = Color.green(pixel);
-                int b = Color.blue(pixel);
-
-                int brightness = (int) (0.2126 * r + 0.7152 * g + 0.0722 * b);
-                histogram[brightness]++;
-                counter++;
-            }
-        }
-
-        // Count pixels with brightness less then 20 //default 10
-        int darkPixelCount = 0;
-        for (int i = 0; i < BRIGHTNESS_THRESHOLD; i++) {
-            darkPixelCount += histogram[i];
-        }
-
-        if (darkPixelCount > totalPixels * BRIGHTNESS_THRESHOLD_PERCENT) {
-            result = IMAGE_DARK;
-        } else {
-            result = IMAGE_NORMAL;
-        }
-
-        Date d2 = new Date();
-        long diff = d2.getTime() - d1.getTime();
-
-        return result;
-    }
-
-    @Override
-    protected void onPostExecute(Boolean result) {
-        super.onPostExecute(result);
-
-        hideProgressBar();
-
-        setCurrentScan();
-
-        if (result) {
-
-            //FragmentManager fm = getFragmentManager();
-            //FragmentTransaction ft = fm.beginTransaction();
-            //EditPhotoFragment editPhotoFragment = EditPhotoFragment.newInstance(_scanId);
-            //ft.replace(R.id.container, editPhotoFragment);
-            //ft.commit();
-
-            dispose();
-        } else {
-            Toast.makeText(getContext(), R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
-            setInfo();
-        }
-    }
-}
-    private void dispose() {
+    private void disposeCamera() {
         if (mCameraView != null) {
             mCameraView.removeCallback(mCallback);
             mCameraView.stop();
@@ -561,18 +267,133 @@ private class SavePhotoAsyncTask extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private CameraView.Callback mCallback = new CameraView.Callback() {
+
+        @Override
+        public void onCameraOpened(CameraView cameraView) {
+        }
+
+        @Override
+        public void onCameraClosed(CameraView cameraView) {
+        }
+
+        @Override
+        public void onPictureTaken(final CameraView cameraView, byte[] imageBytes) {
+            SaveImageAsyncTask savePhotoAsyncTask = new SaveImageAsyncTask(imageBytes);
+            savePhotoAsyncTask.execute();
+        }
+    };
+
+    private class SaveImageAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        private byte[] _imageBytes;
+
+        public SaveImageAsyncTask(byte[] imageBytes) {
+            _imageBytes = imageBytes;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressBar();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            int imageByteslength = _imageBytes.length;
+            Scan scan = new Scan();
+            scan.ApplicationGuid = _application.ApplicationGuid;
+            scan.DocumentGuid = _currentDocument.DocumentGuid;
+            scan.DocumentId = _currentDocument.Id;
+            scan.PageNum = _currentScan;
+            scan.ScanStatus = ScanStatus.None;
+            byte[] smallBytes = resizeBitmap(_imageBytes);
+            int smallByteslength = smallBytes.length;
+            scan.SmallPhoto = smallBytes;
+            //byte[] totalBytes = drawDate(_imageBytes);
+            //scan.LargePhoto = totalBytes;
+            scan.LargePhoto = _imageBytes;
+            scan.ImageLength = scan.LargePhoto.length;
+            _scanId = _dataAccess.insertScan(scan);
+            return _scanId > 0;
+        }
+
+        public byte[] resizeBitmap(byte[] inputBytes) {
+            int inputBytesLength = inputBytes.length;
+            int targetW = 200;
+            int targetH = 200;
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
+            int scaleFactor = 1;
+            if ((targetW > 0) || (targetH > 0)) {
+                scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+            }
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true; //Deprecated API 21
+            Bitmap outputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length, bmOptions);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] outputBytes = stream.toByteArray();
+            int outputBytesLength = outputBytes.length;
+            return outputBytes;
+        }
+
+        private byte[] drawDate(byte[] inputBytes) {
+            Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length);
+            String dateStr = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(new Date());
+            String timeStr = new SimpleDateFormat("HH:mm", Locale.US).format(new Date());
+            int lineHeight = (int) Math.round(inputBitmap.getWidth() * .14);
+            long textSize = Math.round(0.5 * lineHeight);
+            long textMargin = Math.round(inputBitmap.getWidth() * .08);
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+            Bitmap tempBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), lineHeight, conf);
+            Canvas canvas = new Canvas(tempBitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.WHITE); // back Color
+            canvas.drawRect(0, 0, inputBitmap.getWidth(), lineHeight, paint);
+            paint.setColor(Color.BLACK); // Text Color
+            paint.setTextSize(textSize); // Text Size
+            paint.setFakeBoldText(true);
+            long dateTextWidth = Math.round(paint.measureText(dateStr));
+            long timeTextWidth = Math.round(paint.measureText(timeStr));
+            long timeStrX = inputBitmap.getWidth() - timeTextWidth - textMargin;
+            if (timeStrX < (textMargin * 2 + dateTextWidth))
+                timeStrX = (textMargin * 2 + dateTextWidth);
+            canvas.drawText(dateStr, textMargin, textSize + (lineHeight - textSize) / 2, paint);
+            canvas.drawText(timeStr, timeStrX, textSize + (lineHeight - textSize) / 2, paint);
+            Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight, inputBitmap.getConfig());
+            Canvas canvas1 = new Canvas(outputBitmap);
+            canvas1.drawBitmap(inputBitmap, null, new RectF(0, 0, inputBitmap.getWidth(), inputBitmap.getHeight()), null);
+            canvas1.drawBitmap(tempBitmap, null, new RectF(0, inputBitmap.getHeight(), inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight), null);
+            inputBitmap.recycle();
+            tempBitmap.recycle();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] outputBytes = stream.toByteArray();
+            return outputBytes;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            hideProgressBar();
+            setCurrentDocument();
+            resetCamera();
+
+            if (result) {
+
+            } else {
+                Toast.makeText(_context, R.string.something_went_wrong, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

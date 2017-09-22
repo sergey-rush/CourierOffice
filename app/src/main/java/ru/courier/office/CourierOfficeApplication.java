@@ -2,46 +2,41 @@ package ru.courier.office;
 
 import android.app.Application;
 import android.content.Context;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 import ru.courier.office.core.LocalSettings;
 import ru.courier.office.data.DataAccess;
-import ru.courier.office.web.NoteManager;
 import ru.courier.office.web.WebContext;
-
-/**
- * Created by rash on 21.08.2017.
- */
 
 public class CourierOfficeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        setDeviceInfo();
-        WebContext.getInstance();
         DataAccess dataAccess = DataAccess.getInstance(getApplicationContext());
-        //dataAccess.createDatabase();
+        WebContext webContext = WebContext.getInstance();
+        webContext.Imei = setDeviceInfo();
+
     }
 
-    private boolean setDeviceInfo() {
-        if(LocalSettings.getDeviceID(this).equals("")){
-            //String deviceUniqueId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+    private String setDeviceInfo() {
+        String deviceId = getDeviceId();
+        LocalSettings.saveDeviceID(this, deviceId);
 
-            TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-            String deviceUniqueId = telephonyManager.getDeviceId();
-
-            if(deviceUniqueId == null){
-                return false;
-            }
-
-            LocalSettings.saveDeviceID(this, deviceUniqueId);
-        }
-
-        if(LocalSettings.getNotificationID(this).equals("")){
+        if (LocalSettings.getNotificationID(this).equals("")) {
             LocalSettings.saveNotificationID(this, "00000000000");
         }
+        return deviceId;
+    }
 
-        return true;
-
+    private String getDeviceId() {
+        String deviceId;
+        TelephonyManager mTelephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        if (mTelephony.getDeviceId() != null) {
+            deviceId = mTelephony.getDeviceId();
+        } else {
+            deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        }
+        return deviceId;
     }
 }

@@ -31,6 +31,10 @@
                 android:icon="@drawable/ic_info"
                 android:title="@string/nav_data" />
             <item
+                android:id="@+id/nav_updatescans"
+                android:icon="@drawable/ic_star"
+                android:title="Update scans" />
+            <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Upload image" />

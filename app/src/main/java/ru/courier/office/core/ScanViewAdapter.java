@@ -3,8 +3,10 @@ package ru.courier.office.core;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.views.ScanListFragment;
+import ru.courier.office.views.ScanViewFragment;
 
 /**
  * Created by rash on 04.09.2017.
@@ -25,11 +29,12 @@ public class ScanViewAdapter extends PagerAdapter {
 
     private Context _context;
     private List<Scan> _scanList;
-    private LayoutInflater inflater;
+    private LayoutInflater _inflater;
+    private int _documentId;
 
-    // constructor
-    public ScanViewAdapter(Context context, List<Scan> scanList) {
+    public ScanViewAdapter(Context context, int documentId, List<Scan> scanList) {
         _context = context;
+        _documentId = documentId;
         _scanList = scanList;
     }
 
@@ -45,14 +50,12 @@ public class ScanViewAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        TouchImageView imgDisplay;
-        Button btnClose;
 
-        inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View viewLayout = inflater.inflate(R.layout.scan_view_item, container, false);
+        _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View viewLayout = _inflater.inflate(R.layout.scan_view_item, container, false);
 
-        imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.imgDisplay);
-        btnClose = (Button) viewLayout.findViewById(R.id.btnClose);
+        TouchImageView imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.imgDisplay);
+        Button btnClose = (Button) viewLayout.findViewById(R.id.btnClose);
 
         Scan scan = _scanList.get(position);
         byte[] imageBytes = scan.SmallPhoto;
@@ -64,17 +67,12 @@ public class ScanViewAdapter extends PagerAdapter {
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
         imgDisplay.setImageBitmap(bitmap);
 
-//        if (bitmap != null) {
-//            bitmap.recycle();
-//            bitmap = null;
-//        }
-
-        // close button click event
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //_context.finish();
-                Toast.makeText(_context, "ScanViewAdapter onClick Called!", Toast.LENGTH_SHORT).show();
+                ScanListFragment scanListFragment = ScanListFragment.newInstance(_documentId);
+                FragmentManager fragmentManager = ((AppCompatActivity)_context).getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
             }
         });
 
@@ -86,6 +84,5 @@ public class ScanViewAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         ((ViewPager) container).removeView((RelativeLayout) object);
-
     }
 }

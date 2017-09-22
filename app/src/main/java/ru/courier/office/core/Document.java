@@ -9,6 +9,7 @@ import java.util.List;
 public class Document {
     public int Id;
     public String DocumentGuid;
+    public int ApplicationId;
     public String ApplicationGuid;
     public String Title;
     public List<Scan> ScanList;

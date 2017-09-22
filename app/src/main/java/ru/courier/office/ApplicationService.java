@@ -10,17 +10,20 @@ import android.support.annotation.Nullable;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.courier.office.data.DataAccess;
 import ru.courier.office.services.PositionService;
-import ru.courier.office.web.NoteManager;
+import ru.courier.office.web.ScanManager;
+import ru.courier.office.web.WebContext;
 
-/**
- * Created by rash on 14.09.2017.
- */
 
 public class ApplicationService extends Service {
 
     private PositionService _positionService;
     private Timer _timer;
+    private boolean _run = false;
+    Context _context;
+    private WebContext _webContext;
+    private DataAccess _dataAccess;
 
     public void onCreate() {
         super.onCreate();
@@ -28,10 +31,22 @@ public class ApplicationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        _positionService = new PositionService(getApplicationContext());
+
+        _context = getApplicationContext();
+        _webContext = WebContext.getInstance();
+        _dataAccess = DataAccess.getInstance(_context);
+
+        _positionService = new PositionService(_context);
         _positionService.startLocationManager(true);
-        startTimer();
+
+        //startTimer();
         return START_STICKY;
+    }
+
+    private void startUploading()
+    {
+        ScanManager scanManager = new ScanManager(_context, _webContext.Application);
+        scanManager.execute();
     }
 
     final Handler handler = new Handler();
@@ -61,6 +76,7 @@ public class ApplicationService extends Service {
     };
 
     private void onTimerTick() {
+
         Context context = getApplicationContext();
     }
 

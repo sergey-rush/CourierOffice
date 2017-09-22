@@ -1,41 +1,44 @@
 package ru.courier.office.views;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.net.Uri;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.courier.office.R;
-import ru.courier.office.core.Application;
-import ru.courier.office.data.AppViewManager;
+import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
+import ru.courier.office.web.ScanManager;
 import ru.courier.office.web.WebContext;
 
 public class AppViewFragment extends Fragment {
 
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
     private static final String ARG_APPLICATION_ID = "applicationId";
-    private int applicationId;
+    private int _applicationId;
+    private Context _context;
+    private WebContext _webContext;
+    private DataAccess _dataAccess;
+    private View _view;
 
-    private OnFragmentInteractionListener mListener;
-
-    public AppViewFragment() {
-    }
+    public AppViewFragment() {}
 
     public static AppViewFragment newInstance(int applicationId) {
         AppViewFragment fragment = new AppViewFragment();
@@ -49,34 +52,129 @@ public class AppViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            applicationId = getArguments().getInt(ARG_APPLICATION_ID);
+            _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
         }
     }
 
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_appview, container, false);
+        _view = inflater.inflate(R.layout.fragment_appview, container, false);
+        _context = getContext();
+        _webContext = WebContext.getInstance();
+        _dataAccess = DataAccess.getInstance(_context);
 
-        AppViewManager appViewManager = new AppViewManager(view.getContext(), applicationId);
-        appViewManager.execute();
+        FragmentManager fragmentManager = getFragmentManager();
+        List<Fragment> fragmentList = fragmentManager.getFragments();
 
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        setupViewPager(view, viewPager);
+        for (Fragment fragment : fragmentList) {
 
-        tabLayout = (TabLayout) view.findViewById(R.id.tabs);
+            if (fragment instanceof ApplicationFragment) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.remove(fragment);
+                fragmentTransaction.commit();
+            }
+            if (fragment instanceof DocumentFragment) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.remove(fragment);
+                fragmentTransaction.commit();
+            }
+
+            if (fragment instanceof StatusFragment) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.remove(fragment);
+                fragmentTransaction.commit();
+            }
+        }
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView)_view.findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId())
+                {
+                    case R.id.action_add:
+                        onScanDocuments();
+                        break;
+                    case R.id.action_send:
+                        onSendApplication();
+                        break;
+                    case R.id.action_delete:
+                        onDeleteApplication();
+                        break;
+                }
+
+                return true;
+            }
+        });
+
+        viewPager = (ViewPager) _view.findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+
+        tabLayout = (TabLayout) _view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-        return view;
+        return _view;
     }
 
-    private void setupViewPager(View view, ViewPager viewPager) {
+
+    private void onScanDocuments() {
+
+        TakePhotoFragment fragment = TakePhotoFragment.newInstance(_applicationId, 0, 0);
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.container, fragment);
+        ft.commit();
+    }
+
+    private void onSendApplication() {
+
+        //ScanManager scanManager = new ScanManager(_context, _webContext.Application);
+        //scanManager.execute();
+
+        _dataAccess.updateScansByApplicationGuid(_webContext.Application.ApplicationGuid, ScanStatus.Ready);
+    }
+
+    private void onDeleteApplication() {
+        AlertDialog dialog = onDeleteDialog();
+        dialog.show();
+    }
+
+    private AlertDialog onDeleteDialog() {
+        AlertDialog alertDialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
+                .setTitle("Удаление заявки")
+                .setMessage("Вы действительно желаете удалить эту заявку?")
+                .setIcon(R.drawable.ic_question)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        _dataAccess.removeApplication(_applicationId);
+                        Toast.makeText(_context, "Удалено", Toast.LENGTH_SHORT).show();
+
+                        FragmentManager fm = getFragmentManager();
+                        FragmentTransaction ft = fm.beginTransaction();
+                        AppListFragment appListFragment = new AppListFragment();
+                        ft.replace(R.id.container, appListFragment);
+                        ft.commit();
+
+                        dialog.dismiss();
+                    }
+
+                }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                }).create();
+        return alertDialog;
+    }
+
+
+    private void setupViewPager(ViewPager viewPager) {
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
-        adapter.addFrag(new ApplicationFragment(), "ЗАЯВКА");
-        adapter.addFrag(new DocumentFragment(), "ДОКУМЕНТЫ");
-        adapter.addFrag(new StatusFragment(), "СТАТУСЫ");
+        adapter.addFrag(ApplicationFragment.newInstance(_applicationId), "ЗАЯВКА");
+        adapter.addFrag(DocumentFragment.newInstance(_applicationId), "ДОКУМЕНТЫ");
+        adapter.addFrag(StatusFragment.newInstance(_applicationId), "СТАТУСЫ");
         viewPager.setAdapter(adapter);
     }
 
@@ -107,33 +205,5 @@ public class AppViewFragment extends Fragment {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-
-        void onFragmentInteraction(Uri uri);
     }
 }
