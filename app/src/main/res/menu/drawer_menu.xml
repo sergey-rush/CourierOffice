@@ -3,10 +3,6 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/ic_home"
-            android:title="@string/nav_home" />
-        <item
             android:id="@+id/nav_scan"
             android:icon="@drawable/ic_qrcode"
             android:title="@string/nav_scan" />
@@ -15,31 +11,34 @@
             android:icon="@drawable/ic_list"
             android:title="@string/nav_apps" />
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Профиль" />
+            android:id="@+id/nav_notes"
+            android:icon="@drawable/ic_note"
+            android:title="@string/nav_notes" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_help"
+            android:title="@string/nav_help" />
     </group>
 
-    <item android:title="@string/nav_service">
-        <menu>
-            <item
-                android:id="@+id/nav_location"
-                android:icon="@drawable/ic_location"
-                android:title="@string/nav_location" />
-            <item
-                android:id="@+id/nav_data"
-                android:icon="@drawable/ic_info"
-                android:title="@string/nav_data" />
-            <item
-                android:id="@+id/nav_updatescans"
-                android:icon="@drawable/ic_star"
-                android:title="Update scans" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Upload image" />
-
-        </menu>
-    </item>
+    <!--<item android:title="@string/nav_service">-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:id="@+id/nav_location"-->
+                <!--android:icon="@drawable/ic_location"-->
+                <!--android:title="@string/nav_location" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_data"-->
+                <!--android:icon="@drawable/ic_info"-->
+                <!--android:title="@string/nav_data" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_updatescans"-->
+                <!--android:icon="@drawable/ic_star"-->
+                <!--android:title="Update scans" />-->
+            <!--<item-->
+                <!--android:id="@+id/nav_send"-->
+                <!--android:icon="@drawable/ic_menu_send"-->
+                <!--android:title="Upload image" />-->
+        <!--</menu>-->
+    <!--</item>-->
 
 </menu>

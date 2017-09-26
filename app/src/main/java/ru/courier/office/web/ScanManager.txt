@@ -9,6 +9,7 @@ import java.util.List;
 
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
+import ru.courier.office.core.ApplicationStatus;
 import ru.courier.office.core.Document;
 import ru.courier.office.core.LocalSettings;
 import ru.courier.office.core.Scan;
@@ -19,14 +20,12 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
 
     private int responseCode;
     private Context _context;
-    private Application _application;
     private WebContext _webContext;
     private String _deviceId;
     private DataAccess _dataAccess;
 
-    public ScanManager(Context context, Application application) {
+    public ScanManager(Context context) {
         _context = context;
-        _application = application;
         _webContext = WebContext.getInstance();
         _deviceId = LocalSettings.getDeviceID(_context);
         _dataAccess = DataAccess.getInstance(_context);
@@ -40,7 +39,30 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... arg0) {
 
-        List<Document> documents = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
+        List<Application> applications = _dataAccess.getApplications(100);
+
+        for (Application application : applications) {
+            if(application.ApplicationStatus == ApplicationStatus.Deliver)
+            {
+                deliverApplication(application);
+            }
+
+            if(application.ApplicationStatus == ApplicationStatus.Reject)
+            {
+                deliverApplication(application);
+            }
+        }
+        return null;
+    }
+
+    private void rejectApplication(Application application)
+    {
+
+    }
+
+    private void deliverApplication(Application application)
+    {
+        List<Document> documents = _dataAccess.getDocumentsByApplicationGuid(application.ApplicationGuid);
 
         for (Document document : documents) {
             List<Scan> scans = _dataAccess.getScansByDocumentId(document.Id);
@@ -55,8 +77,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
                     if (responseCode == 200 || responseCode == 201) {
                         _webContext.Scan.ScanStatus = ScanStatus.Progress;
                         _dataAccess.updateScan(_webContext.Scan);
-                    }
-                    else{
+                    } else {
                         break; // inner loop
                     }
                 }
@@ -66,8 +87,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
                     if (responseCode == 200) {
                         _webContext.Scan.ScanStatus = ScanStatus.Completed;
                         _dataAccess.updateScan(_webContext.Scan);
-                    }
-                    else{
+                    } else {
                         break; // inner loop
                     }
                 }
@@ -77,10 +97,9 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
                 break; // outer loop
             }
         }
-        return null;
     }
 
-    public void uploadScan(Scan scan) {
+    private void uploadScan(Scan scan) {
 
         int scanImageLength = scan.ImageLength;
         byte[] imageBytes = new byte[scanImageLength];
@@ -111,7 +130,7 @@ public class ScanManager extends AsyncTask<Void, Void, Void> {
     }
 
 
-    public void uploadScan1(Scan scan) {
+    public void uploadScanByPartition(Scan scan) {
 
         int imageLength = scan.ImageLength;
         int sendBytes = 0;

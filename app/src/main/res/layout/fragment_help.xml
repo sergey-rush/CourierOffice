@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_margin="@dimen/dimen16"
+    android:layout_height="match_parent" android:orientation="vertical"
+    tools:context="ru.courier.office.views.HelpFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/title_text_size"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/dimen8"
+        android:text="@string/help_title" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/dimen8"
+        android:text="@string/help_scan_subtitle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginBottom="@dimen/dimen5"
+        android:text="@string/help_scan_text1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginBottom="@dimen/dimen5"
+        android:text="@string/help_scan_text2" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginBottom="@dimen/dimen5"
+        android:text="@string/help_scan_text3" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        android:layout_marginBottom="@dimen/dimen5"
+        android:text="@string/help_scan_text4" />
+
+</LinearLayout>

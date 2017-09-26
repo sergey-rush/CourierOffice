@@ -29,7 +29,7 @@ import ru.courier.office.web.WebContext;
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener,
         HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
         TakePhotoFragment.OnFragmentInteractionListener, QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener,
-        LocationFragment.OnFragmentInteractionListener, UpdateScansFragment.OnFragmentInteractionListener {
+        LocationFragment.OnFragmentInteractionListener, HelpFragment.OnFragmentInteractionListener {
 
     private Switch swtOnline;
     private TextView tvSwitchOnline;
@@ -50,12 +50,12 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        View headerLayout = navigationView.getHeaderView(0);
-        tvSwitchOnline = (TextView) headerLayout.findViewById(R.id.tvSwitchOnline);
-        swtOnline = (Switch) headerLayout.findViewById(R.id.swtOnline);
-        swtOnline.setOnCheckedChangeListener(this);
+        //View headerLayout = navigationView.getHeaderView(0);
+        //tvSwitchOnline = (TextView) headerLayout.findViewById(R.id.tvSwitchOnline);
+        //swtOnline = (Switch) headerLayout.findViewById(R.id.swtOnline);
+        //swtOnline.setOnCheckedChangeListener(this);
 
-        showFragment(new HomeFragment());
+        showFragment(new QrcodeFragment());
     }
 
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -166,22 +166,15 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment = null;
         int id = item.getItemId();
-        if (id == R.id.nav_home) {
-            fragment = new HomeFragment();
-        } else if (id == R.id.nav_scan) {
+
+        if (id == R.id.nav_scan) {
             fragment = new QrcodeFragment();
         } else if (id == R.id.nav_apps) {
             fragment = new AppListFragment();
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_notes) {
             fragment = new HomeFragment();
-        } else if (id == R.id.nav_data) {
-            fragment = new DatabaseFragment();
-        } else if (id == R.id.nav_send) {
-            fragment = new UploadFragment();
-        } else if (id == R.id.nav_location) {
-            fragment = new LocationFragment();
-        } else if (id == R.id.nav_updatescans) {
-            fragment = new UpdateScansFragment();
+        } else if (id == R.id.nav_help) {
+            fragment = new HelpFragment();
         }
 
         showFragment(fragment);

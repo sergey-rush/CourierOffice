@@ -311,7 +311,7 @@ public class TakePhotoFragment extends Fragment {
             scan.DocumentGuid = _currentDocument.DocumentGuid;
             scan.DocumentId = _currentDocument.Id;
             scan.PageNum = _currentScan;
-            scan.ScanStatus = ScanStatus.None;
+            scan.ScanStatus = ScanStatus.Ready;
             byte[] smallBytes = resizeBitmap(_imageBytes);
             int smallByteslength = smallBytes.length;
             scan.SmallPhoto = smallBytes;

@@ -39,14 +39,6 @@ import ru.courier.office.web.ApplicationManager;
 
 import static me.dm7.barcodescanner.core.CameraUtils.getCameraInstance;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain getContext() fragment must implement the
- * {@link QrcodeFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link QrcodeFragment#newInstance} factory method to
- * create an instance of getContext() fragment.
- */
 public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
     private static final int PERMISSION_CAMERA_REQUEST_CODE = 0;
@@ -68,9 +60,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
     private OnFragmentInteractionListener mListener;
 
-    public QrcodeFragment() {
-        // Required empty public constructor
-    }
+    public QrcodeFragment() {}
 
     public static QrcodeFragment newInstance() {
         QrcodeFragment fragment = new QrcodeFragment();
