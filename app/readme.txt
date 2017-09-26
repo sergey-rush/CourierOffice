@@ -11,3 +11,4 @@ git push -u origin master
 3. And now I have made another change.
 
 1. SergeyTask branch is created
+2. SergeyTask is changed again
