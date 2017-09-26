@@ -115,6 +115,50 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
+    public List<Application> getApplicationsByApplicationStatus(ApplicationStatus applicationStatus) {
+        List<Application> applications = new ArrayList<Application>();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationStatus = ?", new String[]{String.valueOf(String.valueOf(applicationStatus.ordinal()))});
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                Application application = new Application();
+                application.Id = cursor.getInt(cursor.getColumnIndex("Id"));
+                application.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
+                application.ApplicationStatus = ApplicationStatus.fromInt(cursor.getInt(cursor.getColumnIndex("ApplicationStatus")));
+                application.MerchantGuid = cursor.getString(cursor.getColumnIndex("MerchantGuid"));
+                application.MerchantName = cursor.getString(cursor.getColumnIndex("MerchantName"));
+                application.Inn = cursor.getString(cursor.getColumnIndex("Inn"));
+                application.Email = cursor.getString(cursor.getColumnIndex("Email"));
+                application.Site = cursor.getString(cursor.getColumnIndex("Site"));
+                application.ManagerName = cursor.getString(cursor.getColumnIndex("ManagerName"));
+                application.ManagerPhone = cursor.getString(cursor.getColumnIndex("ManagerPhone"));
+                application.PersonGuid = cursor.getString(cursor.getColumnIndex("PersonGuid"));
+                application.PersonName = cursor.getString(cursor.getColumnIndex("PersonName"));
+                String birthDate = cursor.getString(cursor.getColumnIndex("BirthDate"));
+                application.Gender = cursor.getInt(cursor.getColumnIndex("Gender"));
+                application.Amount = cursor.getString(cursor.getColumnIndex("Amount"));
+                application.DeliveryAddress = cursor.getString(cursor.getColumnIndex("DeliveryAddress"));
+                String created = cursor.getString(cursor.getColumnIndex("Created"));
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                application.Created = format.parse(created);
+                application.BirthDate = format.parse(birthDate);
+                applications.add(application);
+                cursor.moveToNext();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return applications;
+    }
+
+    @Override
     public List<Application> getApplications(int limit) {
         List<Application> applications = new ArrayList<Application>();
         Cursor cursor = null;

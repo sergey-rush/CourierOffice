@@ -53,6 +53,8 @@ public abstract class DataAccess extends SQLiteOpenHelper {
 
     public abstract Application getApplicationByApplicationGuid(String applicationGuid);
 
+    public abstract List<Application> getApplicationsByApplicationStatus(ApplicationStatus applicationStatus);
+
     public abstract List<Application> getApplications(int limit);
 
     public abstract int countApplications();

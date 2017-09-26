@@ -6,8 +6,8 @@ package ru.courier.office.core;
 
 public enum ApplicationStatus {
     None(0),
-    Delivered(1),
-    Rejected(2);
+    Deliver(1),
+    Reject(2);
 
     private final int value;
 

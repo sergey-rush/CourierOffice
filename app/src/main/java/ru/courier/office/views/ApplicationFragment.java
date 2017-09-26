@@ -4,6 +4,7 @@ package ru.courier.office.views;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,11 +24,12 @@ import android.widget.Toast;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import ru.courier.office.ApplicationService;
 import ru.courier.office.R;
 import ru.courier.office.core.Application;
+import ru.courier.office.core.ApplicationStatus;
 import ru.courier.office.core.ScanStatus;
 import ru.courier.office.data.DataAccess;
-import ru.courier.office.web.ScanManager;
 import ru.courier.office.web.WebContext;
 
 /**
@@ -124,9 +126,8 @@ public class ApplicationFragment extends Fragment {
     }
 
     private void sendApplication() {
-
-        ScanManager scanManager = new ScanManager(_context, _webContext.Application);
-        scanManager.execute();
+        _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Deliver);
+        _context.startService(new Intent(_context, ApplicationService.class));
     }
 
     private AlertDialog onDeleteDialog() {
@@ -157,8 +158,8 @@ public class ApplicationFragment extends Fragment {
         return alertDialog;
     }
 
-    private void loadDataCallback()
-    {
+    private void loadDataCallback() {
+
         Application application = _webContext.Application;
 
         tvId = (TextView) _view.findViewById(R.id.tvId);

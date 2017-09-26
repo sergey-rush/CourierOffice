@@ -2,6 +2,7 @@ package ru.courier.office.views;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -16,15 +17,14 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.courier.office.ApplicationService;
 import ru.courier.office.R;
-import ru.courier.office.core.ScanStatus;
+import ru.courier.office.core.ApplicationStatus;
 import ru.courier.office.data.DataAccess;
-import ru.courier.office.web.ScanManager;
 import ru.courier.office.web.WebContext;
 
 public class AppViewFragment extends Fragment {
@@ -128,11 +128,8 @@ public class AppViewFragment extends Fragment {
     }
 
     private void onSendApplication() {
-
-        //ScanManager scanManager = new ScanManager(_context, _webContext.Application);
-        //scanManager.execute();
-
-        _dataAccess.updateScansByApplicationGuid(_webContext.Application.ApplicationGuid, ScanStatus.Ready);
+        _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Deliver);
+        _context.startService(new Intent(_context, ApplicationService.class));
     }
 
     private void onDeleteApplication() {
@@ -148,8 +145,8 @@ public class AppViewFragment extends Fragment {
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                        _dataAccess.removeApplication(_applicationId);
-                        Toast.makeText(_context, "Удалено", Toast.LENGTH_SHORT).show();
+                        _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Reject);
+                        _context.startService(new Intent(_context, ApplicationService.class));
 
                         FragmentManager fm = getFragmentManager();
                         FragmentTransaction ft = fm.beginTransaction();

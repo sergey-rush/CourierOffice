@@ -20,7 +20,7 @@ import ru.courier.office.data.DataAccess;
 
 public class StatusProvider extends BaseProvider {
 
-    public int postStatus(String postData) {
+    public int putStatus(String postData) {
         HttpURLConnection connection = null;
 
         try {

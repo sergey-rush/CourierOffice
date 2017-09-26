@@ -68,9 +68,18 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.tvPersonName.setTag(application.Id);
         holder.tvMerchantName.setText(application.MerchantName);
 
-        Drawable myIcon = parent.getResources().getDrawable(R.drawable.ic_application);
-        myIcon.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
-        holder.ivStatus.setImageDrawable(myIcon);
+        Drawable statusIcon = parent.getResources().getDrawable(R.drawable.ic_application);
+
+        if(application.ApplicationStatus == ApplicationStatus.None){
+            statusIcon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+        }
+        if(application.ApplicationStatus == ApplicationStatus.Deliver){
+            statusIcon.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+        }
+        if(application.ApplicationStatus == ApplicationStatus.Reject){
+            statusIcon.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+        }
+        holder.ivStatus.setImageDrawable(statusIcon);
 
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         holder.tvCreated.setText(dateFormat.format(application.Created));

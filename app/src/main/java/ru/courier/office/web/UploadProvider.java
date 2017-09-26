@@ -1,21 +1,23 @@
 package ru.courier.office.web;
 
 import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import ru.courier.office.core.Scan;
 import ru.courier.office.core.UrlObject;
 import ru.courier.office.core.UrlType;
-
+/**
+ * Sends image to the server
+ */
 public class UploadProvider extends BaseProvider {
 
 
@@ -23,7 +25,6 @@ public class UploadProvider extends BaseProvider {
     private String lineEnd = "\r\n";
     private String twoHyphens = "--";
     private String charset = "UTF-8";
-    //private DataOutputStream _dataOutputStream;
     private PrintWriter _printWriter;
 
     public int doUpload(Scan scan, byte[] imageBytes) {
@@ -31,7 +32,6 @@ public class UploadProvider extends BaseProvider {
         HttpURLConnection connection = null;
         int imageBytesLength = imageBytes.length;
         String fileName = String.format("PageNum%s.jpg", Integer.toString(scan.PageNum));
-        int maxBufferSize = 1 * 1024 * 1024;
         URL url;
 
         try {
@@ -42,17 +42,15 @@ public class UploadProvider extends BaseProvider {
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setUseCaches(false);
-
-            //connection.setRequestMethod("POST");
+            connection.setRequestMethod(urlObject.HttpMethod.toString());
             connection.setRequestProperty("Connection", "Keep-Alive");
             connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 
             OutputStream outputStream = new BufferedOutputStream(connection.getOutputStream());
             _printWriter = new PrintWriter(new OutputStreamWriter(outputStream, charset), true);
 
-            addFormField("ApplicationGuid", scan.ApplicationGuid);
-            addFormField("DocumentGuid", scan.DocumentGuid);
-            addFormField("PageNum", Integer.toString(scan.PageNum));
+            addFormField("StreamId", scan.StreamGuid);
+
 
             _printWriter.append(twoHyphens + boundary + lineEnd);
             _printWriter.append("Content-Disposition: form-data; name=\"attachedFile\";filename=" + fileName + "" + lineEnd);
@@ -88,7 +86,7 @@ public class UploadProvider extends BaseProvider {
 
     }
 
-    public void addFormField(String name, String value) throws IOException {
+    private void addFormField(String name, String value) throws IOException {
 
         _printWriter.append(twoHyphens + boundary + lineEnd);
         _printWriter.append("Content-Disposition: form-data; name=\"" + name + "\"" + lineEnd);
@@ -97,5 +95,37 @@ public class UploadProvider extends BaseProvider {
         _printWriter.append(value);
         _printWriter.append(lineEnd);
         _printWriter.flush();
+    }
+
+    public int getInfo(String postData) {
+
+        URL url;
+        try {
+            UrlObject urlObject = webContext.getUrl(UrlType.Scan);
+            url = new URL(urlObject.Url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            connection.setReadTimeout(15000);
+            connection.setConnectTimeout(15000);
+            connection.setRequestMethod(urlObject.HttpMethod.toString());
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            serialisePost(connection, postData);
+            responseCode = connection.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK || responseCode == HttpsURLConnection.HTTP_CREATED) {
+                webContext.setCookie(connection.getHeaderFields());
+                String output = deserializeToString(connection);
+                webContext.Scan = parseToScan(output, webContext.Scan);
+            } else {
+                return responseCode;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return responseCode;
     }
 }

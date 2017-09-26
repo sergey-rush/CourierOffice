@@ -28,6 +28,8 @@
     <string name="nav_home">Главная</string>
     <string name="nav_scan">Сканировать</string>
     <string name="nav_apps">Заявки</string>
+    <string name="nav_notes">Сообщения</string>
+    <string name="nav_help">Справка</string>
     <string name="nav_service">Служебные</string>
     <string name="nav_data">База данных</string>
     <string name="nav_location">Местоположение</string>
@@ -44,6 +46,7 @@
     <!-- titles -->
     <string name="title_home_fragment">Сообщения</string>
     <string name="title_qrcode_fragment">Сканировать QR-код</string>
+    <string name="title_help_fragment">Справка</string>
     <string name="title_activity_login">7 seconds</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="title_activity_pinlock">PinlockActivity</string>
@@ -66,4 +69,13 @@
     <string name="reject_button_text">Отказ получателя</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scan_menu_show">Посмотреть</string>
+
+    <!-- Strings related to app menu -->
+    <string name="help_title">Инструкция по работе</string>
+    <string name="help_scan_subtitle">Сканирование</string>
+    <string name="help_scan_text1">1. Перед началом работы убедитесь, что телефон подключен к сети «Интернет».</string>
+    <string name="help_scan_text2">2. Подготовьте кредитную заявку с QR кодом.</string>
+    <string name="help_scan_text3">3. Запустите приложение, выберите пункт меню «Сканировать» и сканируйте QR код заявки.</string>
+    <string name="help_scan_text4">4. Вам будет предложено отсканировать копии документов. Вы можете также сделать это позже.</string>
+    <string name="help_scan_text5">Сканирование</string>
 </resources>
