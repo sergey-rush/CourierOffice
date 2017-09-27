@@ -98,8 +98,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         }
 
         if (fragment instanceof TakePhotoFragment) {
-            _toolbar.setVisibility(View.VISIBLE);
             showFragment(new HomeFragment());
+            _toolbar.setVisibility(View.VISIBLE);
             handled = true;
         }
 
@@ -127,12 +127,13 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         return null;
     }
 
-    private void removeFragment() {
+    private void removeQrcodeFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         List<Fragment> fragmentList = fragmentManager.getFragments();
 
         for (Fragment fragment : fragmentList) {
-            if (fragment instanceof HomeFragment) {
+            if (fragment instanceof QrcodeFragment) {
+
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.remove(fragment);
                 fragmentTransaction.commit();
@@ -165,8 +166,10 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment = null;
-        int id = item.getItemId();
 
+        //removeQrcodeFragment();
+
+        int id = item.getItemId();
         if (id == R.id.nav_scan) {
             fragment = new QrcodeFragment();
         } else if (id == R.id.nav_apps) {

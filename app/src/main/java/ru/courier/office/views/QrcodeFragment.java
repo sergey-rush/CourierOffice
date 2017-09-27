@@ -53,6 +53,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
     private ProgressDialog progressDialog;
     private String _applicationGuid;
     private FrameLayout cameraPreview;
+    private Context _context;
 
     static {
         System.loadLibrary("iconv");
@@ -77,8 +78,10 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
         toolbar.setTitle(getString(R.string.title_qrcode_fragment));
+        _context = getContext();
 
-        releaseCamera();
+
+
 
         View view = inflater.inflate(R.layout.fragment_qrcode, container, false);
         cameraPreview = (FrameLayout) view.findViewById(R.id.cameraPreview);
@@ -86,8 +89,35 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         if(!backCameraExists()){
             showNoCameraDialog();
         }
-        showQRScanner();
+        initControls();
         return view;
+    }
+
+    public void showNoCameraDialog() {
+        AlertDialog noCameraDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom)
+                .setTitle(R.string.error)
+                .setMessage(R.string.camera_not_available)
+                .setIcon(R.drawable.ic_error)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+
+                }).create();
+        noCameraDialog.show();
+    }
+
+    public static boolean backCameraExists() {
+
+        int backCameraId = -1;
+        for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, cameraInfo);
+            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                backCameraId = i;
+            }
+        }
+        return (backCameraId > -1);
     }
 
     @Override
@@ -104,40 +134,15 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         Toast.makeText(view.getContext(), "onButtonCaptureClick", Toast.LENGTH_LONG).show();
     }
 
-    public void showQRScanner() {
+    private void initControls() {
 
-        boolean permissionCameraGranted = (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-        //Log.d("rlf_app", "permissionCameraGranted " + permissionCameraGranted);
+        boolean permissionCameraGranted = (ContextCompat.checkSelfPermission(_context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
         if(!permissionCameraGranted){
-            requestCameraPermission();
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, PERMISSION_CAMERA_REQUEST_CODE);
             return;
         }
 
-        initControls();
-    }
-
-    public void showNoCameraDialog() {        
-        AlertDialog noCameraDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom)
-                .setTitle(R.string.error)
-                .setMessage(R.string.camera_not_available)
-                .setIcon(R.drawable.ic_error)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        dialog.dismiss();
-                    }
-
-                }).create();
-        noCameraDialog.show();
-    }
-
-    public void requestCameraPermission() {
-        ActivityCompat.requestPermissions(this.getActivity(),
-                new String[]{Manifest.permission.CAMERA},
-                PERMISSION_CAMERA_REQUEST_CODE);
-    }
-
-    private void initControls() {
-        this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         autoFocusHandler = new Handler();
         mCamera = getCameraInstance();
@@ -201,6 +206,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
         }
         else {
+            disposeCamera();
             ApplicationManager applicationManager = new ApplicationManager(getContext(), this, _applicationGuid);
             applicationManager.execute();
         }
@@ -279,7 +285,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         if(!autoFocusStarted)    scheduleAutoFocus(); // wait 2 sec and then do check again
     }
 
-    public void releaseCamera() {
+    public void disposeCamera() {
         if (mCamera != null) {
             previewing = false;
             mCamera.setPreviewCallback(null);
@@ -308,18 +314,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         return mCamera;
     }
 
-    public static boolean backCameraExists() {
 
-        int backCameraId = -1;
-        for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
-            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, cameraInfo);
-            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                backCameraId = i;
-            }
-        }
-        return (backCameraId > -1);
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -334,20 +329,11 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onDetach() {
+        disposeCamera();
         super.onDetach();
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain getContext()
-     * fragment to allow an interaction in getContext() fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
        void onFragmentInteraction(Uri uri);

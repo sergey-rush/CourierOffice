@@ -23,6 +23,7 @@ import ru.courier.office.R;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.views.ScanListFragment;
 import ru.courier.office.views.ScanViewFragment;
+import ru.courier.office.views.TakePhotoFragment;
 
 /**
  * Created by rash on 31.08.2017.
@@ -119,11 +120,16 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ScanViewHolder
 
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
+            FragmentManager fragmentManager = ((AppCompatActivity)_context).getSupportFragmentManager();
+
             switch (menuItem.getItemId()) {
                 case R.id.scan_menu_show:
                     ScanViewFragment scanListFragment = ScanViewFragment.newInstance(_documentId, _scanId);
-                    FragmentManager fragmentManager = ((AppCompatActivity)_context).getSupportFragmentManager();
                     fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
+                    return true;
+                case R.id.scan_menu_reshoot:
+                    TakePhotoFragment takePhotoFragment = TakePhotoFragment.newInstance(0, 0, _scanId);
+                    fragmentManager.beginTransaction().replace(R.id.container, takePhotoFragment).commit();
                     return true;
                 case R.id.scan_menu_delete:
                     DataAccess dataAccess = DataAccess.getInstance(_context);

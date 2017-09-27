@@ -69,6 +69,7 @@
     <string name="reject_button_text">Отказ получателя</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scan_menu_show">Посмотреть</string>
+    <string name="scan_menu_reshoot">Переснять</string>
 
     <!-- Strings related to app menu -->
     <string name="help_title">Инструкция по работе</string>

@@ -315,12 +315,12 @@ public class DataProvider extends DataAccess {
 
     @Override
     public List<Document> getDocumentsByApplicationId(int applicationId) {
-        List<Document> documents = null;
+        List<Document> documents = new ArrayList<Document>();
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationId, ApplicationGuid, Title, Count FROM Documents WHERE ApplicationId = ? ORDER BY Id", new String[]{String.valueOf(applicationId)});
             cursor.moveToFirst();
-            documents = new ArrayList<Document>();
+
             while (!cursor.isAfterLast()) {
                 Document document = new Document();
                 document.Id = cursor.getInt(cursor.getColumnIndex("Id"));
@@ -449,13 +449,14 @@ public class DataProvider extends DataAccess {
         Scan scan = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, PhotoGuid, StreamGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE Id = ?", new String[]{String.valueOf(scanId)});
+            cursor = db.rawQuery("SELECT Id, PhotoGuid, StreamGuid, ApplicationId, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE Id = ?", new String[]{String.valueOf(scanId)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 scan = new Scan();
                 scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 scan.PhotoGuid = cursor.getString(cursor.getColumnIndex("PhotoGuid"));
                 scan.StreamGuid = cursor.getString(cursor.getColumnIndex("StreamGuid"));
+                scan.ApplicationId = cursor.getInt(cursor.getColumnIndex("ApplicationId"));
                 scan.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 scan.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
                 scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
@@ -479,7 +480,7 @@ public class DataProvider extends DataAccess {
         List<Scan> scans = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, PhotoGuid, StreamGuid, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY PageNum", new String[]{String.valueOf(documentId)});
+            cursor = db.rawQuery("SELECT Id, PhotoGuid, StreamGuid, ApplicationId, ApplicationGuid, DocumentGuid, DocumentId, PageNum, ImageLength, ScanStatus, SmallPhoto FROM Scans WHERE DocumentId = ? ORDER BY PageNum", new String[]{String.valueOf(documentId)});
             cursor.moveToFirst();
             scans = new ArrayList<Scan>();
             while (!cursor.isAfterLast()) {
@@ -487,6 +488,7 @@ public class DataProvider extends DataAccess {
                 scan.Id = cursor.getInt(cursor.getColumnIndex("Id"));
                 scan.PhotoGuid = cursor.getString(cursor.getColumnIndex("PhotoGuid"));
                 scan.StreamGuid = cursor.getString(cursor.getColumnIndex("StreamGuid"));
+                scan.ApplicationId = cursor.getInt(cursor.getColumnIndex("ApplicationId"));
                 scan.ApplicationGuid = cursor.getString(cursor.getColumnIndex("ApplicationGuid"));
                 scan.DocumentGuid = cursor.getString(cursor.getColumnIndex("DocumentGuid"));
                 scan.DocumentId = cursor.getInt(cursor.getColumnIndex("DocumentId"));
@@ -550,6 +552,7 @@ public class DataProvider extends DataAccess {
     @Override
     public int insertScan(Scan scan) {
         ContentValues contentValues = new ContentValues();
+        contentValues.put("ApplicationId", scan.ApplicationId);
         contentValues.put("ApplicationGuid", scan.ApplicationGuid);
         contentValues.put("DocumentGuid", scan.DocumentGuid);
         contentValues.put("DocumentId", scan.DocumentId);
@@ -565,6 +568,17 @@ public class DataProvider extends DataAccess {
         }
 
         return ret;
+    }
+
+    @Override
+    public boolean updateScanImage(Scan scan) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("ImageLength", scan.ImageLength);
+        contentValues.put("ScanStatus", scan.ScanStatus.ordinal());
+        contentValues.put("SmallPhoto", scan.SmallPhoto);
+        contentValues.put("LargePhoto", scan.LargePhoto);
+        int ret = (int) db.update("Scans", contentValues, "Id = ?", new String[]{String.valueOf(scan.Id)});
+        return ret == 1;
     }
 
     @Override
@@ -617,12 +631,12 @@ public class DataProvider extends DataAccess {
 
     @Override
     public List<Status> getStatusesByApplicationId(int applicationId) {
-        List<Status> statuses = null;
+        List<Status> statuses = new ArrayList<Status>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationId, ApplicationGuid, Code, Category, Info, Created FROM Statuses WHERE ApplicationId = ? ORDER BY Created DESC", new String[]{String.valueOf(applicationId)});
+            cursor = db.rawQuery("SELECT Id, ApplicationId, ApplicationGuid, Code, Category, Info, Created FROM Statuses WHERE ApplicationId = ? ORDER BY Id", new String[]{String.valueOf(applicationId)});
             cursor.moveToFirst();
-            statuses = new ArrayList<Status>();
+
             while (!cursor.isAfterLast()) {
                 Status status = new Status();
                 status.Id = cursor.getInt(cursor.getColumnIndex("Id"));

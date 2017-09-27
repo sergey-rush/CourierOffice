@@ -2,8 +2,6 @@ package ru.courier.office.views;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -16,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +28,7 @@ import com.google.android.cameraview.CameraView;
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import ru.courier.office.R;
@@ -45,6 +43,8 @@ import ru.courier.office.web.WebContext;
 
 public class TakePhotoFragment extends Fragment {
 
+    private OnFragmentInteractionListener mListener;
+
     public static final int BRIGHTNESS_THRESHOLD = 20;
     private static final String ARG_APPLICATION_ID = "applicationId";
     private static final String ARG_DOCUMENT_ID = "documentId";
@@ -55,7 +55,7 @@ public class TakePhotoFragment extends Fragment {
     private static final float BRIGHTNESS_THRESHOLD_PERCENT = .25f;
     boolean pictureTaken = false;
     private int _applicationId;
-    private int documentId;
+    private int _documentId;
     private int _scanId;
     private View _view;
     private Context _context;
@@ -71,10 +71,11 @@ public class TakePhotoFragment extends Fragment {
     private DataAccess _dataAccess;
     private Application _application;
     private Document _currentDocument;
+    private Scan _scan;
     private Toolbar _toolbar;
     private int _totalDocs;
-    private int _currentDoc = 0;
-    private int _currentScan = 0;
+    private int _currentDocIndex = 0;
+    private int _currentScanIndex = 0;
     private TextView _tvTitle;
             
     public static TakePhotoFragment newInstance(int applicationId, int documentId, int scanId) {
@@ -92,7 +93,7 @@ public class TakePhotoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
-            documentId = getArguments().getInt(ARG_DOCUMENT_ID);
+            _documentId = getArguments().getInt(ARG_DOCUMENT_ID);
             _scanId = getArguments().getInt(ARG_SCAN_ID);
         }
     }
@@ -104,6 +105,8 @@ public class TakePhotoFragment extends Fragment {
         _toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
         _toolbar.setVisibility(View.GONE);
 
+        WebContext webContext = WebContext.getInstance();
+        _dataAccess = DataAccess.getInstance(getContext());
         _context = getContext();
 
         ImageView ivPrev = (ImageView) _view.findViewById(R.id.ivPrev);
@@ -132,14 +135,45 @@ public class TakePhotoFragment extends Fragment {
         });
         orientationManager.enable();
 
-        WebContext webContext = WebContext.getInstance();
-        _dataAccess = DataAccess.getInstance(getContext());
-
         if (_applicationId > 0) {
             _application = _dataAccess.getApplicationById(_applicationId);
             webContext.Application = _application;
             _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
             _totalDocs = _application.DocumentList.size() - 1;
+        }
+
+        if (_documentId > 0) {
+            Document document = _dataAccess.getDocumentById(_documentId);
+            _applicationId = document.ApplicationId;
+            _application = _dataAccess.getApplicationById(_applicationId);
+            webContext.Application = _application;
+            _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
+            _totalDocs = _application.DocumentList.size() - 1;
+        }
+
+        if (_scanId > 0) {
+            _scan = _dataAccess.getScanById(_scanId);
+            _applicationId = _scan.ApplicationId;
+            _application = _dataAccess.getApplicationById(_applicationId);
+            webContext.Application = _application;
+            _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
+            _totalDocs = _application.DocumentList.size() - 1;
+
+            for (Document document : _application.DocumentList) {
+                _currentDocument = _application.DocumentList.get(_currentDocIndex);
+                if (document.Id == _scan.DocumentId) {
+                    break;
+                }
+                _currentDocIndex = _currentDocIndex + 1;
+            }
+
+            List<Scan> scanList = _dataAccess.getScansByDocumentId(_currentDocument.Id);
+            for (Scan scan : scanList) {
+                _currentScanIndex = _currentScanIndex + 1;
+                if (scan.Id == _scanId) {
+                    break;
+                }
+            }
         }
 
         setCurrentDocument();
@@ -149,28 +183,31 @@ public class TakePhotoFragment extends Fragment {
     }
 
     private void setPrevDocument() {
-        if (_currentDoc > 0) {
-            _currentDoc = _currentDoc - 1;
+        if (_currentDocIndex > 0) {
+            _currentDocIndex = _currentDocIndex - 1;
         }
         setCurrentDocument();
     }
 
     private void setNextDocument() {
-        if (_currentDoc < _totalDocs) {
-            _currentDoc = _currentDoc + 1;
+        if (_currentDocIndex < _totalDocs) {
+            _currentDocIndex = _currentDocIndex + 1;
         }
         setCurrentDocument();
     }
 
     private void setTitle() {
-        String title = String.format("%d. %s", _currentScan, _currentDocument.Title);
+        String title = String.format("%d. %s", _currentScanIndex, _currentDocument.Title);
         _tvTitle.setText(title);
     }
 
     private void setCurrentDocument() {
-        _currentDocument = _application.DocumentList.get(_currentDoc);
-        _currentScan = _dataAccess.countScansByDocumentId(_currentDocument.Id);
-        _currentScan = _currentScan + 1;
+        _currentDocument = _application.DocumentList.get(_currentDocIndex);
+
+        if (_scanId == 0) {
+            _currentScanIndex = _dataAccess.countScansByDocumentId(_currentDocument.Id);
+            _currentScanIndex = _currentScanIndex + 1;
+        }
         setTitle();
     }
 
@@ -178,8 +215,6 @@ public class TakePhotoFragment extends Fragment {
 
         mCameraView = (CameraView) _view.findViewById(R.id.cvCamera);
         if (mCameraView != null) {
-            //mCameraView.setFlash(CameraView.FLASH_AUTO);
-            //mCameraView.setAspectRatio(AspectRatio.of(4,3));
             mCameraView.addCallback(mCallback);
             mCameraView.start();
         }
@@ -267,8 +302,25 @@ public class TakePhotoFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        disposeCamera();
+        super.onDetach();
+        mListener = null;
+    }
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
@@ -305,12 +357,15 @@ public class TakePhotoFragment extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+
             int imageByteslength = _imageBytes.length;
             Scan scan = new Scan();
+            scan.Id = _scanId;
+            scan.ApplicationId = _application.Id;
             scan.ApplicationGuid = _application.ApplicationGuid;
             scan.DocumentGuid = _currentDocument.DocumentGuid;
             scan.DocumentId = _currentDocument.Id;
-            scan.PageNum = _currentScan;
+            scan.PageNum = _currentScanIndex;
             scan.ScanStatus = ScanStatus.Ready;
             byte[] smallBytes = resizeBitmap(_imageBytes);
             int smallByteslength = smallBytes.length;
@@ -319,8 +374,15 @@ public class TakePhotoFragment extends Fragment {
             //scan.LargePhoto = totalBytes;
             scan.LargePhoto = _imageBytes;
             scan.ImageLength = scan.LargePhoto.length;
-            _scanId = _dataAccess.insertScan(scan);
-            return _scanId > 0;
+            if (_scanId > 0) {
+                _dataAccess.updateScanImage(scan);
+                ScanListFragment scanListFragment = ScanListFragment.newInstance(_scan.DocumentId);
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
+            } else {
+                scan.Id = _dataAccess.insertScan(scan);
+            }
+            return scan.Id > 0;
         }
 
         public byte[] resizeBitmap(byte[] inputBytes) {

@@ -83,20 +83,24 @@ public class ApplicationService extends Service {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-            List<Application> applications = _dataAccess.getApplications(100);
+            List<Application> deliverApplications = _dataAccess.getApplicationsByApplicationStatus(ApplicationStatus.Deliver);
 
-            for (Application application : applications) {
-                if (application.ApplicationStatus == ApplicationStatus.Deliver) {
-                    deliverApplication(application);
-                }
-
-                if (application.ApplicationStatus == ApplicationStatus.Reject) {
-                    rejectApplication(application);
-                }
+            for (Application application : deliverApplications) {
+                deliverApplication(application);
                 if (_responseCode != 201) { // we wait untill application status has been send, otherwise operation completed with error
                     break;
                 }
             }
+
+            List<Application> rejectApplications = _dataAccess.getApplicationsByApplicationStatus(ApplicationStatus.Reject);
+
+            for (Application application : rejectApplications) {
+                rejectApplication(application);
+                if (_responseCode != 201) { // we wait untill application status has been send, otherwise operation completed with error
+                    break;
+                }
+            }
+
             return null;
         }
 

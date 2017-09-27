@@ -15,15 +15,22 @@
             android:id="@+id/ivPrev"
             android:layout_width="48dp"
             android:layout_height="@dimen/dimen48"
-            android:layout_marginTop="@dimen/dimen2" android:layout_alignParentLeft="true"
+            android:layout_marginTop="@dimen/dimen4"
+            android:layout_marginBottom="@dimen/dimen4"
+            android:layout_alignParentLeft="true"
             android:src="@drawable/ic_prev"
             android:tint="@color/white" />
 
         <TextView
-            android:id="@+id/tvTitle" android:layout_marginLeft="@dimen/dimen48" android:layout_marginRight="@dimen/dimen48"
-            android:layout_width="wrap_content" android:gravity="center"
-            android:layout_height="wrap_content" android:layout_centerInParent="true"
-            android:text="tvTitle" android:maxLines="2"
+            android:id="@+id/tvTitle"
+            android:layout_marginLeft="@dimen/dimen48"
+            android:layout_marginRight="@dimen/dimen48"
+            android:layout_width="wrap_content"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="tvTitle"
+            android:maxLines="2"
             android:textSize="@dimen/title_text_size"
             android:textColor="@android:color/white" />
 
@@ -31,7 +38,9 @@
             android:id="@+id/ivNext"
             android:layout_width="48dp"
             android:layout_height="@dimen/dimen48"
-            android:layout_marginTop="@dimen/dimen2" android:layout_alignParentRight="true"
+            android:layout_marginTop="@dimen/dimen4"
+            android:layout_marginBottom="@dimen/dimen4"
+            android:layout_alignParentRight="true"
             android:src="@drawable/ic_next"
             android:tint="@color/white" />
 

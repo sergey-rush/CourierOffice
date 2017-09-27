@@ -38,8 +38,6 @@ public class ApplicationManager extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-
-        _fragment.releaseCamera();
         pDialog = new ProgressDialog(_context);
         pDialog.setMessage("Пожалуйста, подождите...");
         pDialog.setCancelable(false);
