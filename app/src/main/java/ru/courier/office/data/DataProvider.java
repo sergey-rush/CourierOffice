@@ -708,7 +708,7 @@ public class DataProvider extends DataAccess {
         List<Note> notes = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, Info, Created FROM Notes ORDER BY Created DESC Limit ?", new String[]{String.valueOf(limit)});
+            cursor = db.rawQuery("SELECT Id, Info, Created FROM Notes ORDER BY Id DESC Limit ?", new String[]{String.valueOf(limit)});
             cursor.moveToFirst();
             notes = new ArrayList<Note>();
             while (!cursor.isAfterLast()) {

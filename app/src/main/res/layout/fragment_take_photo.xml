@@ -67,43 +67,15 @@
         android:scaleType="centerCrop"
         android:src="@mipmap/ic_grid" />
 
-    <RelativeLayout
+
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/bottomNavigationTakePhoto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal">
-
-        <RelativeLayout
-            android:id="@+id/rlTakePhoto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/rounded_rect">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_camera"
-                android:tint="@color/white" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rlFlash"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_margin="@dimen/dimen8">
-
-            <ImageView
-                android:id="@+id/flashIcon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_alignParentLeft="true"
-                android:src="@drawable/ic_flash_auto"
-                android:tint="@color/white" />
-        </RelativeLayout>
-
-    </RelativeLayout>
+        app:itemBackground = "@color/colorPrimary"
+        app:itemIconTint="@color/colorAccent"
+        app:itemTextColor="@color/colorAccent"
+        app:menu="@menu/takephoto_menu" />
 
 </RelativeLayout>

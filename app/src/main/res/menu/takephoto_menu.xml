@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_back"
+        android:enabled="true"
+        android:icon="@drawable/ic_backspace"
+        android:title="Назад"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_shot"
+        android:enabled="true"
+        android:icon="@drawable/ic_camera"
+        android:title="Снять"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_flash"
+        android:enabled="true"
+        android:icon="@drawable/ic_flash_auto"
+        android:title="Вспышка"
+        app:showAsAction="ifRoom"/>
+
+</menu>

@@ -98,8 +98,9 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         }
 
         if (fragment instanceof TakePhotoFragment) {
-            showFragment(new HomeFragment());
             _toolbar.setVisibility(View.VISIBLE);
+            WebContext webContext = WebContext.getInstance();
+            showFragment(AppViewFragment.newInstance(webContext.Application.Id));
             handled = true;
         }
 

@@ -86,8 +86,8 @@ public class AppViewFragment extends Fragment {
             }
         }
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)_view.findViewById(R.id.bottomNavigationView);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        BottomNavigationView bottomNavigationAppView = (BottomNavigationView)_view.findViewById(R.id.bottomNavigationAppView);
+        bottomNavigationAppView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 

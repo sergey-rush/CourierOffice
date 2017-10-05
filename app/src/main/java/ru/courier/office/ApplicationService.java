@@ -4,11 +4,14 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ru.courier.office.core.Application;
 import ru.courier.office.core.ApplicationStatus;
@@ -28,6 +31,8 @@ public class ApplicationService extends Service {
     private PositionService _positionService;
     private boolean _running = false;
     private Context _context;
+    private static Timer _timer = new Timer();
+    private final Handler _handler = new Handler();
 
 
     public void onCreate() {
@@ -42,23 +47,39 @@ public class ApplicationService extends Service {
         _positionService = new PositionService(_context);
         _positionService.startLocationManager(true);
 
-        if(!_running)
-        {
-            startUploading();
-        }
+        startOrResetTimer();
         return START_STICKY;
     }
+
+    private void startOrResetTimer() {
+
+        if (_timer != null) {
+            _timer.cancel();
+        }
+        _timer = new Timer();
+        _timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                _handler.post(_runnable);
+            }
+        }, 0, 600000);
+    }
+
+    final Runnable _runnable = new Runnable() {
+        public void run() {
+            if(!_running)
+            {
+                startUploading();
+            }
+        }
+    };
 
     private void startUploading()
     {
         _running = true;
-        Toast.makeText(_context, "Start Upload called!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(_context, "Uploading started", Toast.LENGTH_SHORT).show();
         UploadManager uploadManager = new UploadManager();
         uploadManager.execute();
-    }
-
-    private void loadDataCallback() {
-
     }
 
     private class UploadManager extends AsyncTask<Void, Void, Void> {
@@ -237,10 +258,7 @@ public class ApplicationService extends Service {
         protected void onPostExecute(Void output) {
             super.onPostExecute(output);
             _running = false;
-            Toast.makeText(_context, "OnPostExecute called: " + _responseCode, Toast.LENGTH_SHORT).show();
-            if (_responseCode == 200) {
-                loadDataCallback();
-            }
+            Toast.makeText(_context, "Uploading completed: " + _responseCode, Toast.LENGTH_SHORT).show();
         }
     }
 

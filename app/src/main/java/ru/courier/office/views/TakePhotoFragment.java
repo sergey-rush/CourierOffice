@@ -12,10 +12,14 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -60,10 +64,10 @@ public class TakePhotoFragment extends Fragment {
     private View _view;
     private Context _context;
     private CameraView mCameraView;
-    private RelativeLayout rlTakePhoto;
+    //private RelativeLayout rlTakePhoto;
     private RelativeLayout menuScreen;
     private RelativeLayout rlFlash;
-    private ImageView flashIcon;
+    private MenuItem _menuItem;
     private ProgressDialog progressDialog;
     private OrientationManager orientationManager;
     private int currentOrientation = OrientationManager.ScreenOrientation.PORTRAIT.ordinal();
@@ -176,10 +180,82 @@ public class TakePhotoFragment extends Fragment {
             }
         }
 
+        BottomNavigationView bottomNavigationTakePhoto = (BottomNavigationView)_view.findViewById(R.id.bottomNavigationTakePhoto);
+        bottomNavigationTakePhoto.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+                switch (item.getItemId())
+                {
+                    case R.id.action_back:
+                        onBackTouched();
+                        break;
+                    case R.id.action_shot:
+                        onShotTouched();
+                        break;
+                    case R.id.action_flash:
+                        onFlashChanged();
+                        break;
+                }
+
+                return true;
+            }
+        });
+
+
+        Menu menuNav = bottomNavigationTakePhoto.getMenu();
+        _menuItem = menuNav.findItem(R.id.action_flash);
+
         setCurrentDocument();
         initCamera();
 
         return _view;
+    }
+
+    private void onBackTouched() {
+        _toolbar.setVisibility(View.VISIBLE);
+        WebContext webContext = WebContext.getInstance();
+        showFragment(AppViewFragment.newInstance(webContext.Application.Id));
+    }
+
+    private void showFragment(Fragment fragment)
+    {
+        if (fragment != null) {
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        }
+    }
+
+    private void onShotTouched() {
+        if (mCameraView != null && !pictureTaken) {
+
+            LocalSettings.setDeviceOrientationDuringTakePhoto(_context, currentOrientation);
+
+            float frameRatio = (float) mCameraView.getHeight() / (float) mCameraView.getWidth();
+            LocalSettings.setFrameRatio(_context, frameRatio);
+
+            pictureTaken = true;
+            //setTakePhotoButton(false);
+
+            mCameraView.takePicture();
+        }
+    }
+
+    private void onFlashChanged() {
+        switch (mCameraView.getFlash()) {
+            case CameraView.FLASH_AUTO:
+                mCameraView.setFlash(CameraView.FLASH_ON);
+                _menuItem.setIcon(R.drawable.ic_flash_on);
+                break;
+            case CameraView.FLASH_ON:
+                mCameraView.setFlash(CameraView.FLASH_OFF);
+                _menuItem.setIcon(R.drawable.ic_flash_off);
+                break;
+            case CameraView.FLASH_OFF:
+                mCameraView.setFlash(CameraView.FLASH_AUTO);
+                _menuItem.setIcon(R.drawable.ic_flash_auto);
+                break;
+        }
     }
 
     private void setPrevDocument() {
@@ -219,65 +295,20 @@ public class TakePhotoFragment extends Fragment {
             mCameraView.start();
         }
 
-        rlTakePhoto = (RelativeLayout) _view.findViewById(R.id.rlTakePhoto);
-        rlTakePhoto.setOnClickListener(clickListener);
-
-        flashIcon = (ImageView) _view.findViewById(R.id.flashIcon);
-
-        rlFlash = (RelativeLayout) _view.findViewById(R.id.rlFlash);
-
-        rlFlash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View _view) {
-                switch (mCameraView.getFlash()) {
-                    case CameraView.FLASH_AUTO:
-                        mCameraView.setFlash(CameraView.FLASH_ON);
-                        flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_on));
-                        break;
-                    case CameraView.FLASH_ON:
-                        mCameraView.setFlash(CameraView.FLASH_OFF);
-                        flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_off));
-                        break;
-                    case CameraView.FLASH_OFF:
-                        mCameraView.setFlash(CameraView.FLASH_AUTO);
-                        flashIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_flash_auto));
-                        break;
-                }
-            }
-        });
-
         pictureTaken = false;
-        setTakePhotoButton(true);
+        //setTakePhotoButton(true);
     }
 
-    View.OnClickListener clickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
 
-            if (mCameraView != null && !pictureTaken) {
-
-                LocalSettings.setDeviceOrientationDuringTakePhoto(_context, currentOrientation);
-
-                float frameRatio = (float) mCameraView.getHeight() / (float) mCameraView.getWidth();
-                LocalSettings.setFrameRatio(_context, frameRatio);
-
-                pictureTaken = true;
-                setTakePhotoButton(false);
-
-                mCameraView.takePicture();
-            }
-        }
-    };
-
-    private void setTakePhotoButton(boolean state) {
-        rlTakePhoto.setClickable(state);
-        rlTakePhoto.setFocusable(state);
-        rlTakePhoto.setEnabled(state);
-    }
+//    private void setTakePhotoButton(boolean state) {
+//        rlTakePhoto.setClickable(state);
+//        rlTakePhoto.setFocusable(state);
+//        rlTakePhoto.setEnabled(state);
+//    }
 
     private void resetCamera() {
         disposeCamera();
-        setTakePhotoButton(true);
+        //setTakePhotoButton(true);
         initCamera();
     }
 
