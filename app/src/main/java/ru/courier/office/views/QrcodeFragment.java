@@ -202,7 +202,7 @@ public class QrcodeFragment extends Fragment implements View.OnClickListener {
         {
             String message = String.format("Заявка %s уже зарегистрирована в базе данных приложения", _applicationGuid);
             ApplicationExistsDialog(message).show();
-            setFragment(new HomeFragment());
+            setFragment(new NoteFragment());
 
         }
         else {

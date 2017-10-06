@@ -31,8 +31,9 @@ public class ApplicationService extends Service {
     private PositionService _positionService;
     private boolean _running = false;
     private Context _context;
-    private static Timer _timer = new Timer();
+    private static Timer _timer;
     private final Handler _handler = new Handler();
+    List<Application> _applications;
 
 
     public void onCreate() {
@@ -47,35 +48,41 @@ public class ApplicationService extends Service {
         _positionService = new PositionService(_context);
         _positionService.startLocationManager(true);
 
-        startOrResetTimer();
+        startTimer();
         return START_STICKY;
     }
 
-    private void startOrResetTimer() {
+    private void startTimer() {
+
+        if (_timer == null) {
+
+            _timer = new Timer();
+            _timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    _handler.post(_runnable);
+                }
+            }, 0, 600000);
+        }
+    }
+
+    private void stopTimer() {
 
         if (_timer != null) {
             _timer.cancel();
+            stopSelf();
         }
-        _timer = new Timer();
-        _timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                _handler.post(_runnable);
-            }
-        }, 0, 600000);
     }
 
     final Runnable _runnable = new Runnable() {
         public void run() {
-            if(!_running)
-            {
+            if (!_running) {
                 startUploading();
             }
         }
     };
 
-    private void startUploading()
-    {
+    private void startUploading() {
         _running = true;
         Toast.makeText(_context, "Uploading started", Toast.LENGTH_SHORT).show();
         UploadManager uploadManager = new UploadManager();
@@ -104,18 +111,18 @@ public class ApplicationService extends Service {
         @Override
         protected Void doInBackground(Void... arg0) {
 
-            List<Application> deliverApplications = _dataAccess.getApplicationsByApplicationStatus(ApplicationStatus.Deliver);
+            _applications = _dataAccess.getApplicationsByApplicationStatus(ApplicationStatus.Deliver);
 
-            for (Application application : deliverApplications) {
+            for (Application application : _applications) {
                 deliverApplication(application);
                 if (_responseCode != 201) { // we wait untill application status has been send, otherwise operation completed with error
                     break;
                 }
             }
 
-            List<Application> rejectApplications = _dataAccess.getApplicationsByApplicationStatus(ApplicationStatus.Reject);
+            _applications = _dataAccess.getApplicationsByApplicationStatus(ApplicationStatus.Reject);
 
-            for (Application application : rejectApplications) {
+            for (Application application : _applications) {
                 rejectApplication(application);
                 if (_responseCode != 201) { // we wait untill application status has been send, otherwise operation completed with error
                     break;
@@ -125,8 +132,7 @@ public class ApplicationService extends Service {
             return null;
         }
 
-        private void rejectApplication(Application application)
-        {
+        private void rejectApplication(Application application) {
             sendStatus(application);
         }
 
@@ -181,7 +187,7 @@ public class ApplicationService extends Service {
             }
         }
 
-        private String FormatPayload(Document document, Scan scan){
+        private String FormatPayload(Document document, Scan scan) {
             String photoId = scan.PhotoGuid;
             String appId = scan.ApplicationGuid;
             String fileName = document.Title;
@@ -259,9 +265,14 @@ public class ApplicationService extends Service {
             super.onPostExecute(output);
             _running = false;
             Toast.makeText(_context, "Uploading completed: " + _responseCode, Toast.LENGTH_SHORT).show();
+            int count = _dataAccess.countApplicationsExceptApplicationStatus(ApplicationStatus.None);
+            if (count == 0) {
+                stopTimer();
+            }
         }
     }
 
+    @Override
     public void onDestroy() {
         _positionService.stopLocationManager();
         super.onDestroy();

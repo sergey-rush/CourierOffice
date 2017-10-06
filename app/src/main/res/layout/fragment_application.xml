@@ -29,7 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvIdTitle"
-            android:text="tvId"
             android:textColor="@color/black"
             android:textSize="@dimen/dimen16" />
 
@@ -45,7 +44,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvMerchantNameTitle"
-            android:text="tvMerchantName"
             android:textColor="@color/black"
             android:textSize="@dimen/dimen16" />
 
@@ -61,7 +59,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvPersonNameTitle"
-            android:text="tvPersonName"
             android:textColor="@color/black"
             android:textSize="@dimen/dimen16" />
 
@@ -77,7 +74,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvAmountTitle"
-            android:text="tvAmount"
             android:textColor="@color/black"
             android:textSize="@dimen/dimen16" />
 
@@ -93,7 +89,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvDeliveryAddressTitle"
-            android:text="tvDeliveryAddress"
             android:textColor="@color/black"
             android:textSize="@dimen/dimen16" />
 
@@ -109,7 +104,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tvCreatedTitle"
-            android:text="tvCreated"
             android:textColor="@color/black"
             android:textSize="@dimen/dimen16" />
 

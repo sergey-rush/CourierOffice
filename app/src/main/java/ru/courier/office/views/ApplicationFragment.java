@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,7 +40,7 @@ public class ApplicationFragment extends Fragment {
 
     private static final String ARG_APPLICATION_ID = "applicationId";
     private int _applicationId;
-
+    private Toolbar _toolbar;
     private ImageView ivMenu;
     private TextView tvId;
     private TextView tvMerchantName;
@@ -74,6 +75,8 @@ public class ApplicationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         _view = inflater.inflate(R.layout.fragment_application, container, false);
+        _toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
+
         _context = getContext();
         _webContext = WebContext.getInstance();
         _dataAccess = DataAccess.getInstance(_context);
@@ -166,8 +169,11 @@ public class ApplicationFragment extends Fragment {
         tvId.setText(application.ApplicationGuid);
         tvMerchantName = (TextView) _view.findViewById(R.id.tvMerchantName);
         tvMerchantName.setText(application.MerchantName);
+
         tvPersonName = (TextView) _view.findViewById(R.id.tvPersonName);
         tvPersonName.setText(application.PersonName);
+        _toolbar.setTitle(application.PersonName);
+
         tvAmount = (TextView) _view.findViewById(R.id.tvAmount);
         tvAmount.setText(application.Amount);
         tvDeliveryAddress = (TextView) _view.findViewById(R.id.tvDeliveryAddress);
@@ -202,6 +208,8 @@ public class ApplicationFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
+
+
             _webContext.Application = _dataAccess.getApplicationById(_applicationId);
             return null;
         }

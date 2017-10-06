@@ -223,6 +223,26 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
+    public int countApplicationsExceptApplicationStatus(ApplicationStatus applicationStatus) {
+        int count = 0;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Applications WHERE ApplicationStatus != ?", new String[]{String.valueOf(String.valueOf(applicationStatus.ordinal()))});
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(cursor.getColumnIndex("Total"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    @Override
     public int insertApplication(Application application) {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         ContentValues contentValues = new ContentValues();
@@ -292,7 +312,7 @@ public class DataProvider extends DataAccess {
         Document document = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationId, ApplicationGuid, Title, Count FROM Documents FROM Documents WHERE Id = ?", new String[]{String.valueOf(id)});
+            cursor = db.rawQuery("SELECT Id, DocumentGuid, ApplicationId, ApplicationGuid, Title, Count FROM Documents WHERE Id = ?", new String[]{String.valueOf(id)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 document = new Document();

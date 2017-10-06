@@ -23,7 +23,7 @@ import ru.courier.office.data.DataProvider;
 
 public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.ApplicationViewHolder> {
 
-    private List<Application> applicationList;
+    private List<Application> _applicationList;
 
     public class ApplicationViewHolder extends RecyclerView.ViewHolder {
 
@@ -46,7 +46,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
 
     public ApplicationAdapter(List<Application> applicationList) {
-        this.applicationList = applicationList;
+        _applicationList = applicationList;
     }
 
     ViewGroup parent;
@@ -61,7 +61,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     @Override
     public void onBindViewHolder(ApplicationViewHolder holder, int position) {
-        Application application = applicationList.get(position);
+        Application application = _applicationList.get(position);
 
         holder.tvAmount.setText(application.Amount);
         holder.tvPersonName.setText(application.PersonName);
@@ -69,17 +69,23 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.tvMerchantName.setText(application.MerchantName);
 
         Drawable statusIcon = parent.getResources().getDrawable(R.drawable.ic_application);
+        holder.ivStatus.setImageDrawable(statusIcon);
 
         if(application.ApplicationStatus == ApplicationStatus.None){
-            statusIcon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+            //statusIcon.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+            holder.ivStatus.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
         }
         if(application.ApplicationStatus == ApplicationStatus.Deliver){
-            statusIcon.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+            //statusIcon.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+            holder.ivStatus.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
         }
         if(application.ApplicationStatus == ApplicationStatus.Reject){
-            statusIcon.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+            //statusIcon.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+            holder.ivStatus.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
         }
-        holder.ivStatus.setImageDrawable(statusIcon);
+
+
+
 
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         holder.tvCreated.setText(dateFormat.format(application.Created));
@@ -87,6 +93,6 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
 
     @Override
     public int getItemCount() {
-        return applicationList.size();
+        return _applicationList.size();
     }
 }

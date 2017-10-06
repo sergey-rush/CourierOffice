@@ -1,8 +1,10 @@
 package ru.courier.office.views;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +35,9 @@ public class AppViewFragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private static final String ARG_APPLICATION_ID = "applicationId";
+    private static final String ARG_TAB_INDEX = "tabIndex";
     private int _applicationId;
+    private int _tabIndex;
     private Context _context;
     private WebContext _webContext;
     private DataAccess _dataAccess;
@@ -40,10 +45,11 @@ public class AppViewFragment extends Fragment {
 
     public AppViewFragment() {}
 
-    public static AppViewFragment newInstance(int applicationId) {
+    public static AppViewFragment newInstance(int applicationId, int tabIndex) {
         AppViewFragment fragment = new AppViewFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_APPLICATION_ID, applicationId);
+        args.putInt(ARG_TAB_INDEX, tabIndex);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,12 +59,14 @@ public class AppViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             _applicationId = getArguments().getInt(ARG_APPLICATION_ID);
+            _tabIndex = getArguments().getInt(ARG_TAB_INDEX);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _view = inflater.inflate(R.layout.fragment_appview, container, false);
+
         _context = getContext();
         _webContext = WebContext.getInstance();
         _dataAccess = DataAccess.getInstance(_context);
@@ -114,9 +122,11 @@ public class AppViewFragment extends Fragment {
         tabLayout = (TabLayout) _view.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+        TabLayout.Tab tab = tabLayout.getTabAt(_tabIndex);
+        tab.select();
+
         return _view;
     }
-
 
     private void onScanDocuments() {
 
@@ -165,7 +175,6 @@ public class AppViewFragment extends Fragment {
         return alertDialog;
     }
 
-
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
@@ -203,4 +212,5 @@ public class AppViewFragment extends Fragment {
             return mFragmentTitleList.get(position);
         }
     }
+
 }

@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import java.util.List;
 public class AppListFragment extends Fragment implements View.OnClickListener{
 
     private OnFragmentInteractionListener mListener;
+    private Toolbar _toolbar;
 
     public AppListFragment() {}
 
@@ -40,6 +42,9 @@ public class AppListFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_applist, container, false);
+
+        _toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
+        _toolbar.setTitle(getString(R.string.title_applist_fragment));
 
         List<Application> applications = DataAccess.getInstance(getContext()).getApplications(100);
 
@@ -58,11 +63,11 @@ public class AppListFragment extends Fragment implements View.OnClickListener{
             public void onClick(View view, int position) {
 
                 TextView tvPersonName = (TextView) view.findViewById(R.id.tvPersonName);
-                int id = (int)tvPersonName.getTag();
+                int applicationId = (int)tvPersonName.getTag();
 
                 FragmentManager fm = getFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
-                AppViewFragment appViewFragment = AppViewFragment.newInstance(id);
+                AppViewFragment appViewFragment = AppViewFragment.newInstance(applicationId, 0);
                 ft.replace(R.id.container, appViewFragment);
                 ft.commit();
             }

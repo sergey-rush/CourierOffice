@@ -22,11 +22,11 @@ import ru.courier.office.data.DataAccess;
 import ru.courier.office.web.NoteProvider;
 import ru.courier.office.web.WebContext;
 
-public class HomeFragment extends Fragment {
+public class NoteFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public HomeFragment() { }
+    public NoteFragment() { }
 
     private Context _context;
     private Toolbar toolbar;
@@ -41,7 +41,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        view = inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_note, container, false);
 
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
         toolbar.setTitle(getString(R.string.title_home_fragment));

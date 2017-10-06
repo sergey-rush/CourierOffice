@@ -59,6 +59,8 @@ public abstract class DataAccess extends SQLiteOpenHelper {
 
     public abstract int countApplications();
 
+    public abstract int countApplicationsExceptApplicationStatus(ApplicationStatus applicationStatus);
+
     public abstract int insertApplication(Application application);
 
     public abstract boolean updateApplicationByApplicationStatus(int id, ApplicationStatus applicationStatus);

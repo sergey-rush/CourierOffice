@@ -1,5 +1,6 @@
 package ru.courier.office.views;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,9 +28,9 @@ import ru.courier.office.R;
 import ru.courier.office.web.WebContext;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener,
-        HomeFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
+        NoteFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
         TakePhotoFragment.OnFragmentInteractionListener, QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener,
-        LocationFragment.OnFragmentInteractionListener, HelpFragment.OnFragmentInteractionListener {
+        LocationFragment.OnFragmentInteractionListener, HelpFragment.OnFragmentInteractionListener, AboutFragment.OnFragmentInteractionListener {
 
     private Switch swtOnline;
     private TextView tvSwitchOnline;
@@ -87,7 +88,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         if (fragment instanceof ScanListFragment) {
             WebContext webContext = WebContext.getInstance();
-            showFragment(AppViewFragment.newInstance(webContext.Application.Id));
+            showFragment(AppViewFragment.newInstance(webContext.Application.Id, 1));
             handled = true;
         }
 
@@ -100,7 +101,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         if (fragment instanceof TakePhotoFragment) {
             _toolbar.setVisibility(View.VISIBLE);
             WebContext webContext = WebContext.getInstance();
-            showFragment(AppViewFragment.newInstance(webContext.Application.Id));
+            showFragment(AppViewFragment.newInstance(webContext.Application.Id, 0));
             handled = true;
         }
 
@@ -168,17 +169,20 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     public boolean onNavigationItemSelected(MenuItem item) {
         Fragment fragment = null;
 
-        //removeQrcodeFragment();
-
         int id = item.getItemId();
         if (id == R.id.nav_scan) {
             fragment = new QrcodeFragment();
         } else if (id == R.id.nav_apps) {
             fragment = new AppListFragment();
         } else if (id == R.id.nav_notes) {
-            fragment = new HomeFragment();
+            fragment = new NoteFragment();
         } else if (id == R.id.nav_help) {
             fragment = new HelpFragment();
+        } else if (id == R.id.nav_about) {
+        fragment = new AboutFragment();
+        } else if (id == R.id.nav_mail) {
+            sendEmail();
+            return true;
         }
 
         showFragment(fragment);
@@ -194,6 +198,20 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        }
+    }
+
+    private void sendEmail(){
+
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+        emailIntent.setData(Uri.parse("mailto:" + "support@7seconds.ru"));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Курьер Офис сообщение");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "Здравствуйте!");
+
+        try {
+            startActivity(Intent.createChooser(emailIntent, "Отправить письмо с помощью:"));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(this, "Почтовый клиент не установлен.", Toast.LENGTH_SHORT).show();
         }
     }
 

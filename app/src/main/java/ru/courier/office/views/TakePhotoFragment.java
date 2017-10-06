@@ -215,7 +215,7 @@ public class TakePhotoFragment extends Fragment {
     private void onBackTouched() {
         _toolbar.setVisibility(View.VISIBLE);
         WebContext webContext = WebContext.getInstance();
-        showFragment(AppViewFragment.newInstance(webContext.Application.Id));
+        showFragment(AppViewFragment.newInstance(webContext.Application.Id, 0));
     }
 
     private void showFragment(Fragment fragment)
@@ -399,14 +399,15 @@ public class TakePhotoFragment extends Fragment {
             scan.PageNum = _currentScanIndex;
             scan.ScanStatus = ScanStatus.Ready;
             byte[] smallBytes = resizeBitmap(_imageBytes);
-            int smallByteslength = smallBytes.length;
+            //int smallByteslength = smallBytes.length;
             scan.SmallPhoto = smallBytes;
             //byte[] totalBytes = drawDate(_imageBytes);
             //scan.LargePhoto = totalBytes;
-            scan.LargePhoto = _imageBytes;
+            scan.LargePhoto = drawDate(_imageBytes);
             scan.ImageLength = scan.LargePhoto.length;
             if (_scanId > 0) {
                 _dataAccess.updateScanImage(scan);
+
                 ScanListFragment scanListFragment = ScanListFragment.newInstance(_scan.DocumentId);
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
@@ -416,7 +417,8 @@ public class TakePhotoFragment extends Fragment {
             return scan.Id > 0;
         }
 
-        public byte[] resizeBitmap(byte[] inputBytes) {
+
+        private byte[] resizeBitmap(byte[] inputBytes) {
             int inputBytesLength = inputBytes.length;
             int targetW = 200;
             int targetH = 200;
@@ -441,15 +443,20 @@ public class TakePhotoFragment extends Fragment {
         }
 
         private byte[] drawDate(byte[] inputBytes) {
+
             Bitmap inputBitmap = BitmapFactory.decodeByteArray(inputBytes, 0, inputBytes.length);
+
             String dateStr = new SimpleDateFormat("dd.MM.yyyy", Locale.US).format(new Date());
             String timeStr = new SimpleDateFormat("HH:mm", Locale.US).format(new Date());
+
             int lineHeight = (int) Math.round(inputBitmap.getWidth() * .14);
             long textSize = Math.round(0.5 * lineHeight);
             long textMargin = Math.round(inputBitmap.getWidth() * .08);
+
             Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-            Bitmap tempBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), lineHeight, conf);
-            Canvas canvas = new Canvas(tempBitmap);
+            Bitmap textBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), lineHeight, conf);
+
+            Canvas canvas = new Canvas(textBitmap);
             Paint paint = new Paint();
             paint.setColor(Color.WHITE); // back Color
             canvas.drawRect(0, 0, inputBitmap.getWidth(), lineHeight, paint);
@@ -463,15 +470,18 @@ public class TakePhotoFragment extends Fragment {
                 timeStrX = (textMargin * 2 + dateTextWidth);
             canvas.drawText(dateStr, textMargin, textSize + (lineHeight - textSize) / 2, paint);
             canvas.drawText(timeStr, timeStrX, textSize + (lineHeight - textSize) / 2, paint);
+
             Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight, inputBitmap.getConfig());
             Canvas canvas1 = new Canvas(outputBitmap);
             canvas1.drawBitmap(inputBitmap, null, new RectF(0, 0, inputBitmap.getWidth(), inputBitmap.getHeight()), null);
-            canvas1.drawBitmap(tempBitmap, null, new RectF(0, inputBitmap.getHeight(), inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight), null);
+            canvas1.drawBitmap(textBitmap, null, new RectF(0, inputBitmap.getHeight(), inputBitmap.getWidth(), inputBitmap.getHeight() + lineHeight), null);
             inputBitmap.recycle();
-            tempBitmap.recycle();
+            textBitmap.recycle();
+
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
             byte[] outputBytes = stream.toByteArray();
+
             return outputBytes;
         }
 

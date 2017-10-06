@@ -22,10 +22,12 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.courier.office.R;
+import ru.courier.office.core.Document;
 import ru.courier.office.core.GridSpacingItemDecoration;
 import ru.courier.office.core.Scan;
 import ru.courier.office.core.ScanAdapter;
 import ru.courier.office.data.DataAccess;
+import ru.courier.office.web.WebContext;
 
 
 public class ScanListFragment extends Fragment {
@@ -33,8 +35,10 @@ public class ScanListFragment extends Fragment {
     private static final String ARG_DOCUMENT_ID = "documentId";
    
     private int _documentId;
-    private String title;
-
+    private Document _document;
+    private Toolbar _toolbar;
+    private WebContext _webContext;
+    private DataAccess _dataAccess;
     private RecyclerView _listView;
     private ScanAdapter adapter;
     private List<Scan> _scanList;
@@ -64,12 +68,16 @@ public class ScanListFragment extends Fragment {
 
         _view = inflater.inflate(R.layout.fragment_scan_list, container, false);
 
+        _toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
+        _toolbar.setVisibility(View.VISIBLE);
+
+
         _context = getContext();
+        _webContext = WebContext.getInstance();
+        _dataAccess = DataAccess.getInstance(_context);
+
         ScanAsyncTask scanAsyncTask = new ScanAsyncTask();
         scanAsyncTask.execute();
-
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
-        MenuItem btnCorner = (MenuItem) toolbar.findViewById(R.id.btnCorner);
 
         return _view;
     }
@@ -83,6 +91,8 @@ public class ScanListFragment extends Fragment {
     }
     private void loadDataCallback() {
 
+        _toolbar.setTitle(_document.Title);
+
         if (_scanList.size() > 0) {
             _listView = (RecyclerView) _view.findViewById(R.id.rvScans);
             adapter = new ScanAdapter(_context, _documentId,_scanList);
@@ -91,19 +101,6 @@ public class ScanListFragment extends Fragment {
             _listView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
             _listView.setItemAnimator(new DefaultItemAnimator());
             _listView.setAdapter(adapter);
-
-//            _listView.setOnClickListener(new AdapterView.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//
-//                    TextView tvTitle = (TextView) view.findViewById(R.id.tvTitle);
-//                    int scanId = Integer.parseInt(tvTitle.getTag().toString());
-//
-//                    ScanViewFragment scanListFragment = ScanViewFragment.newInstance(_documentId, scanId);
-//                    FragmentManager fragmentManager = getFragmentManager();
-//                    fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
-//                }
-//            });
         }
     }
     
@@ -123,8 +120,8 @@ public class ScanListFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            DataAccess dataAccess = DataAccess.getInstance(_context);
-            _scanList = dataAccess.getScansByDocumentId(_documentId);
+            _document = _dataAccess.getDocumentById(_documentId);
+            _scanList = _dataAccess.getScansByDocumentId(_documentId);
             return null;
         }
 

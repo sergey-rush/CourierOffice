@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import ru.courier.office.R;
 import ru.courier.office.data.DataAccess;
 import ru.courier.office.views.AppListFragment;
-import ru.courier.office.views.HomeFragment;
 import ru.courier.office.views.QrcodeFragment;
 import ru.courier.office.views.TakePhotoFragment;
 
