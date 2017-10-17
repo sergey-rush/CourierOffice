@@ -1,12 +1,21 @@
 package ru.courier.office.views;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,15 +34,16 @@ import java.util.List;
 
 import ru.courier.office.ApplicationService;
 import ru.courier.office.R;
+import ru.courier.office.core.LocalSettings;
 import ru.courier.office.web.WebContext;
 
-public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, CompoundButton.OnCheckedChangeListener,
+public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback,
         NoteFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
         TakePhotoFragment.OnFragmentInteractionListener, QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener,
         LocationFragment.OnFragmentInteractionListener, HelpFragment.OnFragmentInteractionListener, AboutFragment.OnFragmentInteractionListener {
 
-    private Switch swtOnline;
-    private TextView tvSwitchOnline;
+
+    private WebContext _webContext;
     private Toolbar _toolbar;
 
     @Override
@@ -50,25 +60,10 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //View headerLayout = navigationView.getHeaderView(0);
-        //tvSwitchOnline = (TextView) headerLayout.findViewById(R.id.tvSwitchOnline);
-        //swtOnline = (Switch) headerLayout.findViewById(R.id.swtOnline);
-        //swtOnline.setOnCheckedChangeListener(this);
+        _webContext = WebContext.getInstance();
+        setDeviceInfo();
 
         showFragment(new QrcodeFragment());
-    }
-
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            tvSwitchOnline.setText("Онлайн");
-            startService(new Intent(this, ApplicationService.class));
-            Toast.makeText(this, "Приложение онлайн", Toast.LENGTH_SHORT).show();
-        } else {
-            tvSwitchOnline.setText("Оффлайн");
-            stopService(new Intent(this, ApplicationService.class));
-            Toast.makeText(this, "Приложение оффлайн", Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override
@@ -76,8 +71,15 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
         boolean handled = false;
 
-        android.app.FragmentManager fragmentManager = getFragmentManager();
-        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+
+//        android.app.FragmentManager fragmentManager = getFragmentManager();
+//        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+//        for (Fragment f : fragmentList) {
+//
+//            if (f instanceof Fragment) {
+//
+//            }
+//        }
 
         Fragment fragment = getVisibleFragment();
 
@@ -87,30 +89,22 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         }
 
         if (fragment instanceof ScanListFragment) {
-            WebContext webContext = WebContext.getInstance();
-            showFragment(AppViewFragment.newInstance(webContext.Application.Id, 1));
+            showFragment(AppViewFragment.newInstance(_webContext.Application.Id, 1));
             handled = true;
         }
 
         if (fragment instanceof ScanViewFragment) {
-            WebContext webContext = WebContext.getInstance();
-            showFragment(ScanListFragment.newInstance(webContext.SelectedDocumentId));
+            showFragment(ScanListFragment.newInstance(_webContext.SelectedDocumentId));
             handled = true;
         }
 
         if (fragment instanceof TakePhotoFragment) {
             _toolbar.setVisibility(View.VISIBLE);
-            WebContext webContext = WebContext.getInstance();
-            showFragment(AppViewFragment.newInstance(webContext.Application.Id, 0));
+            showFragment(AppViewFragment.newInstance(_webContext.Application.Id, 0));
             handled = true;
         }
 
-        for (Fragment f : fragmentList) {
 
-            if (f instanceof Fragment) {
-
-            }
-        }
 
         if (!handled) {
             super.onBackPressed();
@@ -214,6 +208,90 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             Toast.makeText(this, "Почтовый клиент не установлен.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private final int REQUEST_PERMISSION_PHONE_STATE = 1;
+
+    private boolean setDeviceInfo() {
+        if (LocalSettings.getDeviceID(this).equals("")) {
+            requestPhoneStatePermission();
+
+//            String deviceId;
+//            TelephonyManager mTelephony = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+//            if (mTelephony.getDeviceId() != null) {
+//                deviceId = mTelephony.getDeviceId();
+//            } else {
+//                deviceId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+//            }
+//            LocalSettings.saveDeviceID(this, deviceId);
+        } else {
+            _webContext.Imei = LocalSettings.getDeviceID(this);
+        }
+
+        return true;
+    }
+
+    private void requestPhoneStatePermission() {
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+
+            // shouldShowRequestPermissionRationale
+            // This method returns true if the app has requested this permission previously and the user denied the request.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE)) {
+
+                AlertDialog dialog = onPermissionRequest(Manifest.permission.READ_PHONE_STATE, REQUEST_PERMISSION_PHONE_STATE);
+                dialog.show();
+
+            } else {
+                requestPermission(Manifest.permission.READ_PHONE_STATE, REQUEST_PERMISSION_PHONE_STATE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_PHONE_STATE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Разрешение получено", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Разрешение отказано", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
+
+    private AlertDialog onPermissionRequest(final String permission, final int permissionRequestCode) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this, R.style.AlertDialogCustom)
+                .setTitle("Разрешение")
+                .setMessage("Прошу разрешения")
+                .setIcon(R.drawable.ic_error)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        requestPermission(permission, permissionRequestCode);
+                   }
+
+                }).create();
+        return alertDialog;
+    }
+
+    private void requestPermission(String permissionName, int permissionRequestCode) {
+        ActivityCompat.requestPermissions(this, new String[]{permissionName}, permissionRequestCode);
+    }
+
+//    private void showExplanation(String title, String message, final String permission, final int permissionRequestCode) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle(title)
+//                .setMessage(message)
+//                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        requestPermission(permission, permissionRequestCode);
+//                    }
+//                });
+//        builder.create().show();
+//    }
+
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {

@@ -550,6 +550,26 @@ public class DataProvider extends DataAccess {
     }
 
     @Override
+    public int countScansByApplicationId(int applicationId) {
+        int count = 0;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Scans WHERE ApplicationId = ?", new String[]{String.valueOf(applicationId)});
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                count = cursor.getInt(cursor.getColumnIndex("Total"));
+            }
+        } catch (SQLiteException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return count;
+    }
+
+    @Override
     public int countScansByDocumentId(int documentId) {
         int count = 0;
         Cursor cursor = null;

@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,8 +139,13 @@ public class AppViewFragment extends Fragment {
     }
 
     private void onSendApplication() {
-        _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Deliver);
-        _context.startService(new Intent(_context, ApplicationService.class));
+        int scanCount = _dataAccess.countScansByApplicationId(_applicationId);
+        if (scanCount > 0) {
+            _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Deliver);
+            _context.startService(new Intent(_context, ApplicationService.class));
+        } else {
+            Toast.makeText(_context, R.string.application_has_no_scanned_documents, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void onDeleteApplication() {

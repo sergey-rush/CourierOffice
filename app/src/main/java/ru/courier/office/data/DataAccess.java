@@ -89,6 +89,8 @@ public abstract class DataAccess extends SQLiteOpenHelper {
 
     public abstract int countScans();
 
+    public abstract int countScansByApplicationId(int applicationId);
+
     public abstract int countScansByDocumentId(int documentId);
 
     public abstract int insertScan(Scan scan);

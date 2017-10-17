@@ -41,6 +41,7 @@
     <string name="something_went_wrong">Что-то пошло не так...</string>
     <string name="connection_failed">Ошибка подключения</string>
     <string name="connection_not_available">Не удалось подключиться к серверу. Проверьте подключение к интернету.</string>
+    <string name="application_has_no_scanned_documents">Заявка не содержит ни одного скана документов</string>
 
     <!-- Strings related to fragments -->
     <string name="welcome">Это главная страница. Здесь предполагается отображать новости и другие служебные сообщения</string>

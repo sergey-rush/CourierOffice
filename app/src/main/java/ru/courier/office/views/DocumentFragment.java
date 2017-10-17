@@ -90,6 +90,8 @@ public class DocumentFragment extends Fragment {
     }
 
     private class DocumentAsyncTask extends AsyncTask<Void, Void, Void> {
+        private List<Document> _documents;
+
         private DocumentAsyncTask() {
         }
 
@@ -107,7 +109,7 @@ public class DocumentFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... arg0) {
             DataAccess dataAccess = DataAccess.getInstance(_context);
-            _webContext.Application.DocumentList = dataAccess.getDocumentsByApplicationId(_applicationId);
+            _documents = dataAccess.getDocumentsByApplicationId(_applicationId);
             return null;
         }
 
@@ -117,7 +119,8 @@ public class DocumentFragment extends Fragment {
             if (pDialog.isShowing())
                 pDialog.dismiss();
 
-            if (_webContext.Application.DocumentList != null) {
+            if (_documents.size() > 0) {
+                _webContext.Application.DocumentList = _documents;
                 loadDataCallback();
             }
         }
