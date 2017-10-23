@@ -103,34 +103,34 @@ public class ScanViewFragment extends Fragment {
             DataAccess dataAccess = DataAccess.getInstance(_context);
             _scanList = dataAccess.getScansByDocumentId(_documentId);
 
-            for (Scan scan : _scanList) {
-
-                int scanImageLength = scan.ImageLength;
-                byte[] imageBytes = new byte[scanImageLength];
-
-                // The bytes have already been read
-                int totalBytes = 0;
-                int bufferSize = 1048576;
-
-                if (scanImageLength < bufferSize) {
-                    bufferSize = scanImageLength;
-                }
-
-                while (totalBytes < scanImageLength) {
-
-                    if (totalBytes + bufferSize > scanImageLength) {
-                        bufferSize = scanImageLength - totalBytes;
-                    }
-
-                    byte[] buffer = new byte[bufferSize];
-                    buffer = dataAccess.getScanImage(scan.Id, totalBytes, bufferSize);
-
-                    System.arraycopy(buffer, 0, imageBytes, totalBytes, buffer.length);
-                    totalBytes = (totalBytes + bufferSize);
-                }
-
-                scan.LargePhoto = imageBytes;
-            }
+//            for (Scan scan : _scanList) {
+//
+//                int scanImageLength = scan.ImageLength;
+//                byte[] imageBytes = new byte[scanImageLength];
+//
+//                // The bytes have already been read
+//                int totalBytes = 0;
+//                int bufferSize = 1048576;
+//
+//                if (scanImageLength < bufferSize) {
+//                    bufferSize = scanImageLength;
+//                }
+//
+//                while (totalBytes < scanImageLength) {
+//
+//                    if (totalBytes + bufferSize > scanImageLength) {
+//                        bufferSize = scanImageLength - totalBytes;
+//                    }
+//
+//                    byte[] buffer = new byte[bufferSize];
+//                    buffer = dataAccess.getScanImage(scan.Id, totalBytes, bufferSize);
+//
+//                    System.arraycopy(buffer, 0, imageBytes, totalBytes, buffer.length);
+//                    totalBytes = (totalBytes + bufferSize);
+//                }
+//
+//                scan.LargePhoto = imageBytes;
+//            }
             return null;
         }
 

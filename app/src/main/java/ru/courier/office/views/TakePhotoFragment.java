@@ -1,7 +1,9 @@
 package ru.courier.office.views;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,10 +14,12 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,7 +33,13 @@ import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -81,6 +91,7 @@ public class TakePhotoFragment extends Fragment {
     private int _currentDocIndex = 0;
     private int _currentScanIndex = 0;
     private TextView _tvTitle;
+    private WebContext _webContext;
             
     public static TakePhotoFragment newInstance(int applicationId, int documentId, int scanId) {
         TakePhotoFragment fragment = new TakePhotoFragment();
@@ -109,9 +120,14 @@ public class TakePhotoFragment extends Fragment {
         _toolbar = (Toolbar) getActivity().findViewById(R.id.tlbMain);
         _toolbar.setVisibility(View.GONE);
 
-        WebContext webContext = WebContext.getInstance();
+        _webContext = WebContext.getInstance();
         _dataAccess = DataAccess.getInstance(getContext());
         _context = getContext();
+
+        if (ContextCompat.checkSelfPermission(_context, Manifest.permission.WRITE_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED) {
+            String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            requestPermissions(permissions, 1);
+        }
 
         ImageView ivPrev = (ImageView) _view.findViewById(R.id.ivPrev);
         ivPrev.setOnClickListener(new View.OnClickListener() {
@@ -141,25 +157,32 @@ public class TakePhotoFragment extends Fragment {
 
         if (_applicationId > 0) {
             _application = _dataAccess.getApplicationById(_applicationId);
-            webContext.Application = _application;
+            _webContext.Application = _application;
             _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
             _totalDocs = _application.DocumentList.size() - 1;
         }
 
         if (_documentId > 0) {
-            Document document = _dataAccess.getDocumentById(_documentId);
-            _applicationId = document.ApplicationId;
+            _currentDocument = _dataAccess.getDocumentById(_documentId);
+            _applicationId = _currentDocument.ApplicationId;
             _application = _dataAccess.getApplicationById(_applicationId);
-            webContext.Application = _application;
+            _webContext.Application = _application;
             _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
             _totalDocs = _application.DocumentList.size() - 1;
+
+            for (Document document : _application.DocumentList) {
+                if (document.Id == _currentDocument.Id) {
+                    break;
+                }
+                _currentDocIndex = _currentDocIndex + 1;
+            }
         }
 
         if (_scanId > 0) {
             _scan = _dataAccess.getScanById(_scanId);
             _applicationId = _scan.ApplicationId;
             _application = _dataAccess.getApplicationById(_applicationId);
-            webContext.Application = _application;
+            _webContext.Application = _application;
             _application.DocumentList = _dataAccess.getDocumentsByApplicationGuid(_application.ApplicationGuid);
             _totalDocs = _application.DocumentList.size() - 1;
 
@@ -212,14 +235,27 @@ public class TakePhotoFragment extends Fragment {
         return _view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mCameraView.start();
+        orientationManager.enable();
+    }
+
+    @Override
+    public void onPause() {
+        mCameraView.stop();
+        super.onPause();
+        orientationManager.disable();
+    }
+
     private void onBackTouched() {
         _toolbar.setVisibility(View.VISIBLE);
         WebContext webContext = WebContext.getInstance();
         showFragment(AppViewFragment.newInstance(webContext.Application.Id, 0));
     }
 
-    private void showFragment(Fragment fragment)
-    {
+    private void showFragment(Fragment fragment) {
         if (fragment != null) {
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
@@ -296,15 +332,7 @@ public class TakePhotoFragment extends Fragment {
         }
 
         pictureTaken = false;
-        //setTakePhotoButton(true);
     }
-
-
-//    private void setTakePhotoButton(boolean state) {
-//        rlTakePhoto.setClickable(state);
-//        rlTakePhoto.setFocusable(state);
-//        rlTakePhoto.setEnabled(state);
-//    }
 
     private void resetCamera() {
         disposeCamera();
@@ -403,8 +431,26 @@ public class TakePhotoFragment extends Fragment {
             scan.SmallPhoto = smallBytes;
             //byte[] totalBytes = drawDate(_imageBytes);
             //scan.LargePhoto = totalBytes;
-            scan.LargePhoto = drawDate(_imageBytes);
+
+            if (_currentDocument.Title.equals("Фото клиента")) {
+                scan.LargePhoto = drawDate(_imageBytes);
+            } else {
+                scan.LargePhoto = _imageBytes;
+            }
+
             scan.ImageLength = scan.LargePhoto.length;
+
+            // try to insert and then update image blob
+
+//            String filename = String.format("%s.%d.jpg", _currentDocument.ApplicationGuid, _currentScanIndex);
+//            String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath() + filename;
+//            saveImage(_imageBytes, path);
+//
+//            byte[] newImageBytes = readImage(path);
+//            int newImageBytesLength = newImageBytes.length;
+//            scan.LargePhoto = newImageBytes;
+//            scan.ImageLength = newImageBytesLength;
+
             if (_scanId > 0) {
                 _dataAccess.updateScanImage(scan);
 
@@ -416,7 +462,6 @@ public class TakePhotoFragment extends Fragment {
             }
             return scan.Id > 0;
         }
-
 
         private byte[] resizeBitmap(byte[] inputBytes) {
             int inputBytesLength = inputBytes.length;
@@ -483,6 +528,40 @@ public class TakePhotoFragment extends Fragment {
             byte[] outputBytes = stream.toByteArray();
 
             return outputBytes;
+        }
+
+        private byte[] readImage(String path) {
+
+            File file = new File(path);
+            int size = (int) file.length();
+            byte[] bytes = new byte[size];
+            try {
+                BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+                buf.read(bytes, 0, bytes.length);
+                buf.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bytes;
+        }
+
+        private void saveImage(byte[] imageBytes, String path) {
+
+            try {
+                Bitmap bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+                File f = new File(path);
+
+                FileOutputStream fo = new FileOutputStream(f);
+                fo.write(bytes.toByteArray());
+                fo.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

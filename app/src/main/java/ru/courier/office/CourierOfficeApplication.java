@@ -3,6 +3,7 @@ package ru.courier.office;
 import android.app.Application;
 import android.content.Context;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 
 import ru.courier.office.core.LocalSettings;

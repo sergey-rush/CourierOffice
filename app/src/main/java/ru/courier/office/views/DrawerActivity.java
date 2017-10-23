@@ -1,21 +1,17 @@
 package ru.courier.office.views;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,14 +21,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
 
-import ru.courier.office.ApplicationService;
 import ru.courier.office.R;
 import ru.courier.office.core.LocalSettings;
 import ru.courier.office.web.WebContext;
@@ -63,7 +55,20 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         _webContext = WebContext.getInstance();
         setDeviceInfo();
 
-        showFragment(new QrcodeFragment());
+        showFragment(new HelpFragment());
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+    }
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
     }
 
     @Override
@@ -187,8 +192,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         return true;
     }
 
-    private void showFragment(Fragment fragment)
-    {
+    private void showFragment(Fragment fragment) {
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();

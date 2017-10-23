@@ -2,11 +2,14 @@ package ru.courier.office.views;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,13 +82,45 @@ public class DocumentFragment extends Fragment {
 
                     TextView tvTitle = (TextView) view.findViewById(R.id.tvTitle);
                     int documentId = Integer.parseInt(tvTitle.getTag().toString());
-                    _webContext.SelectedDocumentId = documentId;
-                    ScanListFragment scanListFragment = ScanListFragment.newInstance(documentId);
-                    FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
+                    TextView tvCount = (TextView) view.findViewById(R.id.tvCount);
+                    int count = Integer.parseInt(tvCount.getText().toString());
 
+                    if (count > 0) {
+                        _webContext.SelectedDocumentId = documentId;
+                        ScanListFragment scanListFragment = ScanListFragment.newInstance(documentId);
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.container, scanListFragment).commit();
+                    } else {
+                        showNoScansDialog(documentId);
+                    }
                 }
             });
+        }
+    }
+
+    private void showNoScansDialog(final int documentId) {
+        AlertDialog dialog = new AlertDialog.Builder(_context, R.style.AlertDialogCustom)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.document_has_no_scans)
+                .setIcon(R.drawable.ic_question)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        TakePhotoFragment fragment = TakePhotoFragment.newInstance(_applicationId, documentId, 0);
+                        showFragment(fragment);
+                        dialog.dismiss();
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.dismiss();
+                    }
+                }).create();
+        dialog.show();
+    }
+
+    private void showFragment(Fragment fragment) {
+        if (fragment != null) {
+            FragmentManager fragmentManager = ((AppCompatActivity) _context).getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
         }
     }
 

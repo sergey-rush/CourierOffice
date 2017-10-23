@@ -84,7 +84,7 @@ public class ApplicationService extends Service {
 
     private void startUploading() {
         _running = true;
-        Toast.makeText(_context, "Uploading started", Toast.LENGTH_SHORT).show();
+        Toast.makeText(_context, "Загрузка началась...", Toast.LENGTH_SHORT).show();
         UploadManager uploadManager = new UploadManager();
         uploadManager.execute();
     }
@@ -191,7 +191,7 @@ public class ApplicationService extends Service {
             String photoId = scan.PhotoGuid;
             String appId = scan.ApplicationGuid;
             String fileName = document.Title;
-            String appType = "CourierAppV2";
+            String appType = "CourierAppV3";
             String docId = document.DocumentGuid;
             String pageNum = Integer.toString(scan.PageNum);
             String postData = String.format("{\"PhotoId\":\"%s\", \"ApplicationId\":\"%s\", \"FileName\":\"%s\", \"AppType\":\"%s\", \"DocumentId\":\"%s\", \"PageNum\":\"%s\", \"Imei\":\"%s\"}", photoId, appId, fileName, appType, docId, pageNum, _deviceId);
@@ -264,7 +264,7 @@ public class ApplicationService extends Service {
         protected void onPostExecute(Void output) {
             super.onPostExecute(output);
             _running = false;
-            Toast.makeText(_context, "Uploading completed: " + _responseCode, Toast.LENGTH_SHORT).show();
+            Toast.makeText(_context, "Загрузка завершена: " + _responseCode, Toast.LENGTH_SHORT).show();
             int count = _dataAccess.countApplicationsExceptApplicationStatus(ApplicationStatus.None);
             if (count == 0) {
                 stopTimer();
