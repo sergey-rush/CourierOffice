@@ -202,26 +202,23 @@ public class ApplicationService extends Service {
 
             int scanImageLength = scan.ImageLength;
             byte[] imageBytes = new byte[scanImageLength];
-
-            // The bytes have already been read
-            int totalBytes = 0;
+            int offset = 1;
             int bufferSize = 1 * 1024 * 1024;
 
             if (scanImageLength < bufferSize) {
                 bufferSize = scanImageLength;
             }
 
-            while (totalBytes < scanImageLength) {
+            while (offset < scanImageLength) {
 
-                if (totalBytes + bufferSize > scanImageLength) {
-                    bufferSize = scanImageLength - totalBytes;
+                if (offset + bufferSize > scanImageLength) {
+                    bufferSize = (scanImageLength - offset);
                 }
 
-                byte[] buffer = new byte[bufferSize];
-                buffer = _dataAccess.getScanImage(scan.Id, totalBytes, bufferSize);
-
-                System.arraycopy(buffer, 0, imageBytes, totalBytes, buffer.length);
-                totalBytes = (totalBytes + bufferSize);
+                byte[] buffer = _dataAccess.getScanImage(scan.Id, offset, bufferSize);
+                int bufferLength = buffer.length;
+                System.arraycopy(buffer, 0, imageBytes, offset -1, buffer.length);
+                offset = (offset + bufferLength);
             }
 
             UploadProvider uploadProvider = new UploadProvider();
@@ -234,29 +231,6 @@ public class ApplicationService extends Service {
             _responseCode = statusProvider.putStatus(postData);
             if (_responseCode == 201) {
                 _dataAccess.removeApplication(application.Id);
-            }
-        }
-
-        public void uploadScanByPartition(Scan scan) {
-
-            int imageLength = scan.ImageLength;
-            int sendBytes = 0;
-            int bufferLength = 1 * 1024 * 1024;
-
-            while (sendBytes < imageLength) {
-
-                if (bufferLength > imageLength - sendBytes) {
-                    bufferLength = imageLength - sendBytes;
-                }
-
-                byte[] imageBytes = _dataAccess.getScanImage(scan.Id, sendBytes, bufferLength);
-                int imageBytesLength = imageBytes.length;
-                UploadProvider uploadProvider = new UploadProvider();
-                _responseCode = uploadProvider.doUpload(scan, imageBytes);
-                if (_responseCode != 200) {
-                    return;
-                }
-                sendBytes = sendBytes + imageBytesLength;
             }
         }
 

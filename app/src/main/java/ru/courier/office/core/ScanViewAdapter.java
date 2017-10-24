@@ -113,7 +113,7 @@ public class ScanViewAdapter extends PagerAdapter {
             int scanImageLength = _scan.ImageLength;
             byte[] imageBytes = new byte[scanImageLength];
             int offset = 1;
-            int bufferSize = 1048576;
+            int bufferSize = 1 * 1024 * 1024;
 
             if (scanImageLength < bufferSize) {
                 bufferSize = scanImageLength;

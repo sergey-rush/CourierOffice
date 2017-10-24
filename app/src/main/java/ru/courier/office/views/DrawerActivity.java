@@ -31,7 +31,7 @@ import ru.courier.office.web.WebContext;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, ActivityCompat.OnRequestPermissionsResultCallback,
         NoteFragment.OnFragmentInteractionListener, DatabaseFragment.OnFragmentInteractionListener, AppListFragment.OnFragmentInteractionListener,
-        TakePhotoFragment.OnFragmentInteractionListener, QrcodeFragment.OnFragmentInteractionListener, UploadFragment.OnFragmentInteractionListener,
+        TakePhotoFragment.OnFragmentInteractionListener, QrcodeFragment.OnFragmentInteractionListener,
         LocationFragment.OnFragmentInteractionListener, HelpFragment.OnFragmentInteractionListener, AboutFragment.OnFragmentInteractionListener {
 
 

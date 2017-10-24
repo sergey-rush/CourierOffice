@@ -92,33 +92,6 @@ public class UploadFragment extends Fragment implements View.OnClickListener{
 
     public void onButtonUploadClick(View view) {
 
-        //Toast.makeText(getContext(), "onButtonUploadClick", Toast.LENGTH_SHORT).show();
-
-        DataAccess dataAccess = DataAccess.getInstance(getContext());
-        Scan scan = dataAccess.getScanById(23);
-
-        int imageLength = scan.ImageLength;
-        int sendBytes = 0;
-        int bundle = 1024 * 1024;
-        int counter = 1;
-
-        while(sendBytes < imageLength) {
-
-            int bufferLength = counter * bundle;
-            if (bufferLength > imageLength - sendBytes) {
-                bufferLength = imageLength - sendBytes;
-            }
-
-            byte[] imageBytes = dataAccess.getScanImage(scan.Id, sendBytes, bufferLength);
-            int imageBytesLength = imageBytes.length;
-            ImageManager imageManager = new ImageManager(getContext(), scan, imageBytes);
-            final AsyncTask<Void, Void, Void> execute = imageManager.execute();
-            sendBytes = sendBytes + bufferLength;
-            Log.d("UPD", String.format("Counter: %s SendBytes: %s BufferLength: %s", Integer.toString(counter), Integer.toString(sendBytes), Integer.toString(bufferLength)));
-            counter++;
-        }
-
-        Log.d("UPD", String.format("SendBytes: %s", Integer.toString(sendBytes)));
     }
 
     public void onButtonPressed(Uri uri) {
