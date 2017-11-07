@@ -28,7 +28,7 @@
 
     <!-- Strings related to menu -->
     <string name="nav_home">Главная</string>
-    <string name="nav_scan">Сканировать</string>
+    <string name="nav_scan">Сканировать QR-код</string>
     <string name="nav_apps">Заявки</string>
     <string name="nav_notes">Сообщения</string>
     <string name="nav_help">Справка</string>
@@ -44,7 +44,8 @@
     <string name="connection_failed">Ошибка подключения</string>
     <string name="connection_not_available">Не удалось подключиться к серверу. Проверьте подключение к интернету.</string>
     <string name="document_has_no_scans">Документ не содержит ни одного скана. Вы желаете сейчас сделать скан документа?</string>
-    <string name="application_has_no_scanned_documents">Заявка не содержит ни одного скана документов</string>
+    <string name="some_document_has_no_scan">Отправка невозможна. Один из документов заявки не содержит ни одного скана</string>
+    <string name="application_in_progress">Заявка обрабатывается</string>
 
     <!-- Strings related to fragments -->
     <string name="welcome">Это главная страница. Здесь предполагается отображать новости и другие служебные сообщения</string>

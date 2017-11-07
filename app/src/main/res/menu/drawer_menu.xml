@@ -11,42 +11,10 @@
             android:icon="@drawable/ic_list"
             android:title="@string/nav_apps" />
         <item
-            android:id="@+id/nav_notes"
-            android:icon="@drawable/ic_note"
-            android:title="@string/nav_notes" />
-        <item
             android:id="@+id/nav_help"
             android:icon="@drawable/ic_help"
             android:title="@string/nav_help" />
-        <item
-            android:id="@+id/nav_about"
-            android:icon="@drawable/ic_about"
-            android:title="@string/nav_about" />
-        <item
-            android:id="@+id/nav_mail"
-            android:icon="@drawable/ic_mail"
-            android:title="@string/nav_mail" />
-    </group>
 
-    <!--<item android:title="@string/nav_service">-->
-        <!--<menu>-->
-            <!--<item-->
-                <!--android:id="@+id/nav_location"-->
-                <!--android:icon="@drawable/ic_location"-->
-                <!--android:title="@string/nav_location" />-->
-            <!--<item-->
-                <!--android:id="@+id/nav_data"-->
-                <!--android:icon="@drawable/ic_info"-->
-                <!--android:title="@string/nav_data" />-->
-            <!--<item-->
-                <!--android:id="@+id/nav_updatescans"-->
-                <!--android:icon="@drawable/ic_star"-->
-                <!--android:title="Update scans" />-->
-            <!--<item-->
-                <!--android:id="@+id/nav_send"-->
-                <!--android:icon="@drawable/ic_menu_send"-->
-                <!--android:title="Upload image" />-->
-        <!--</menu>-->
-    <!--</item>-->
+    </group>
 
 </menu>

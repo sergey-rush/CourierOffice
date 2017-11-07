@@ -32,6 +32,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         TextView tvAmount;
         TextView tvCreated;
         ImageView ivStatus;
+        TextView tvAddress;
 
         public ApplicationViewHolder(View view) {
             super(view);
@@ -41,6 +42,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             tvAmount = (TextView) view.findViewById(R.id.tvAmount);
             ivStatus = (ImageView) view.findViewById(R.id.ivStatus);
             tvCreated = (TextView) view.findViewById(R.id.tvCreated);
+            tvAddress = (TextView) view.findViewById(R.id.tvAddress);
         }
     }
 
@@ -67,6 +69,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
         holder.tvPersonName.setText(application.PersonName);
         holder.tvPersonName.setTag(application.Id);
         holder.tvMerchantName.setText(application.MerchantName);
+        holder.tvAddress.setText(application.DeliveryAddress);
 
         Drawable statusIcon = parent.getResources().getDrawable(R.drawable.ic_application);
         holder.ivStatus.setImageDrawable(statusIcon);
@@ -84,8 +87,7 @@ public class ApplicationAdapter extends RecyclerView.Adapter<ApplicationAdapter.
             holder.ivStatus.setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
         }
 
-
-
+        holder.ivStatus.setTag(application.ApplicationStatus);
 
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         holder.tvCreated.setText(dateFormat.format(application.Created));

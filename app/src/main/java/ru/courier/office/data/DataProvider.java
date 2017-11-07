@@ -554,7 +554,8 @@ public class DataProvider extends DataAccess {
         int count = 0;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Scans WHERE ApplicationId = ?", new String[]{String.valueOf(applicationId)});
+            cursor = db.rawQuery("SELECT COUNT(Documents.Id) as Total FROM Documents LEFT OUTER JOIN Scans ON Scans.DocumentId = Documents.Id WHERE Scans.DocumentId IS NULL AND Documents.ApplicationId = ?", new String[]{String.valueOf(applicationId)});
+            //cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Scans WHERE ApplicationId = ?", new String[]{String.valueOf(applicationId)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 count = cursor.getInt(cursor.getColumnIndex("Total"));

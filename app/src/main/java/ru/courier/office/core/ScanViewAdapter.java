@@ -2,6 +2,7 @@ package ru.courier.office.core;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -34,9 +35,11 @@ import ru.courier.office.views.ScanListFragment;
 public class ScanViewAdapter extends PagerAdapter {
 
     private Context _context;
+    private byte[] _imageBytes;
     private List<Scan> _scanList;
     private LayoutInflater _inflater;
     private int _documentId;
+    private View _view;
 
     public ScanViewAdapter(Context context, int documentId, List<Scan> scanList) {
         _context = context;
@@ -58,9 +61,9 @@ public class ScanViewAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = _inflater.inflate(R.layout.scan_view_item, container, false);
+        _view = _inflater.inflate(R.layout.scan_view_item, container, false);
 
-        Button btnClose = (Button) view.findViewById(R.id.btnClose);
+        Button btnClose = (Button) _view.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,32 +74,61 @@ public class ScanViewAdapter extends PagerAdapter {
         });
 
         Scan scan = _scanList.get(position);
-        ScanAsyncTask scanAsyncTask = new ScanAsyncTask(view, scan);
+        ScanAsyncTask scanAsyncTask = new ScanAsyncTask(scan);
         scanAsyncTask.execute();
 
-        //byte[] imageBytes = scan.SmallPhoto;
+        container.addView(_view);
 
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//        options.inSampleSize = 1;
-//
-//        final Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length, options);
-//        TouchImageView imgDisplay = (TouchImageView) view.findViewById(R.id.imgDisplay);
-//        imgDisplay.setImageBitmap(bitmap);
-
-        container.addView(view);
-
-        return view;
+        return _view;
     }
+
+    private void loadDataCallback() {
+        if (_imageBytes != null) {
+
+            TouchImageView imgDisplay = (TouchImageView) _view.findViewById(R.id.imgDisplay);
+            int reqWidth = imgDisplay.viewWidth;
+            int reqHeight = imgDisplay.viewHeight;
+
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length, options);
+            options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+            //options.inSampleSize = 10;
+            options.inJustDecodeBounds = false;
+            final Bitmap bitmap = BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length, options);
+
+            imgDisplay.setImageBitmap(bitmap);
+        }
+    }
+
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height/2;
+            final int halfWidth = width/2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
 
     private class ScanAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private View _view;
         private Scan _scan;
-        private byte[] _imageBytes;
+        private ScanAsyncTask(Scan scan) {
 
-        private ScanAsyncTask(View view, Scan scan) {
-            _view = view;
             _scan = scan;
         }
 
@@ -139,17 +171,7 @@ public class ScanViewAdapter extends PagerAdapter {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-
-            if (_imageBytes != null) {
-
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                options.inSampleSize = 1;
-
-                final Bitmap bitmap = BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length, options);
-                TouchImageView imgDisplay = (TouchImageView) _view.findViewById(R.id.imgDisplay);
-                imgDisplay.setImageBitmap(bitmap);
-            }
+            loadDataCallback();
         }
     }
 
