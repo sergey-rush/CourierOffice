@@ -6,23 +6,19 @@
     <ru.courier.office.core.TouchImageView
         android:id="@+id/imgDisplay"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:scaleType="fitCenter" />
+        android:layout_height="fill_parent" />
 
     <Button
         android:id="@+id/btnClose"
-        android:layout_width="wrap_content"
+        android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="15dp"
         android:layout_marginTop="15dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:background="@drawable/button_transparent"
-        android:textColor="#ffffff"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="Закрыть" />
+        android:padding="@dimen/dimen4"
+        android:background="@color/grey2"
+        android:textColor="@color/colorAccent"
+        android:text="X" />
 
 </RelativeLayout>
