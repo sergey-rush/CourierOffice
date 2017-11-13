@@ -20,14 +20,12 @@ import ru.courier.office.data.DataAccess;
 
 public class ScanViewFragment extends Fragment {
 
-    private static final String ARG_DOCUMRNT_ID = "documentId";
+    private static final String ARG_DOCUMENT_ID = "documentId";
     private static final String ARG_SCAN_ID = "scanId";
 
     private int _documentId;
     private int _scanId;
     private Context _context;
-    private ScanViewAdapter adapter;
-    private ViewPager viewPager;
     private List<Scan> _scanList;
     private View _view;
 
@@ -36,7 +34,7 @@ public class ScanViewFragment extends Fragment {
     public static ScanViewFragment newInstance(int documentId, int scanId) {
         ScanViewFragment fragment = new ScanViewFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_DOCUMRNT_ID, documentId);
+        args.putInt(ARG_DOCUMENT_ID, documentId);
         args.putInt(ARG_SCAN_ID, scanId);
         fragment.setArguments(args);
         return fragment;
@@ -46,7 +44,7 @@ public class ScanViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            _documentId = getArguments().getInt(ARG_DOCUMRNT_ID);
+            _documentId = getArguments().getInt(ARG_DOCUMENT_ID);
             _scanId = getArguments().getInt(ARG_SCAN_ID);
         }
     }
@@ -63,15 +61,14 @@ public class ScanViewFragment extends Fragment {
 
     private void loadDataCallback() {
         if (_scanList.size() > 0) {
-            viewPager = (ViewPager) _view.findViewById(R.id.pager);
-            adapter = new ScanViewAdapter(_context, _documentId, _scanList);
+            ViewPager viewPager = (ViewPager) _view.findViewById(R.id.pager);
+            ScanViewAdapter adapter = new ScanViewAdapter(_context, _documentId, _scanList);
             viewPager.setAdapter(adapter);
             viewPager.setCurrentItem(getIndex());
         }
     }
 
-    private int getIndex()
-    {
+    private int getIndex() {
         int index = 0;
         for(Scan scan: _scanList){
             if(scan.Id == _scanId)
@@ -100,7 +97,6 @@ public class ScanViewFragment extends Fragment {
         protected Void doInBackground(Void... arg0) {
             DataAccess dataAccess = DataAccess.getInstance(_context);
             _scanList = dataAccess.getScansByDocumentId(_documentId);
-
             return null;
         }
 
