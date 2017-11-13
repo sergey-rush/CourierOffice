@@ -140,11 +140,12 @@ public class AppViewFragment extends Fragment {
 
     private void onSendApplication() {
         int scanCount = _dataAccess.countScansByApplicationId(_applicationId);
-        if (scanCount > 0) {
+        if (scanCount == 0) {
             _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Deliver);
             _context.startService(new Intent(_context, ApplicationService.class));
+            setFragment(new AppListFragment());
         } else {
-            Toast.makeText(_context, R.string.application_has_no_scanned_documents, Toast.LENGTH_SHORT).show();
+            Toast.makeText(_context, R.string.some_document_has_no_scan, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -163,13 +164,7 @@ public class AppViewFragment extends Fragment {
 
                         _dataAccess.updateApplicationByApplicationStatus(_applicationId, ApplicationStatus.Reject);
                         _context.startService(new Intent(_context, ApplicationService.class));
-
-                        FragmentManager fm = getFragmentManager();
-                        FragmentTransaction ft = fm.beginTransaction();
-                        AppListFragment appListFragment = new AppListFragment();
-                        ft.replace(R.id.container, appListFragment);
-                        ft.commit();
-
+                        setFragment(new AppListFragment());
                         dialog.dismiss();
                     }
 
@@ -181,12 +176,19 @@ public class AppViewFragment extends Fragment {
         return alertDialog;
     }
 
+    public void setFragment(Fragment fragment) {
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.container, fragment);
+        ft.commit();
+    }
+
     private void setupViewPager(ViewPager viewPager) {
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
         adapter.addFrag(ApplicationFragment.newInstance(_applicationId), "ЗАЯВКА");
         adapter.addFrag(DocumentFragment.newInstance(_applicationId), "ДОКУМЕНТЫ");
-        adapter.addFrag(StatusFragment.newInstance(_applicationId), "СТАТУСЫ");
+        //adapter.addFrag(StatusFragment.newInstance(_applicationId), "СТАТУСЫ");
         viewPager.setAdapter(adapter);
     }
 

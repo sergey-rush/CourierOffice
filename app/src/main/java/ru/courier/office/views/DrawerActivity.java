@@ -151,16 +151,6 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.btnCorner) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -173,15 +163,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new QrcodeFragment();
         } else if (id == R.id.nav_apps) {
             fragment = new AppListFragment();
-        } else if (id == R.id.nav_notes) {
-            fragment = new NoteFragment();
         } else if (id == R.id.nav_help) {
             fragment = new HelpFragment();
-        } else if (id == R.id.nav_about) {
-        fragment = new AboutFragment();
-        } else if (id == R.id.nav_mail) {
-            sendEmail();
-            return true;
         }
 
         showFragment(fragment);
