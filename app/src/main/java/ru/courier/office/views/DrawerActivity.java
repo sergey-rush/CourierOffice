@@ -185,7 +185,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     private void sendEmail(){
 
         Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-        emailIntent.setData(Uri.parse("mailto:" + "support@7seconds.ru"));
+        emailIntent.setData(Uri.parse("mailto:" + "support@mail.ru"));
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Курьер Офис сообщение");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Здравствуйте!");
 

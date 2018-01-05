@@ -29,10 +29,6 @@ public class ScanViewAdapter extends PagerAdapter {
     private List<Scan> _scanList;
     private int _documentId;
     private View _view;
-<<<<<<< HEAD
-=======
-
->>>>>>> dce8518d39a835588fe93419535c10d992fd5eca
 
     public ScanViewAdapter(Context context, int documentId, List<Scan> scanList) {
         _context = context;
@@ -53,13 +49,8 @@ public class ScanViewAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
 
-<<<<<<< HEAD
-        _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        _view = _inflater.inflate(R.layout.scan_view_item, container, false);
-=======
         LayoutInflater inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         _view = inflater.inflate(R.layout.scan_view_item, container, false);
->>>>>>> dce8518d39a835588fe93419535c10d992fd5eca
 
         Button btnClose = (Button) _view.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
@@ -72,33 +63,13 @@ public class ScanViewAdapter extends PagerAdapter {
         });
 
         Scan scan = _scanList.get(position);
-<<<<<<< HEAD
-        ScanAsyncTask scanAsyncTask = new ScanAsyncTask(scan);
-        scanAsyncTask.execute();
-
-        container.addView(_view);
-
-        return _view;
-    }
-
-    private void loadDataCallback() {
-        if (_imageBytes != null) {
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            options.inSampleSize = 10;
-
-            final Bitmap bitmap = BitmapFactory.decodeByteArray(_imageBytes, 0, _imageBytes.length, options);
-            TouchImageView imgDisplay = (TouchImageView) _view.findViewById(R.id.imgDisplay);
-            imgDisplay.setImageBitmap(bitmap);
-        }
-=======
 
         final TouchImageView imgDisplay = (TouchImageView) _view.findViewById(R.id.imgDisplay);
         ScanAsyncTask scanAsyncTask = new ScanAsyncTask(scan, imgDisplay);
         scanAsyncTask.execute();
 
         container.addView(_view);
+
         return _view;
     }
 
@@ -139,21 +110,16 @@ public class ScanViewAdapter extends PagerAdapter {
         }
 
         return inSampleSize;
->>>>>>> dce8518d39a835588fe93419535c10d992fd5eca
     }
 
 
     private class ScanAsyncTask extends AsyncTask<Void, Void, Void> {
 
         private Scan _scan;
-<<<<<<< HEAD
-        private ScanAsyncTask(Scan scan) {
-=======
+
         private TouchImageView _imgDisplay;
 
         private ScanAsyncTask(Scan scan, TouchImageView imgDisplay) {
->>>>>>> dce8518d39a835588fe93419535c10d992fd5eca
-
             _scan = scan;
             _imgDisplay = imgDisplay;
         }
@@ -196,11 +162,7 @@ public class ScanViewAdapter extends PagerAdapter {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-<<<<<<< HEAD
-            loadDataCallback();
-=======
             loadDataCallback(_scan, _imgDisplay);
->>>>>>> dce8518d39a835588fe93419535c10d992fd5eca
         }
     }
 
