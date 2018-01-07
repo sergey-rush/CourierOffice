@@ -13,7 +13,7 @@
         android:id="@+id/imageViewLogo"
         android:layout_width="256dp"
         android:layout_height="149dp"
-        app:srcCompat="@mipmap/ic_main"
+        app:srcCompat="@drawable/ic_main"
         android:layout_marginRight="8dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"

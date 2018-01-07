@@ -163,6 +163,8 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new QrcodeFragment();
         } else if (id == R.id.nav_apps) {
             fragment = new AppListFragment();
+        } else if (id == R.id.nav_notes) {
+            fragment = new NoteFragment();
         } else if (id == R.id.nav_help) {
             fragment = new HelpFragment();
         }
