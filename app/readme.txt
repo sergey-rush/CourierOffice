@@ -14,4 +14,8 @@ git branch BranchName
 git merge BranchName
 git rebase
 
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
+
 

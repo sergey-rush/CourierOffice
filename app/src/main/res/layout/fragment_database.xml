@@ -56,7 +56,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
-            android:padding="@dimen/button_padding" android:layout_margin="@dimen/dimen16"
+            android:padding="@dimen/dimen16" android:layout_margin="@dimen/dimen16"
             android:text="Create Database"
             android:textColor="@android:color/white" />
 
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
-            android:padding="@dimen/button_padding" android:layout_margin="@dimen/dimen16"
+            android:padding="@dimen/dimen16" android:layout_margin="@dimen/dimen16"
             android:text="Setup Database"
             android:textColor="@android:color/white" />
 
@@ -74,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
-            android:padding="@dimen/button_padding" android:layout_margin="@dimen/dimen16"
+            android:padding="@dimen/dimen16" android:layout_margin="@dimen/dimen16"
             android:text="Drop Database"
             android:textColor="@android:color/white" />
 

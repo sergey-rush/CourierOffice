@@ -188,7 +188,7 @@ public class AppViewFragment extends Fragment {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
         adapter.addFrag(ApplicationFragment.newInstance(_applicationId), "ЗАЯВКА");
         adapter.addFrag(DocumentFragment.newInstance(_applicationId), "ДОКУМЕНТЫ");
-        //adapter.addFrag(StatusFragment.newInstance(_applicationId), "СТАТУСЫ");
+        adapter.addFrag(StatusFragment.newInstance(_applicationId), "СТАТУСЫ");
         viewPager.setAdapter(adapter);
     }
 

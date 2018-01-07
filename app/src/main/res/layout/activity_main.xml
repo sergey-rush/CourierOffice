@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/button_bg"
         android:onClick="btnLoginClick"
-        android:paddingTop="@dimen/button_padding" android:paddingBottom="@dimen/button_padding"
+        android:paddingTop="@dimen/dimen16" android:paddingBottom="@dimen/dimen16"
         android:paddingLeft="@dimen/button_side_padding" android:paddingRight="@dimen/button_side_padding"
         android:text="@string/login"
         android:textColor="@android:color/white" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
             android:onClick="btnRegisterClick"
-            android:padding="@dimen/button_padding"
+            android:padding="@dimen/dimen16"
             android:text="@string/register"
             android:textColor="@android:color/white" />
 

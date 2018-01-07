@@ -12,10 +12,7 @@
     <dimen name="slide_title">30sp</dimen>
     <dimen name="slide_desc">16sp</dimen>
     <dimen name="desc_padding">40dp</dimen>
-    <dimen name="button_padding">16dp</dimen>
     <dimen name="button_side_padding">44dp</dimen>
-
-    <dimen name="title_text_size">18sp</dimen>
 
     <!-- Common dimensions -->
     <dimen name="dimen0">0dp</dimen>
@@ -27,6 +24,7 @@
     <dimen name="dimen12">12dp</dimen>
     <dimen name="dimen16">16dp</dimen>
     <dimen name="dimen20">20dp</dimen>
+    <dimen name="dimen24">24dp</dimen>
     <dimen name="dimen30">30dp</dimen>
     <dimen name="dimen32">32dp</dimen>
     <dimen name="dimen40">40dp</dimen>
@@ -35,4 +33,14 @@
     <dimen name="dimen100">100dp</dimen>
     <dimen name="dimen110">110dp</dimen>
     <dimen name="dimen160">160dp</dimen>
+
+    <!-- Common font sizes -->
+    <dimen name="font18">18sp</dimen>
+    <dimen name="font20">20sp</dimen>
+    <dimen name="font22">22sp</dimen>
+    <dimen name="font24">24sp</dimen>
+    <dimen name="font26">26sp</dimen>
+    <dimen name="font28">28sp</dimen>
+    <dimen name="font30">30sp</dimen>
+    <dimen name="font32">32sp</dimen>
 </resources>

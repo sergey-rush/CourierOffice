@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
             android:onClick="btnNextClick"
-            android:padding="@dimen/button_padding"
+            android:padding="@dimen/dimen16"
             android:text="@string/next"
             android:textColor="@android:color/white" />
 

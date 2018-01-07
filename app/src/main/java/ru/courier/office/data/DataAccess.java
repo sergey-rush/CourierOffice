@@ -11,8 +11,10 @@ import android.util.Log;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import ru.courier.office.core.Application;
 import ru.courier.office.core.ApplicationStatus;
@@ -144,6 +146,8 @@ public abstract class DataAccess extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Scans(Id INTEGER PRIMARY KEY AUTOINCREMENT, PhotoGuid TEXT, StreamGuid TEXT, ApplicationId INTEGER, ApplicationGuid TEXT, DocumentGuid TEXT, DocumentId INTEGER, PageNum INTEGER, ImageLength INTEGER, ScanStatus INTEGER, SmallPhoto BLOB, LargePhoto BLOB)");
         db.execSQL("CREATE TABLE Notes(Id INTEGER PRIMARY KEY, Info TEXT, Created TEXT)");
     }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

@@ -35,7 +35,7 @@ public class DataProvider extends DataAccess {
         Application application = null;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE Id = ?", new String[]{String.valueOf(String.valueOf(id))});
+            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE Id = ?", new String[]{String.valueOf(id)});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 application = new Application();
@@ -119,7 +119,7 @@ public class DataProvider extends DataAccess {
         List<Application> applications = new ArrayList<Application>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationStatus = ?", new String[]{String.valueOf(String.valueOf(applicationStatus.ordinal()))});
+            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications WHERE ApplicationStatus = ?", new String[]{String.valueOf(applicationStatus.ordinal())});
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 Application application = new Application();
@@ -163,7 +163,7 @@ public class DataProvider extends DataAccess {
         List<Application> applications = new ArrayList<Application>();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications ORDER BY Created DESC Limit ?", new String[]{String.valueOf(String.valueOf(limit))});
+            cursor = db.rawQuery("SELECT Id, ApplicationGuid, ApplicationStatus, MerchantGuid, MerchantName, Inn, Email, Site, ManagerName, ManagerPhone, PersonGuid, PersonName, BirthDate, Gender, Amount, DeliveryAddress, Created FROM Applications ORDER BY Created DESC Limit ?", new String[]{String.valueOf(limit)});
             cursor.moveToFirst();
             while (!cursor.isAfterLast()) {
                 Application application = new Application();
@@ -227,7 +227,7 @@ public class DataProvider extends DataAccess {
         int count = 0;
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Applications WHERE ApplicationStatus != ?", new String[]{String.valueOf(String.valueOf(applicationStatus.ordinal()))});
+            cursor = db.rawQuery("SELECT COUNT(*) AS Total FROM Applications WHERE ApplicationStatus != ?", new String[]{String.valueOf(applicationStatus.ordinal())});
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 count = cursor.getInt(cursor.getColumnIndex("Total"));
@@ -292,6 +292,13 @@ public class DataProvider extends DataAccess {
             status.ApplicationId = applicationId;
             insertStatus(status);
         }
+
+
+        Note note = new Note();
+        note.Id = applicationId;
+        note.Info = String.format("Заявка № %s загружена", application.ApplicationGuid);
+        note.Created = new Date();
+        insertNote(note);
         return applicationId;
     }
 

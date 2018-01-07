@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
             android:onClick="onSignClick"
-            android:padding="@dimen/button_padding"
+            android:padding="@dimen/dimen16"
             android:text="@string/sign_button"
             android:textColor="@android:color/white" />
 
@@ -82,8 +82,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/button_bg"
             android:onClick="btnPinlockClick"
-            android:paddingTop="@dimen/button_padding"
-            android:paddingBottom="@dimen/button_padding"
+            android:paddingTop="@dimen/dimen16"
+            android:paddingBottom="@dimen/dimen16"
             android:paddingLeft="@dimen/button_side_padding"
             android:paddingRight="@dimen/button_side_padding"
             android:text="Pinlock"
