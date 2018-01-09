@@ -37,6 +37,7 @@
     <string name="nav_service">Служебные</string>
     <string name="nav_data">База данных</string>
     <string name="nav_location">Местоположение</string>
+    <string name="nav_exit">Выход</string>
 
     <!-- Strings related to hardware and network-->
     <string name="camera_not_available">Камера недоступна</string>
@@ -62,12 +63,12 @@
     <!-- Intro -->
     <string name="login">Вход</string>
     <string name="register">Регистрация</string>
-    <string name="title_slide1">Кредит онлайн</string>
-    <string name="desc_slide1">Без визита в банк, нужен только паспорт</string>
-    <string name="title_slide2">Заявка на кредит</string>
-    <string name="desc_slide2">Укажите сумму кредита</string>
-    <string name="title_slide3">Одобрение банка</string>
-    <string name="desc_slide3">Банк примет решение в течение 10 минут</string>
+    <string name="title_slide1">Широкие услуги</string>
+    <string name="desc_slide1">Укажите время визита курьера</string>
+    <string name="title_slide2">Доступ онлайн</string>
+    <string name="desc_slide2">Ваши пожелания</string>
+    <string name="title_slide3">Получено одобрение</string>
+    <string name="desc_slide3">Мы принимаем решение в течение 10 минут</string>
 
     <!-- Strings related to app menu -->
     <string name="menu_scan">Сканировать</string>
@@ -75,7 +76,6 @@
     <string name="menu_delete">Удалить</string>
     <string name="call_operator">Позвонить оператору</string>
     <string name="reject_button_text">Отказ получателя</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="scan_menu_show">Посмотреть</string>
     <string name="scan_menu_reshoot">Переснять</string>
 

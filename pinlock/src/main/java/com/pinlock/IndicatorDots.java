@@ -159,7 +159,7 @@ public class IndicatorDots extends LinearLayout {
 
     public void resetPinLock() {
 
-        vibrator.vibrate(300);
+        vibrator.vibrate(140);
         final Handler animHandler = new Handler();
         Thread thread = new Thread(new Runnable() {
             @Override

@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     public void btnLoginClick(View v)
     {
         //Toast.makeText(this, "btnLoginClick", Toast.LENGTH_LONG).show();
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, PinlockActivity.class));
         //finish();
     }
 

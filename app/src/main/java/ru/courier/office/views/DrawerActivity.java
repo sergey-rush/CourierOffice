@@ -169,6 +169,9 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             fragment = new HelpFragment();
         } else if (id == R.id.nav_about) {
             fragment = new AboutFragment();
+        } else if (id == R.id.nav_exit) {
+            logOut();
+            return true;
         }
 
         showFragment(fragment);
@@ -177,6 +180,11 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         drawer.closeDrawer(GravityCompat.START);
 
         return true;
+    }
+
+    private void logOut(){
+        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+        startActivity(intent);
     }
 
     private void showFragment(Fragment fragment) {

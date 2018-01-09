@@ -7,15 +7,7 @@
     android:background="@color/appBackground"
     tools:context="ru.courier.office.views.RegisterActivity">
 
-    <ImageView
-        android:id="@+id/imageViewLogo"
-        android:layout_width="192dp"
-        android:layout_height="192dp"
-        android:src="@mipmap/ic_logo"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp" />
+
 
     <FrameLayout
         android:id="@+id/loginFrame"
